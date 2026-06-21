@@ -472,3 +472,11 @@ setView(location.hash.replace("#", "") && views[location.hash.replace("#", "")]
   ? location.hash.replace("#", "")
   : "dashboard");
 render();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {
+      // The app still works without offline caching.
+    });
+  });
+}
