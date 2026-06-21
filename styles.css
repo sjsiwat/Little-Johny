@@ -1165,39 +1165,98 @@ body::before {
 }
 
 /* ============================================================
-   AUTH BAR (sidebar)
+   SIDEBAR HEADER — brand + top-right controls
    ============================================================ */
-.auth-bar {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 2px dashed var(--line);
+.sidebar-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px dashed var(--line);
 }
 
-.auth-login-btn {
+/* brand no longer has its own border-bottom */
+.sidebar-header .brand {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-controls {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  width: 100%;
-  min-height: 2.3rem;
-  padding: 0 0.85rem;
-  border-radius: var(--radius-md);
-  border: 1.5px dashed var(--line);
+  gap: 0.3rem;
+  flex-shrink: 0;
+  padding-top: 0.15rem;
+}
+
+.theme-toggle-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--line);
   background: var(--surface-soft);
   color: var(--ink-muted);
-  font-family: var(--font-body);
-  font-size: 0.82rem;
-  font-weight: 500;
-  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast) var(--ease-snap);
+  font-size: 0.9rem;
+  display: grid;
+  place-items: center;
+  transition:
+    background var(--t-fast),
+    color var(--t-fast),
+    transform var(--t-fast) var(--ease-snap);
 }
 
-.auth-login-btn:hover {
+.theme-toggle-icon:hover {
   background: var(--surface);
   color: var(--ink);
-  transform: translateY(-2px);
+  transform: rotate(180deg);
 }
 
+.auth-dot-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--line);
+  background: var(--surface-soft);
+  display: grid;
+  place-items: center;
+  transition:
+    background var(--t-fast),
+    transform var(--t-fast) var(--ease-snap),
+    box-shadow var(--t-fast);
+}
+
+.auth-dot-btn:hover {
+  background: var(--surface);
+  transform: scale(1.12);
+  box-shadow: var(--shadow-sketch-sm);
+}
+
+.status-dot {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+  transition: background 0.35s, box-shadow 0.35s;
+}
+
+.status-dot--online {
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.22);
+}
+
+/* Auth user panel — bottom of sidebar, shown when signed in */
 .auth-user {
+  margin-top: auto;
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--line-soft);
+  background: color-mix(in srgb, var(--primary-soft) 55%, var(--surface-soft));
   display: grid;
   gap: 0.4rem;
 }
@@ -1205,13 +1264,12 @@ body::before {
 .auth-user-email {
   display: block;
   font-family: var(--font-body);
-  font-size: 0.75rem;
+  font-size: 0.73rem;
   color: var(--primary);
-  font-weight: 500;
+  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 0 0.1rem;
 }
 
 .auth-logout-btn {
@@ -1219,89 +1277,139 @@ body::before {
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 2.1rem;
-  padding: 0 0.75rem;
-  border-radius: var(--radius-md);
+  min-height: 1.9rem;
+  padding: 0 0.6rem;
+  border-radius: var(--radius-sm);
   border: 1.5px solid var(--line);
   background: var(--surface-soft);
   color: var(--ink-muted);
   font-family: var(--font-body);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 500;
-  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast) var(--ease-snap);
+  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
 }
 
 .auth-logout-btn:hover {
   background: var(--accent-soft);
   color: var(--accent);
   border-color: var(--accent);
-  transform: translateY(-1px);
 }
 
 /* ============================================================
-   AUTH MODAL
+   CAT PARADE CANVAS
+   ============================================================ */
+.cat-parade-wrap {
+  position: relative;
+  height: 9rem;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sketch);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+#catParadeCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================================
+   AUTH MODAL — two-screen design
    ============================================================ */
 .auth-modal {
   position: fixed;
   inset: 0;
   margin: auto;
   width: min(92vw, 22rem);
-  max-height: 90vh;
+  max-height: 92vh;
   border: 2px solid var(--line);
   border-radius: var(--radius-xl);
   background: var(--surface);
   box-shadow: var(--shadow-sketch);
   color: var(--ink);
   padding: 0;
-  overflow: hidden;
+  overflow: hidden auto;
 }
 
 .auth-modal::backdrop {
-  background: color-mix(in srgb, var(--ink) 40%, transparent);
-  backdrop-filter: blur(4px);
+  background: color-mix(in srgb, var(--ink) 42%, transparent);
+  backdrop-filter: blur(5px);
 }
 
 .auth-modal[open] {
-  animation: modal-in 0.22s var(--ease-snap) both;
+  animation: modal-in 0.24s var(--ease-snap) both;
 }
 
 @keyframes modal-in {
-  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  from { opacity: 0; transform: translateY(14px) scale(0.96); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.auth-modal-form {
+/* Each screen is a panel — [hidden] must win over display:grid */
+.auth-panel        { display: grid; gap: 0.9rem; padding: 1.75rem 1.75rem 1.5rem; position: relative; }
+.auth-panel[hidden] { display: none !important; }
+
+.auth-close-x {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--line);
+  background: var(--surface-soft);
+  color: var(--ink-muted);
+  font-size: 1.1rem;
   display: grid;
-  gap: 1rem;
-  padding: 1.75rem;
+  place-items: center;
+  line-height: 1;
+  transition: background var(--t-fast), color var(--t-fast);
 }
 
-.auth-modal-form h2 {
-  font-family: var(--font-hand);
+.auth-close-x:hover { background: var(--accent-soft); color: var(--accent); }
+
+.auth-panel-icon {
   font-size: 1.8rem;
+  line-height: 1;
+  color: var(--primary);
+}
+
+.auth-panel-icon--online { color: #22c55e; }
+
+.auth-panel-title {
+  font-family: var(--font-hand);
+  font-size: 1.85rem;
   font-weight: 700;
   line-height: 1.1;
+  margin-top: -0.2rem;
 }
 
 .auth-modal-hint {
   font-family: var(--font-body);
-  font-size: 0.78rem;
+  font-size: 0.79rem;
   color: var(--ink-muted);
-  line-height: 1.6;
-  margin-top: -0.25rem;
+  line-height: 1.65;
+  margin-top: -0.3rem;
+}
+
+.auth-form {
+  display: grid;
+  gap: 0.75rem;
 }
 
 .auth-label {
   display: grid;
-  gap: 0.35rem;
+  gap: 0.3rem;
   font-family: var(--font-body);
-  font-size: 0.82rem;
+  font-size: 0.81rem;
   font-weight: 500;
   color: var(--ink-muted);
 }
 
 .auth-label input {
-  min-height: 2.6rem;
+  min-height: 2.55rem;
   padding: 0 0.85rem;
   border: 2px solid var(--line);
   border-radius: var(--radius-md);
@@ -1320,15 +1428,11 @@ body::before {
 
 .auth-error {
   font-family: var(--font-body);
-  font-size: 0.8rem;
+  font-size: 0.79rem;
   color: var(--accent);
-  min-height: 1.2em;
+  min-height: 1.1em;
   line-height: 1.5;
-}
-
-.auth-modal-actions {
-  display: grid;
-  gap: 0.5rem;
+  margin-top: -0.2rem;
 }
 
 .auth-submit-btn {
@@ -1341,38 +1445,87 @@ body::before {
   font-weight: 600;
   font-size: 0.9rem;
   box-shadow: var(--shadow-sketch-sm);
-  transition: transform var(--t-fast) var(--ease-snap), box-shadow var(--t-fast);
+  transition:
+    transform var(--t-fast) var(--ease-snap),
+    box-shadow var(--t-fast);
 }
 
 .auth-submit-btn:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-sketch); }
-.auth-submit-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+.auth-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
 
-.auth-switch-btn {
-  min-height: 2.3rem;
+.auth-submit-btn--danger {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.auth-guest-btn {
+  min-height: 2.4rem;
+  padding: 0 0.9rem;
   border-radius: var(--radius-md);
-  border: 1.5px solid var(--line);
-  background: var(--surface-soft);
+  border: 1.5px dashed var(--line);
+  background: transparent;
   color: var(--ink-muted);
   font-family: var(--font-body);
   font-size: 0.82rem;
   font-weight: 500;
-  transition: background var(--t-fast), color var(--t-fast);
+  text-align: center;
+  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
 }
 
-.auth-switch-btn:hover { background: var(--surface); color: var(--ink); }
+.auth-guest-btn:hover {
+  background: var(--surface-soft);
+  color: var(--ink);
+  border-color: var(--line-soft);
+}
 
-.auth-close-btn {
-  min-height: 2.1rem;
-  border-radius: var(--radius-md);
-  border: none;
-  background: transparent;
-  color: var(--ink-faint);
+.auth-switch-text {
   font-family: var(--font-body);
-  font-size: 0.78rem;
+  font-size: 0.79rem;
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+.auth-link-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-family: var(--font-body);
+  font-size: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
   transition: color var(--t-fast);
 }
 
-.auth-close-btn:hover { color: var(--ink-muted); }
+.auth-link-btn:hover { color: var(--primary-light); }
+
+/* Success panel */
+.auth-success-panel {
+  text-align: center;
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.auth-success-icon {
+  font-size: 3rem;
+  line-height: 1;
+  color: var(--primary);
+  animation: success-pop 0.4s var(--ease-snap) both;
+}
+
+@keyframes success-pop {
+  from { transform: scale(0.4) rotate(-20deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg);    opacity: 1; }
+}
+
+/* Signed-in panel */
+.auth-signedin-panel {
+  text-align: center;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
 
 /* ============================================================
    REDUCED MOTION

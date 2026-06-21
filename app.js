@@ -611,17 +611,12 @@ render();
 
 /* ── Auth UI ── */
 function updateAuthBar(user) {
-  const loginBtn = document.getElementById("authLoginBtn");
-  const userEl   = document.getElementById("authUser");
-  const emailEl  = document.getElementById("authUserEmail");
-  if (user) {
-    loginBtn.hidden = true;
-    userEl.hidden   = false;
-    if (emailEl) emailEl.textContent = user.email;
-  } else {
-    loginBtn.hidden = false;
-    userEl.hidden   = true;
-  }
+  const dot    = document.getElementById("statusDot");
+  const userEl = document.getElementById("authUser");
+  const emailEl = document.getElementById("authUserEmail");
+  if (dot)    dot.classList.toggle("status-dot--online", !!user);
+  if (userEl) userEl.hidden = !user;
+  if (emailEl && user) emailEl.textContent = user.email;
 }
 
 async function onSignedIn(user) {
@@ -640,74 +635,134 @@ async function initAuth() {
   updateAuthBar(user);
   if (user) onSignedIn(user);
 
-  Auth.onChange((event, user) => {
-    updateAuthBar(user);
-    if (event === "SIGNED_IN") onSignedIn(user);
+  Auth.onChange((event, u) => {
+    updateAuthBar(u);
+    if (event === "SIGNED_IN")  onSignedIn(u);
     if (event === "SIGNED_OUT") showToast("ออกจากระบบแล้ว — ข้อมูล local ยังอยู่");
   });
 
-  /* Auth modal */
-  const modal      = document.getElementById("authModal");
-  const form       = document.getElementById("authForm");
-  const loginBtn   = document.getElementById("authLoginBtn");
-  const closeBtn   = document.getElementById("authModalClose");
-  const signupBtn  = document.getElementById("authSwitchSignup");
-  const logoutBtn  = document.getElementById("authLogoutBtn");
-  const modeLabel  = document.getElementById("authModeLabel");
-  const errEl      = document.getElementById("authError");
-  let isSignup = false;
+  /* ── Modal elements ── */
+  const modal          = document.getElementById("authModal");
+  const loginPanel     = document.getElementById("authLoginPanel");
+  const signupPanel    = document.getElementById("authSignupPanel");
+  const successPanel   = document.getElementById("authSuccessPanel");
+  const signedInPanel  = document.getElementById("authSignedInPanel");
+  const loginForm      = document.getElementById("authLoginForm");
+  const signupForm     = document.getElementById("authSignupForm");
+  const loginErr       = document.getElementById("authError");
+  const signupErr      = document.getElementById("authSignupError");
 
-  loginBtn.addEventListener("click", () => {
-    isSignup = false;
-    modeLabel.textContent = "เข้าสู่ระบบ";
-    if (signupBtn) signupBtn.textContent = "ยังไม่มีบัญชี? สมัครใช้งาน";
-    errEl.textContent = "";
+  const panels = [loginPanel, signupPanel, successPanel, signedInPanel];
+  function showPanel(name) {
+    const map = { login: loginPanel, signup: signupPanel, success: successPanel, signedIn: signedInPanel };
+    panels.forEach(p => { if (p) p.hidden = true; });
+    if (map[name]) map[name].hidden = false;
+  }
+
+  /* dot button → open correct panel */
+  document.getElementById("authLoginBtn").addEventListener("click", () => {
+    if (Auth.isLoggedIn()) {
+      const el = document.getElementById("authSignedInEmail");
+      if (el) el.textContent = Auth.getUser().email;
+      showPanel("signedIn");
+    } else {
+      if (loginErr)  loginErr.textContent  = "";
+      if (loginForm) loginForm.reset();
+      showPanel("login");
+    }
     modal.showModal();
   });
 
-  closeBtn.addEventListener("click", () => modal.close());
+  /* close on backdrop click */
   modal.addEventListener("click", e => { if (e.target === modal) modal.close(); });
 
-  if (signupBtn) {
-    signupBtn.addEventListener("click", () => {
-      isSignup = !isSignup;
-      modeLabel.textContent = isSignup ? "สมัครใช้งาน" : "เข้าสู่ระบบ";
-      signupBtn.textContent = isSignup ? "มีบัญชีแล้ว? เข้าสู่ระบบ" : "ยังไม่มีบัญชี? สมัครใช้งาน";
-      errEl.textContent = "";
-    });
-  }
+  /* all [data-auth-close] elements */
+  modal.addEventListener("click", e => {
+    if (e.target.closest("[data-auth-close]")) modal.close();
+  });
 
-  form.addEventListener("submit", async e => {
+  /* explicit close X on login panel */
+  document.getElementById("authModalClose")?.addEventListener("click", () => modal.close());
+
+  /* guest mode button */
+  document.getElementById("authGuestBtn")?.addEventListener("click", () => modal.close());
+
+  /* switch to signup */
+  document.getElementById("authSwitchSignup")?.addEventListener("click", () => {
+    if (signupErr) signupErr.textContent = "";
+    if (signupForm) signupForm.reset();
+    showPanel("signup");
+  });
+
+  /* switch back to login */
+  document.getElementById("authSwitchLogin")?.addEventListener("click", () => {
+    if (loginErr) loginErr.textContent = "";
+    if (loginForm) loginForm.reset();
+    showPanel("login");
+  });
+
+  /* back from success to login */
+  document.getElementById("authSuccessBackBtn")?.addEventListener("click", () => {
+    if (loginErr) loginErr.textContent = "";
+    if (loginForm) loginForm.reset();
+    showPanel("login");
+  });
+
+  /* login form submit */
+  loginForm?.addEventListener("submit", async e => {
     e.preventDefault();
     const email    = document.getElementById("authEmail").value.trim();
     const password = document.getElementById("authPassword").value;
-    const submitBtn = form.querySelector("button[type='submit']");
-    submitBtn.disabled = true;
-    errEl.textContent = "";
+    const btn      = loginForm.querySelector("button[type='submit']");
+    btn.disabled   = true;
+    loginErr.textContent = "";
     try {
-      if (isSignup) {
-        await Auth.signUp(email, password);
-        errEl.style.color = "var(--primary)";
-        errEl.textContent = "สมัครแล้ว! กรุณาตรวจสอบอีเมลเพื่อยืนยัน";
-      } else {
-        await Auth.signIn(email, password);
-        modal.close();
-      }
+      await Auth.signIn(email, password);
+      modal.close();
     } catch (err) {
-      errEl.style.color = "";
-      errEl.textContent = err.message || "เกิดข้อผิดพลาด";
+      loginErr.textContent = err.message || "เกิดข้อผิดพลาด";
     } finally {
-      submitBtn.disabled = false;
+      btn.disabled = false;
     }
   });
 
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", async () => {
-      await Auth.signOut();
-      state = Storage.loadLocal(defaultState);
-      render();
-    });
-  }
+  /* signup form submit */
+  signupForm?.addEventListener("submit", async e => {
+    e.preventDefault();
+    const email    = document.getElementById("authSignupEmail").value.trim();
+    const password = document.getElementById("authSignupPassword").value;
+    const confirm  = document.getElementById("authSignupConfirm").value;
+    const btn      = signupForm.querySelector("button[type='submit']");
+    signupErr.textContent = "";
+    if (password !== confirm) {
+      signupErr.textContent = "Password ไม่ตรงกัน";
+      return;
+    }
+    btn.disabled = true;
+    try {
+      await Auth.signUp(email, password);
+      showPanel("success");
+    } catch (err) {
+      signupErr.textContent = err.message || "เกิดข้อผิดพลาด";
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  /* logout from signed-in panel */
+  document.getElementById("authLogoutModalBtn")?.addEventListener("click", async () => {
+    await Auth.signOut();
+    state = Storage.loadLocal(defaultState);
+    render();
+    modal.close();
+  });
+
+  /* logout from sidebar user panel */
+  document.getElementById("authLogoutBtn")?.addEventListener("click", async () => {
+    await Auth.signOut();
+    state = Storage.loadLocal(defaultState);
+    render();
+  });
 }
 
 initAuth();
