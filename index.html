@@ -14,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css?v=2" />
@@ -24,6 +24,7 @@
   <body>
     <!-- Animated background canvas -->
     <canvas id="bg-canvas" aria-hidden="true"></canvas>
+    <div class="paper-grain" aria-hidden="true"></div>
 
     <div class="app-shell">
       <!-- ── Sidebar ── -->
@@ -57,220 +58,9 @@
           </div>
         </div>
 
-        <!-- Cat mascot SVG animation -->
+        <!-- Cat mascot — painterly manga cat (canvas) -->
         <div class="cat-mascot" aria-hidden="true">
-          <svg
-            class="cat-svg"
-            viewBox="0 0 80 80"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <ellipse
-              class="cat-body"
-              cx="40"
-              cy="52"
-              rx="18"
-              ry="16"
-              fill="#1a1814"
-              stroke="#1a1814"
-              stroke-width="1.5"
-            />
-            <circle
-              class="cat-head"
-              cx="40"
-              cy="32"
-              r="14"
-              fill="#1a1814"
-              stroke="#1a1814"
-              stroke-width="1.5"
-            />
-            <polygon
-              class="cat-ear-l"
-              points="28,22 24,10 34,18"
-              fill="#1a1814"
-              stroke="#1a1814"
-              stroke-width="1.5"
-              stroke-linejoin="round"
-            />
-            <polygon
-              class="cat-ear-r"
-              points="52,22 56,10 46,18"
-              fill="#1a1814"
-              stroke="#1a1814"
-              stroke-width="1.5"
-              stroke-linejoin="round"
-            />
-            <polygon points="29,20 26,13 33,18" fill="#e8a0a0" opacity="0.7" />
-            <polygon points="51,20 54,13 47,18" fill="#e8a0a0" opacity="0.7" />
-            <ellipse
-              class="cat-eye-l"
-              cx="35"
-              cy="30"
-              rx="2.5"
-              ry="3"
-              fill="#fdfaf4"
-            />
-            <ellipse
-              class="cat-eye-r"
-              cx="45"
-              cy="30"
-              rx="2.5"
-              ry="3"
-              fill="#fdfaf4"
-            />
-            <ellipse
-              class="cat-pupil-l"
-              cx="35"
-              cy="31"
-              rx="1.2"
-              ry="2"
-              fill="#1a1814"
-            />
-            <ellipse
-              class="cat-pupil-r"
-              cx="45"
-              cy="31"
-              rx="1.2"
-              ry="2"
-              fill="#1a1814"
-            />
-            <circle cx="36" cy="29.5" r="0.6" fill="white" />
-            <circle cx="46" cy="29.5" r="0.6" fill="white" />
-            <polygon points="40,35 38.5,37 41.5,37" fill="#e8a0a0" />
-            <path
-              d="M38.5,37 Q40,39 41.5,37"
-              stroke="#555"
-              stroke-width="0.8"
-              fill="none"
-            />
-            <line
-              class="whisker"
-              x1="26"
-              y1="35"
-              x2="36"
-              y2="36"
-              stroke="#888"
-              stroke-width="0.8"
-            />
-            <line
-              class="whisker"
-              x1="25"
-              y1="37.5"
-              x2="36"
-              y2="37.5"
-              stroke="#888"
-              stroke-width="0.8"
-            />
-            <line
-              class="whisker"
-              x1="26"
-              y1="40"
-              x2="36"
-              y2="39"
-              stroke="#888"
-              stroke-width="0.8"
-            />
-            <line
-              class="whisker"
-              x1="54"
-              y1="35"
-              x2="44"
-              y2="36"
-              stroke="#888"
-              stroke-width="0.8"
-            />
-            <line
-              class="whisker"
-              x1="55"
-              y1="37.5"
-              x2="44"
-              y2="37.5"
-              stroke="#888"
-              stroke-width="0.8"
-            />
-            <line
-              class="whisker"
-              x1="54"
-              y1="40"
-              x2="44"
-              y2="39"
-              stroke="#888"
-              stroke-width="0.8"
-            />
-            <path
-              class="cat-tail"
-              d="M58,60 Q72,52 68,42 Q64,34 58,40"
-              stroke="#1a1814"
-              stroke-width="3"
-              fill="none"
-              stroke-linecap="round"
-            />
-            <ellipse cx="32" cy="67" rx="6" ry="4" fill="#1a1814" />
-            <ellipse cx="48" cy="67" rx="6" ry="4" fill="#1a1814" />
-            <line
-              x1="30"
-              y1="69"
-              x2="30"
-              y2="71"
-              stroke="#555"
-              stroke-width="0.8"
-            />
-            <line
-              x1="32"
-              y1="70"
-              x2="32"
-              y2="72"
-              stroke="#555"
-              stroke-width="0.8"
-            />
-            <line
-              x1="34"
-              y1="69"
-              x2="34"
-              y2="71"
-              stroke="#555"
-              stroke-width="0.8"
-            />
-            <line
-              x1="46"
-              y1="69"
-              x2="46"
-              y2="71"
-              stroke="#555"
-              stroke-width="0.8"
-            />
-            <line
-              x1="48"
-              y1="70"
-              x2="48"
-              y2="72"
-              stroke="#555"
-              stroke-width="0.8"
-            />
-            <line
-              x1="50"
-              y1="69"
-              x2="50"
-              y2="71"
-              stroke="#555"
-              stroke-width="0.8"
-            />
-            <ellipse
-              cx="31"
-              cy="36"
-              rx="4"
-              ry="2.5"
-              fill="#f4a0a0"
-              opacity="0.35"
-            />
-            <ellipse
-              cx="49"
-              cy="36"
-              rx="4"
-              ry="2.5"
-              fill="#f4a0a0"
-              opacity="0.35"
-            />
-          </svg>
+          <canvas id="catMascotCanvas" width="276" height="248"></canvas>
         </div>
 
         <nav class="nav-list">
@@ -284,6 +74,22 @@
             >Secretary</a
           >
         </nav>
+
+        <!-- Decorative plant note -->
+        <div class="sidebar-plant" aria-hidden="true">
+          <svg class="plant-svg" viewBox="0 0 60 70" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="30" cy="62" rx="14" ry="6" fill="#5a8a3a" opacity="0.3"/>
+            <rect x="28" y="30" width="4" height="32" rx="2" fill="#6b7c3a"/>
+            <path d="M30,48 Q18,38 14,26 Q22,28 30,40" fill="#7ab648" opacity="0.85"/>
+            <path d="M30,42 Q42,32 46,20 Q38,23 30,36" fill="#95c95a" opacity="0.8"/>
+            <path d="M30,54 Q20,46 16,36 Q24,37 30,48" fill="#7ab648" opacity="0.7"/>
+          </svg>
+          <div class="plant-note">
+            <span>Focus on</span>
+            <em>what matters</em>
+            <span>today</span>
+          </div>
+        </div>
 
         <!-- Auth user panel — visible when signed in -->
         <div class="auth-user" id="authUser" hidden>
@@ -316,6 +122,10 @@
                 Johny Memo คือพื้นที่ทำงานส่วนตัวที่เริ่มได้ทันที เก็บข้อมูลใน
                 browser ก่อน แล้วค่อยต่อ LINE, AI และ cloud sync ภายหลัง
               </p>
+              <div class="hero-today">
+                <span class="section-label">Today focus</span>
+                <span id="heroFocusTitle">Plan your next move</span>
+              </div>
               <div class="hero-actions">
                 <button
                   class="primary-action"
@@ -334,32 +144,42 @@
               </div>
             </div>
             
-            <div class="hero-preview" aria-hidden="true">
-              <div class="preview-card primary-preview">
-                <span>Today focus</span>
-                <strong id="heroFocusTitle">Plan your next move</strong>
+            <div class="hero-visual" aria-hidden="true">
+              <div class="line-chat">
+                <div class="line-topbar">
+                  <span class="line-back">‹</span>
+                  <span class="line-ava">
+                    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><polygon points="8,9 6,2 14,7" fill="#2f2823"/><polygon points="24,9 26,2 18,7" fill="#2f2823"/><circle cx="16" cy="17" r="11" fill="#2f2823"/><circle cx="12" cy="16" r="2.1" fill="#d8aa50"/><circle cx="20" cy="16" r="2.1" fill="#d8aa50"/><circle cx="12.3" cy="16.2" r="0.9" fill="#1c1714"/><circle cx="20.3" cy="16.2" r="0.9" fill="#1c1714"/><path d="M14.5 20.5 q1.5 1.4 3 0" stroke="#d99a92" stroke-width="1" fill="none" stroke-linecap="round"/></svg>
+                  </span>
+                  <div class="line-title"><strong>johnymemo</strong><span>online</span></div>
+                  <span class="line-menu">⋮</span>
+                </div>
+                <div class="line-body" id="lineChatBody"></div>
+                <div class="line-inputbar">
+                  <span class="line-plus">＋</span>
+                  <span class="line-inputfield">Aa</span>
+                  <span class="line-send">➤</span>
+                </div>
               </div>
             </div>
           </section>
 
-          <!-- Cat parade — replaces 3 quick-start cards -->
-          <div class="cat-parade-wrap" aria-hidden="true">
-            <canvas id="catParadeCanvas"></canvas>
-          </div>
-
           <div class="stats-grid">
             <article class="stat-card">
+              <div class="stat-icon stat-icon--tasks">☰</div>
               <span>งานทั้งหมด</span><strong id="statTotalTasks">0</strong>
             </article>
             <article class="stat-card">
+              <div class="stat-icon stat-icon--open">⧗</div>
               <span>งานค้าง</span><strong id="statOpenTasks">0</strong>
             </article>
             <article class="stat-card">
+              <div class="stat-icon stat-icon--done">✓</div>
               <span>เสร็จแล้ว</span><strong id="statDoneTasks">0</strong>
             </article>
             <article class="stat-card">
-              <span>รายจ่ายเดือนนี้</span
-              ><strong id="statMonthExpense">฿0</strong>
+              <div class="stat-icon stat-icon--expense">฿</div>
+              <span>รายจ่ายเดือนนี้</span><strong id="statMonthExpense">฿0</strong>
             </article>
           </div>
 
@@ -375,7 +195,7 @@
                   type="button"
                   data-view-jump="tasks"
                 >
-                  ดูงาน
+                  ดูงานทั้งหมด →
                 </button>
               </div>
               <div class="item-list" id="focusList"></div>
@@ -391,7 +211,7 @@
                   type="button"
                   data-view-jump="expenses"
                 >
-                  เพิ่มรายการ
+                  ดูทั้งหมด →
                 </button>
               </div>
               <div class="expense-bars" id="expenseBars"></div>
@@ -407,7 +227,7 @@
                   type="button"
                   data-view-jump="notes"
                 >
-                  เปิด Notes
+                  ดูทั้งหมด →
                 </button>
               </div>
               <div class="item-list compact" id="recentNotes"></div>
@@ -548,443 +368,173 @@
       </main>
     </div>
 
+    <!-- Free-roaming cat that walks across the bottom of the page -->
+    <canvas id="catRoamCanvas" class="cat-roam" aria-hidden="true"></canvas>
+
     <!-- ═══════════════════════════════════════
-         ANIMATED BACKGROUND — Multi-layer canvas
+         ANIMATED BACKGROUND — soft watercolour drift
     ═══════════════════════════════════════ -->
     <script>
       (function () {
         const canvas = document.getElementById("bg-canvas");
         const ctx = canvas.getContext("2d");
-        let W, H;
+        let W, H, rafId = null, t = 0;
 
-        /* ── Palette: vivid contrasting colors ── */
-        function getPalette() {
-          const dark = document.documentElement.dataset.theme === "dark";
-          return dark
+        function isDark() {
+          return document.documentElement.dataset.theme === "dark";
+        }
+        function palette() {
+          return isDark()
             ? {
-                blobs: [
-                  "rgba(116,198,157,0.18)", // teal
-                  "rgba(240,128,96,0.16)", // coral
-                  "rgba(123,168,238,0.16)", // blue
-                  "rgba(230,192,96,0.14)", // amber
-                  "rgba(200,120,220,0.14)", // violet
-                ],
-                rings: [
-                  "rgba(116,198,157,0.28)",
-                  "rgba(240,128,96,0.24)",
-                  "rgba(123,168,238,0.22)",
-                  "rgba(230,192,96,0.20)",
-                ],
-                dots: [
-                  "rgba(116,198,157,0.55)",
-                  "rgba(240,128,96,0.50)",
-                  "rgba(123,168,238,0.50)",
-                  "rgba(230,192,96,0.45)",
-                  "rgba(200,120,220,0.45)",
-                ],
-                lines: "rgba(116,198,157,0.14)",
-                stroke: "rgba(116,198,157,0.18)",
-                tri: [
-                  "rgba(116,198,157,0.20)",
-                  "rgba(240,128,96,0.18)",
-                  "rgba(200,120,220,0.16)",
-                ],
-                cross: "rgba(230,192,96,0.22)",
+                washes: ["#3a5560","#3d5347","#5a4a36","#5c4030","#5a3f3c"],
+                leaves: ["#6f8f6a","#88a07a","#a89464"],
+                petals: ["#caa089","#b08aa0","#d9c081"],
+                pollen: "rgba(236,227,211,",
               }
             : {
-                blobs: [
-                  "rgba(45,106,79,0.13)", // green
-                  "rgba(193,68,14,0.11)", // red-orange
-                  "rgba(38,85,160,0.11)", // blue
-                  "rgba(154,107,0,0.10)", // amber
-                  "rgba(140,50,170,0.09)", // purple
-                ],
-                rings: [
-                  "rgba(45,106,79,0.22)",
-                  "rgba(193,68,14,0.20)",
-                  "rgba(38,85,160,0.18)",
-                  "rgba(154,107,0,0.17)",
-                ],
-                dots: [
-                  "rgba(45,106,79,0.45)",
-                  "rgba(193,68,14,0.40)",
-                  "rgba(38,85,160,0.40)",
-                  "rgba(154,107,0,0.36)",
-                  "rgba(140,50,170,0.36)",
-                ],
-                lines: "rgba(45,106,79,0.10)",
-                stroke: "rgba(45,106,79,0.12)",
-                tri: [
-                  "rgba(45,106,79,0.16)",
-                  "rgba(193,68,14,0.14)",
-                  "rgba(140,50,170,0.12)",
-                ],
-                cross: "rgba(154,107,0,0.18)",
+                washes: ["#6f93a6","#94ab8a","#d9c3a3","#c47e5e","#d99a92"],
+                leaves: ["#94ab8a","#aac09a","#7f9a72"],
+                petals: ["#e7b9a4","#d99a92","#e6cf9a"],
+                pollen: "rgba(120,100,70,",
               };
         }
 
-        /* ── Helpers ── */
+        function rand(a, b) { return a + Math.random() * (b - a); }
+        function randInt(a, b) { return Math.floor(rand(a, b)); }
+
         function resize() {
           W = canvas.width = window.innerWidth;
           H = canvas.height = window.innerHeight;
         }
 
-        function wrap(obj, pad = 200) {
-          if (obj.x > W + pad) obj.x = -pad;
-          else if (obj.x < -pad) obj.x = W + pad;
-          if (obj.y > H + pad) obj.y = -pad;
-          else if (obj.y < -pad) obj.y = H + pad;
+        /* soft drifting colour washes */
+        let washes;
+        function initWashes() {
+          washes = Array.from({ length: 6 }, (_, i) => ({
+            x: rand(0, W), y: rand(0, H),
+            r: Math.min(W, H) * rand(0.22, 0.42),
+            dx: rand(-0.12, 0.12), dy: rand(-0.1, 0.1),
+            ph: rand(0, Math.PI * 2), ci: i % 5,
+          }));
         }
-
-        function rand(min, max) {
-          return min + Math.random() * (max - min);
-        }
-        function randInt(min, max) {
-          return Math.floor(rand(min, max));
-        }
-
-        /* ── Blobs ── */
-        let blobs;
-        function initBlobs() {
-          blobs = [
-            {
-              x: W * 0.1,
-              y: H * 0.15,
-              r: Math.min(W, H) * 0.3,
-              dx: 0.18,
-              dy: 0.12,
-              ci: 0,
-            },
-            {
-              x: W * 0.8,
-              y: H * 0.1,
-              r: Math.min(W, H) * 0.26,
-              dx: -0.14,
-              dy: 0.16,
-              ci: 1,
-            },
-            {
-              x: W * 0.55,
-              y: H * 0.7,
-              r: Math.min(W, H) * 0.22,
-              dx: 0.11,
-              dy: -0.13,
-              ci: 2,
-            },
-            {
-              x: W * 0.92,
-              y: H * 0.55,
-              r: Math.min(W, H) * 0.2,
-              dx: -0.16,
-              dy: -0.1,
-              ci: 3,
-            },
-            {
-              x: W * 0.15,
-              y: H * 0.82,
-              r: Math.min(W, H) * 0.18,
-              dx: 0.13,
-              dy: 0.17,
-              ci: 4,
-            },
-            {
-              x: W * 0.45,
-              y: H * 0.3,
-              r: Math.min(W, H) * 0.15,
-              dx: -0.12,
-              dy: -0.08,
-              ci: 1,
-            },
-          ];
-        }
-
-        function drawBlobs(p) {
+        function drawWashes(p) {
           ctx.save();
-          ctx.filter = "blur(55px)";
-          blobs.forEach((b) => {
+          ctx.filter = "blur(70px)";
+          ctx.globalCompositeOperation = isDark() ? "lighter" : "multiply";
+          washes.forEach((b) => {
+            const pulse = 1 + Math.sin(t * 0.4 + b.ph) * 0.08;
+            const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r * pulse);
+            const c = p.washes[b.ci];
+            g.addColorStop(0, c + (isDark() ? "55" : "44"));
+            g.addColorStop(1, c + "00");
+            ctx.fillStyle = g;
             ctx.beginPath();
-            ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-            ctx.fillStyle = p.blobs[b.ci];
+            ctx.arc(b.x, b.y, b.r * pulse, 0, Math.PI * 2);
             ctx.fill();
-            b.x += b.dx;
-            b.y += b.dy;
-            wrap(b, 300);
+            b.x += b.dx; b.y += b.dy;
+            if (b.x < -b.r) b.x = W + b.r; if (b.x > W + b.r) b.x = -b.r;
+            if (b.y < -b.r) b.y = H + b.r; if (b.y > H + b.r) b.y = -b.r;
           });
-          ctx.filter = "none";
           ctx.restore();
         }
 
-        /* ── Rings ── */
-        let rings;
-        function initRings() {
-          rings = Array.from({ length: 14 }, (_, i) => ({
-            x: rand(0, W),
-            y: rand(0, H),
-            r: rand(20, 110),
-            dx: rand(-0.35, 0.35),
-            dy: rand(-0.28, 0.28),
-            rot: rand(0, Math.PI * 2),
-            drot: rand(-0.005, 0.005),
-            lw: rand(1, 2.5),
-            dash: Math.random() > 0.45,
-            ci: randInt(0, 4),
-          }));
-        }
-
-        function drawRings(p) {
-          rings.forEach((r) => {
-            ctx.save();
-            ctx.translate(r.x, r.y);
-            ctx.rotate(r.rot);
-            ctx.beginPath();
-            ctx.arc(0, 0, r.r, 0, Math.PI * 2);
-            ctx.strokeStyle = p.rings[r.ci];
-            ctx.lineWidth = r.lw;
-            ctx.setLineDash(r.dash ? [8, 12] : []);
-            ctx.stroke();
-            ctx.setLineDash([]);
-            ctx.restore();
-            r.x += r.dx;
-            r.y += r.dy;
-            r.rot += r.drot;
-            wrap(r, 150);
-          });
-        }
-
-        /* ── Particles ── */
-        let pts;
-        function initParticles() {
-          pts = Array.from({ length: 70 }, (_, i) => ({
-            x: rand(0, W),
-            y: rand(0, H),
-            r: rand(2, 5),
-            dx: rand(-0.45, 0.45),
-            dy: rand(-0.4, 0.4),
-            pulse: rand(0, Math.PI * 2),
-            dp: rand(0.014, 0.025),
-            ci: randInt(0, 5),
-          }));
-        }
-
-        function drawParticles(p) {
-          pts.forEach((pt) => {
-            pt.pulse += pt.dp;
-            const s = 0.65 + Math.sin(pt.pulse) * 0.35;
-            ctx.beginPath();
-            ctx.arc(pt.x, pt.y, pt.r * s, 0, Math.PI * 2);
-            ctx.fillStyle = p.dots[pt.ci];
-            ctx.fill();
-            pt.x += pt.dx;
-            pt.y += pt.dy;
-            wrap(pt, 50);
-          });
-        }
-
-        /* ── Connection lines between nearby particles ── */
-        function drawConnections(p) {
-          const thresh = 140;
-          for (let i = 0; i < pts.length; i++) {
-            for (let j = i + 1; j < pts.length; j++) {
-              const dx = pts[i].x - pts[j].x,
-                dy = pts[i].y - pts[j].y;
-              const d = Math.sqrt(dx * dx + dy * dy);
-              if (d < thresh) {
-                ctx.beginPath();
-                ctx.moveTo(pts[i].x, pts[i].y);
-                ctx.lineTo(pts[j].x, pts[j].y);
-                const a = (1 - d / thresh) * 0.18;
-                ctx.strokeStyle = p.lines.replace(/[\d.]+\)$/, a + ")");
-                ctx.lineWidth = 0.6;
-                ctx.stroke();
-              }
-            }
-          }
-        }
-
-        /* ── Wavy sketch lines ── */
-        let sketches;
-        function initSketches() {
-          sketches = Array.from({ length: 7 }, () => {
-            const sx = rand(0, W),
-              sy = rand(0, H);
+        /* floating leaves + petals */
+        let flora;
+        function initFlora() {
+          flora = Array.from({ length: 16 }, () => {
+            const leaf = Math.random() > 0.45;
             return {
-              pts: Array.from({ length: 7 }, (_, j) => ({
-                x: sx + (j - 3) * 100 + rand(-40, 40),
-                y: sy + rand(-60, 60),
-              })),
-              dx: rand(-0.22, 0.22),
-              dy: rand(-0.18, 0.18),
-              t: rand(0, Math.PI * 2),
-              dt: rand(0.007, 0.013),
+              x: rand(0, W), y: rand(-H * 0.2, H),
+              size: rand(9, 20),
+              vy: rand(0.18, 0.5),
+              vx: rand(-0.25, 0.25),
+              rot: rand(0, Math.PI * 2),
+              vr: rand(-0.01, 0.01),
+              sway: rand(0, Math.PI * 2),
+              dsway: rand(0.008, 0.018),
+              leaf,
+              ci: leaf ? randInt(0, 3) : randInt(0, 3),
             };
           });
         }
-
-        function drawSketches(p) {
-          sketches.forEach((s) => {
-            s.t += s.dt;
+        function drawLeaf(f, p) {
+          ctx.save();
+          ctx.translate(f.x + Math.sin(f.sway) * 16, f.y);
+          ctx.rotate(f.rot + Math.sin(f.sway) * 0.3);
+          ctx.globalAlpha = isDark() ? 0.5 : 0.62;
+          if (f.leaf) {
+            ctx.fillStyle = p.leaves[f.ci];
             ctx.beginPath();
-            ctx.strokeStyle = p.stroke;
-            ctx.lineWidth = 1.2;
-            ctx.setLineDash([5, 10]);
-            const pp = s.pts;
-            ctx.moveTo(
-              pp[0].x + Math.sin(s.t) * 10,
-              pp[0].y + Math.cos(s.t * 0.7) * 6,
-            );
-            for (let i = 1; i < pp.length; i++) {
-              const cpx =
-                pp[i - 1].x +
-                (pp[i].x - pp[i - 1].x) * 0.5 +
-                Math.sin(s.t + i) * 18;
-              const cpy = pp[i - 1].y + Math.sin(s.t * 0.9 + i) * 22;
-              ctx.quadraticCurveTo(
-                cpx,
-                cpy,
-                pp[i].x + Math.sin(s.t + i * 0.5) * 12,
-                pp[i].y + Math.cos(s.t + i) * 10,
-              );
-            }
-            ctx.stroke();
-            ctx.setLineDash([]);
-            pp.forEach((pt) => {
-              pt.x += s.dx;
-              pt.y += s.dy;
-            });
-            const cx = pp.reduce((a, pt) => a + pt.x, 0) / pp.length;
-            const cy = pp.reduce((a, pt) => a + pt.y, 0) / pp.length;
-            if (cx > W + 400 || cx < -400)
-              pp.forEach((pt) => {
-                pt.x -= s.dx * W * 2;
-              });
-            if (cy > H + 400 || cy < -400)
-              pp.forEach((pt) => {
-                pt.y -= s.dy * H * 2;
-              });
-          });
-        }
-
-        /* ── Floating triangles ── */
-        let tris;
-        function initTris() {
-          tris = Array.from({ length: 8 }, () => ({
-            x: rand(0, W),
-            y: rand(0, H),
-            size: rand(12, 40),
-            dx: rand(-0.3, 0.3),
-            dy: rand(-0.25, 0.25),
-            rot: rand(0, Math.PI * 2),
-            drot: rand(-0.006, 0.006),
-            ci: randInt(0, 3),
-            filled: Math.random() > 0.5,
-          }));
-        }
-
-        function drawTris(p) {
-          tris.forEach((t) => {
-            ctx.save();
-            ctx.translate(t.x, t.y);
-            ctx.rotate(t.rot);
-            ctx.beginPath();
-            ctx.moveTo(0, -t.size);
-            ctx.lineTo(t.size * 0.866, t.size * 0.5);
-            ctx.lineTo(-t.size * 0.866, t.size * 0.5);
-            ctx.closePath();
-            if (t.filled) {
-              ctx.fillStyle = p.tri[t.ci];
+            ctx.moveTo(0, -f.size);
+            ctx.quadraticCurveTo(f.size * 0.7, 0, 0, f.size);
+            ctx.quadraticCurveTo(-f.size * 0.7, 0, 0, -f.size);
+            ctx.fill();
+            ctx.strokeStyle = isDark() ? "rgba(0,0,0,0.25)" : "rgba(90,110,80,0.4)";
+            ctx.lineWidth = 0.8;
+            ctx.beginPath(); ctx.moveTo(0, -f.size); ctx.lineTo(0, f.size); ctx.stroke();
+          } else {
+            ctx.fillStyle = p.petals[f.ci];
+            for (let i = 0; i < 5; i++) {
+              ctx.save();
+              ctx.rotate((Math.PI * 2 / 5) * i);
+              ctx.beginPath();
+              ctx.ellipse(0, -f.size * 0.55, f.size * 0.34, f.size * 0.6, 0, 0, Math.PI * 2);
               ctx.fill();
-            } else {
-              ctx.strokeStyle = p.tri[t.ci];
-              ctx.lineWidth = 1.5;
-              ctx.stroke();
+              ctx.restore();
             }
-            ctx.restore();
-            t.x += t.dx;
-            t.y += t.dy;
-            t.rot += t.drot;
-            wrap(t, 60);
+            ctx.fillStyle = isDark() ? "#d9b873" : "#e6c060";
+            ctx.beginPath(); ctx.arc(0, 0, f.size * 0.26, 0, Math.PI * 2); ctx.fill();
+          }
+          ctx.restore();
+        }
+        function updateFlora(p) {
+          flora.forEach((f) => {
+            f.y += f.vy; f.x += f.vx; f.rot += f.vr; f.sway += f.dsway;
+            if (f.y > H + 30) { f.y = -30; f.x = rand(0, W); }
+            if (f.x < -40) f.x = W + 40; if (f.x > W + 40) f.x = -40;
+            drawLeaf(f, p);
           });
         }
 
-        /* ── Floating crosses / plus signs ── */
-        let crosses;
-        function initCrosses() {
-          crosses = Array.from({ length: 10 }, () => ({
-            x: rand(0, W),
-            y: rand(0, H),
-            size: rand(6, 20),
-            dx: rand(-0.28, 0.28),
-            dy: rand(-0.22, 0.22),
-            rot: rand(0, Math.PI * 2),
-            drot: rand(-0.008, 0.008),
-            pulse: rand(0, Math.PI * 2),
-            dp: rand(0.01, 0.02),
+        /* tiny pollen dust */
+        let pollen;
+        function initPollen() {
+          pollen = Array.from({ length: 38 }, () => ({
+            x: rand(0, W), y: rand(0, H),
+            r: rand(0.8, 2.4),
+            dx: rand(-0.18, 0.18), dy: rand(-0.16, 0.16),
+            pulse: rand(0, Math.PI * 2), dp: rand(0.01, 0.02),
           }));
         }
-
-        function drawCrosses(p) {
-          crosses.forEach((c) => {
-            c.pulse += c.dp;
-            const s = c.size * (0.8 + Math.sin(c.pulse) * 0.2);
-            ctx.save();
-            ctx.translate(c.x, c.y);
-            ctx.rotate(c.rot);
-            ctx.strokeStyle = p.cross;
-            ctx.lineWidth = 1.5;
+        function drawPollen(p) {
+          pollen.forEach((d) => {
+            d.pulse += d.dp;
+            const a = (0.25 + Math.abs(Math.sin(d.pulse)) * 0.4) * (isDark() ? 0.5 : 1);
+            ctx.fillStyle = p.pollen + a + ")";
             ctx.beginPath();
-            ctx.moveTo(-s, 0);
-            ctx.lineTo(s, 0);
-            ctx.moveTo(0, -s);
-            ctx.lineTo(0, s);
-            ctx.stroke();
-            ctx.restore();
-            c.x += c.dx;
-            c.y += c.dy;
-            c.rot += c.drot;
-            wrap(c, 30);
+            ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+            ctx.fill();
+            d.x += d.dx; d.y += d.dy;
+            if (d.x < 0) d.x = W; if (d.x > W) d.x = 0;
+            if (d.y < 0) d.y = H; if (d.y > H) d.y = 0;
           });
         }
-
-        /* ── Main loop ── */
-        let rafId = null;
 
         function init() {
-          resize();
-          initBlobs();
-          initRings();
-          initParticles();
-          initSketches();
-          initTris();
-          initCrosses();
+          resize(); initWashes(); initFlora(); initPollen();
         }
-
         function draw() {
           ctx.clearRect(0, 0, W, H);
-          const p = getPalette();
-          drawBlobs(p);
-          drawSketches(p);
-          drawTris(p);
-          drawCrosses(p);
-          drawRings(p);
-          drawConnections(p);
-          drawParticles(p);
+          const p = palette();
+          drawWashes(p);
+          drawPollen(p);
+          updateFlora(p);
+          t += 0.016;
           rafId = requestAnimationFrame(draw);
         }
-
-        function pause() {
-          if (rafId) {
-            cancelAnimationFrame(rafId);
-            rafId = null;
-          }
-        }
-        function resume() {
-          if (!rafId) draw();
-        }
-
-        document.addEventListener("visibilitychange", () => {
-          document.hidden ? pause() : resume();
-        });
-
+        function pause() { if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
+        function resume() { if (!rafId) draw(); }
+        document.addEventListener("visibilitychange", () => document.hidden ? pause() : resume());
         window.addEventListener("resize", init);
         init();
         draw();
@@ -1135,55 +685,43 @@
     </dialog>
 
     <!-- ═══════════════════════════════════════
-         CAT PARADE — animated walking cats canvas
+         CATS — painterly manga cats (parade · mascot · roamer)
     ═══════════════════════════════════════ -->
     <script>
       (function () {
-        const canvas = document.getElementById("catParadeCanvas");
-        if (!canvas) return;
-        const ctx = canvas.getContext("2d");
-
-        const CAT_CONFIGS = [
-          { body: "#1a1814", inner: "#e8a0a0", thread: "#e85454" }, // black + red
-          { body: "#2d6a4f", inner: "#a8e8c0", thread: "#74c69d" }, // forest + teal
-          { body: "#c1440e", inner: "#ffd0b0", thread: "#f08060" }, // terracotta + coral
-          { body: "#2655a0", inner: "#b0c8f0", thread: "#7ba8ee" }, // navy + sky
-          { body: "#9a6b00", inner: "#f0e0a0", thread: "#e6c060" }, // amber + gold
-        ];
-
-        let cats = [],
-          W = 0,
-          H = 0,
-          t = 0,
-          rafId = null;
-
-        function resize() {
-          const rect = canvas.parentElement.getBoundingClientRect();
-          W = canvas.width = Math.round(rect.width);
-          H = canvas.height = Math.round(rect.height);
-          initCats();
+        /* ───────── shared painterly helpers ───────── */
+        function fillSoft(ctx, color, blur) {
+          ctx.save();
+          ctx.shadowColor = color;
+          ctx.shadowBlur = blur || 0;
+          ctx.fillStyle = color;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+          ctx.fill();
+          ctx.restore();
         }
-
-        function initCats() {
-          cats = CAT_CONFIGS.map((cfg, i) => ({
-            x: W + 100 + i * 160,
-            y: H * 0.62 + ((i % 3) - 1) * 9,
-            speed: 0.55 + i * 0.07,
-            scale: 0.85 + (i % 2) * 0.18,
-            phase: i * 1.3,
-            cfg,
-          }));
+        function setupDPR(canvas, cssW, cssH) {
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          canvas.width = Math.round(cssW * dpr);
+          canvas.height = Math.round(cssH * dpr);
+          const ctx = canvas.getContext("2d");
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          return ctx;
         }
+        function isDark() { return document.documentElement.dataset.theme === "dark"; }
 
-        /* ── Draw a single walking cat facing left ── */
-        function drawCat(cat) {
+        /* track pointer globally for the mascot */
+        const pointer = { x: innerWidth * 0.5, y: innerHeight * 0.4 };
+        window.addEventListener("mousemove", (e) => { pointer.x = e.clientX; pointer.y = e.clientY; });
+
+        /* ───────── side-view walking cat (parade + roamer) ───────── */
+        function drawWalkingCat(ctx, cat, t) {
           const { x, y, scale, cfg, phase } = cat;
           const lT = t + phase;
           const legSwing = Math.sin(lT * 5) * 7;
-          const bodyBob = Math.sin(lT * 10) * 1.3;
-          const tailWag = Math.sin(lT * 3) * 14;
-          const blinkVal = Math.sin(lT * 0.7);
-          const eyeScaleY = blinkVal > 0.92 ? 0.08 : 1;
+          const bob = Math.sin(lT * 10) * 1.4;
+          const tailWag = Math.sin(lT * 3) * 13;
+          const blink = Math.sin(lT * 0.7) > 0.93 ? 0.12 : 1;
 
           ctx.save();
           ctx.translate(x, y);
@@ -1191,267 +729,355 @@
 
           /* tail */
           ctx.strokeStyle = cfg.body;
-          ctx.lineWidth = 3;
-          ctx.lineCap = "round";
+          ctx.lineWidth = 3.4; ctx.lineCap = "round";
+          ctx.save(); ctx.shadowColor = cfg.body; ctx.shadowBlur = 3;
           ctx.beginPath();
-          ctx.moveTo(16, 2 + bodyBob);
-          ctx.bezierCurveTo(
-            27,
-            -7 + tailWag,
-            29,
-            -20 + tailWag * 0.5,
-            19,
-            -27 + tailWag * 0.3,
-          );
+          ctx.moveTo(16, 2 + bob);
+          ctx.bezierCurveTo(28, -7 + tailWag, 30, -21 + tailWag * 0.5, 19, -28 + tailWag * 0.3);
           ctx.stroke();
+          ctx.restore();
 
           /* back legs */
-          ctx.strokeStyle = cfg.body;
-          ctx.lineWidth = 4;
-          ctx.beginPath();
-          ctx.moveTo(8, 10 + bodyBob);
-          ctx.lineTo(13 + legSwing * 0.5, 24);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(2, 10 + bodyBob);
-          ctx.lineTo(4 - legSwing * 0.5, 24);
-          ctx.stroke();
+          ctx.strokeStyle = cfg.shade; ctx.lineWidth = 4.2;
+          ctx.beginPath(); ctx.moveTo(8, 10 + bob); ctx.lineTo(13 + legSwing * 0.5, 24); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(2, 10 + bob); ctx.lineTo(4 - legSwing * 0.5, 24); ctx.stroke();
 
           /* body */
-          ctx.fillStyle = cfg.body;
           ctx.beginPath();
-          ctx.ellipse(0, 0 + bodyBob, 20, 13, 0, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.ellipse(0, bob, 20, 13, 0, 0, Math.PI * 2);
+          fillSoft(ctx, cfg.body, 5);
+          /* belly highlight */
+          ctx.beginPath(); ctx.ellipse(-2, 3 + bob, 14, 8, 0, 0, Math.PI * 2);
+          ctx.fillStyle = cfg.hi; ctx.fill();
 
           /* head */
-          ctx.fillStyle = cfg.body;
-          ctx.beginPath();
-          ctx.arc(-18, -4 + bodyBob, 12, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.beginPath(); ctx.arc(-18, -4 + bob, 12, 0, Math.PI * 2);
+          fillSoft(ctx, cfg.body, 4);
 
           /* ears */
           ctx.fillStyle = cfg.body;
-          ctx.beginPath();
-          ctx.moveTo(-23, -13 + bodyBob);
-          ctx.lineTo(-30, -25 + bodyBob);
-          ctx.lineTo(-15, -14 + bodyBob);
-          ctx.closePath();
-          ctx.fill();
-          ctx.beginPath();
-          ctx.moveTo(-12, -12 + bodyBob);
-          ctx.lineTo(-10, -24 + bodyBob);
-          ctx.lineTo(-4, -14 + bodyBob);
-          ctx.closePath();
-          ctx.fill();
-
-          /* inner ears */
-          ctx.fillStyle = cfg.inner;
-          ctx.globalAlpha = 0.65;
-          ctx.beginPath();
-          ctx.moveTo(-23, -14 + bodyBob);
-          ctx.lineTo(-28, -22 + bodyBob);
-          ctx.lineTo(-16, -15 + bodyBob);
-          ctx.closePath();
-          ctx.fill();
-          ctx.beginPath();
-          ctx.moveTo(-12, -13 + bodyBob);
-          ctx.lineTo(-11, -21 + bodyBob);
-          ctx.lineTo(-6, -15 + bodyBob);
-          ctx.closePath();
-          ctx.fill();
+          ctx.beginPath(); ctx.moveTo(-23, -13 + bob); ctx.lineTo(-30, -25 + bob); ctx.lineTo(-15, -14 + bob); ctx.closePath(); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(-12, -12 + bob); ctx.lineTo(-10, -24 + bob); ctx.lineTo(-4, -14 + bob); ctx.closePath(); ctx.fill();
+          ctx.fillStyle = cfg.inner; ctx.globalAlpha = 0.7;
+          ctx.beginPath(); ctx.moveTo(-23, -14 + bob); ctx.lineTo(-28, -22 + bob); ctx.lineTo(-16, -15 + bob); ctx.closePath(); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(-12, -13 + bob); ctx.lineTo(-11, -21 + bob); ctx.lineTo(-6, -15 + bob); ctx.closePath(); ctx.fill();
           ctx.globalAlpha = 1;
 
-          /* eye white */
-          ctx.fillStyle = "#fdfaf4";
+          /* big manga eye */
           ctx.save();
-          ctx.translate(-22, -5 + bodyBob);
-          ctx.scale(1, eyeScaleY);
-          ctx.beginPath();
-          ctx.ellipse(0, 0, 2.5, 3, 0, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-
-          /* pupil */
-          ctx.fillStyle = "#1a1814";
-          ctx.save();
-          ctx.translate(-22, -4.5 + bodyBob);
-          ctx.scale(1, eyeScaleY);
-          ctx.beginPath();
-          ctx.ellipse(0, 0, 1.2, 2, 0, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-
-          /* eye shine */
-          if (eyeScaleY > 0.5) {
-            ctx.fillStyle = "white";
-            ctx.beginPath();
-            ctx.arc(-23, -6.5 + bodyBob, 0.65, 0, Math.PI * 2);
-            ctx.fill();
+          ctx.translate(-22, -4.5 + bob);
+          ctx.scale(1, blink);
+          ctx.beginPath(); ctx.ellipse(0, 0, 3.4, 4.2, 0, 0, Math.PI * 2);
+          ctx.fillStyle = cfg.iris; ctx.fill();
+          ctx.beginPath(); ctx.ellipse(0.3, 0.4, 1.5, 2.6, 0, 0, Math.PI * 2);
+          ctx.fillStyle = "#1c1814"; ctx.fill();
+          if (blink > 0.5) {
+            ctx.fillStyle = "rgba(255,255,255,0.95)";
+            ctx.beginPath(); ctx.arc(-1, -1.4, 1, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(1, 1.1, 0.5, 0, Math.PI * 2); ctx.fill();
           }
+          ctx.restore();
 
-          /* nose */
+          /* nose + blush */
           ctx.fillStyle = cfg.inner;
-          ctx.globalAlpha = 0.9;
-          ctx.beginPath();
-          ctx.moveTo(-26.5, -1.5 + bodyBob);
-          ctx.lineTo(-28, 0.5 + bodyBob);
-          ctx.lineTo(-25, 0.5 + bodyBob);
-          ctx.closePath();
-          ctx.fill();
+          ctx.beginPath(); ctx.moveTo(-27, -1 + bob); ctx.lineTo(-28.4, 0.8 + bob); ctx.lineTo(-25.6, 0.8 + bob); ctx.closePath(); ctx.fill();
+          ctx.fillStyle = cfg.blush; ctx.globalAlpha = 0.4;
+          ctx.beginPath(); ctx.ellipse(-25.5, 1.5 + bob, 3, 1.8, 0, 0, Math.PI * 2); ctx.fill();
           ctx.globalAlpha = 1;
-
-          /* mouth */
-          ctx.strokeStyle = "#888";
-          ctx.lineWidth = 0.7;
-          ctx.beginPath();
-          ctx.moveTo(-28, 1 + bodyBob);
-          ctx.quadraticCurveTo(-26.5, 3 + bodyBob, -25, 1 + bodyBob);
-          ctx.stroke();
 
           /* whiskers */
-          ctx.strokeStyle =
-            cfg.body === "#1a1814" ? "#aaa" : "rgba(255,255,255,0.55)";
-          ctx.lineWidth = 0.8;
-          ctx.beginPath();
-          ctx.moveTo(-28, -1 + bodyBob);
-          ctx.lineTo(-17, -1.5 + bodyBob);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(-28, 1 + bodyBob);
-          ctx.lineTo(-17, 1 + bodyBob);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(-28, 3 + bodyBob);
-          ctx.lineTo(-17, 2.5 + bodyBob);
-          ctx.stroke();
-
-          /* blush */
-          ctx.fillStyle = "#f4a0a0";
-          ctx.globalAlpha = 0.28;
-          ctx.beginPath();
-          ctx.ellipse(-26, 0 + bodyBob, 3.5, 2, 0, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.globalAlpha = 1;
+          ctx.strokeStyle = cfg.whisker; ctx.lineWidth = 0.7;
+          for (const o of [-1.5, 0.8, 3]) { ctx.beginPath(); ctx.moveTo(-28, o + bob); ctx.lineTo(-17, o * 0.8 + bob); ctx.stroke(); }
 
           /* front legs */
-          ctx.strokeStyle = cfg.body;
-          ctx.lineWidth = 4;
-          ctx.beginPath();
-          ctx.moveTo(-8, 10 + bodyBob);
-          ctx.lineTo(-5 - legSwing, 24);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(-14, 10 + bodyBob);
-          ctx.lineTo(-17 + legSwing, 24);
-          ctx.stroke();
+          ctx.strokeStyle = cfg.body; ctx.lineWidth = 4.2;
+          ctx.beginPath(); ctx.moveTo(-8, 10 + bob); ctx.lineTo(-5 - legSwing, 24); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(-14, 10 + bob); ctx.lineTo(-17 + legSwing, 24); ctx.stroke();
 
-          /* ground shadow */
-          ctx.fillStyle = "rgba(0,0,0,0.06)";
-          ctx.beginPath();
-          ctx.ellipse(0, 26, 18, 4, 0, 0, Math.PI * 2);
-          ctx.fill();
-
+          /* shadow */
+          ctx.fillStyle = "rgba(60,50,40,0.08)";
+          ctx.beginPath(); ctx.ellipse(0, 26, 18, 3.5, 0, 0, Math.PI * 2); ctx.fill();
           ctx.restore();
         }
 
-        /* ── Draw colored thread trailing behind each cat ── */
-        function drawThread(cat) {
+        function drawThread(ctx, cat, t) {
           const { x, y, scale, cfg, phase } = cat;
           const lT = t + phase;
-          const bodyBob = Math.sin(lT * 10) * 1.3;
-          const sx = x + 20 * scale;
-          const sy = y + bodyBob * scale;
-
+          const bob = Math.sin(lT * 10) * 1.4;
+          const sx = x + 20 * scale, sy = y + bob * scale;
           ctx.save();
-          ctx.strokeStyle = cfg.thread;
-          ctx.lineWidth = 1.8;
-          ctx.globalAlpha = 0.78;
-          ctx.lineCap = "round";
-          ctx.lineJoin = "round";
-
-          ctx.beginPath();
-          ctx.moveTo(sx, sy);
-          ctx.bezierCurveTo(
-            sx + 35,
-            sy + Math.sin(lT * 2.2) * 9,
-            sx + 70,
-            sy + Math.sin(lT * 2.2 + 1.6) * 9,
-            sx + 105,
-            sy + Math.sin(lT * 2.2 + 3.0) * 7,
-          );
+          ctx.strokeStyle = cfg.thread; ctx.lineWidth = 1.8; ctx.globalAlpha = 0.78;
+          ctx.lineCap = "round"; ctx.lineJoin = "round";
+          ctx.beginPath(); ctx.moveTo(sx, sy);
+          ctx.bezierCurveTo(sx + 35, sy + Math.sin(lT * 2.2) * 9, sx + 70, sy + Math.sin(lT * 2.2 + 1.6) * 9, sx + 105, sy + Math.sin(lT * 2.2 + 3) * 7);
           ctx.stroke();
-
-          /* small yarn ball at end */
-          const bx = sx + 105,
-            by = sy + Math.sin(lT * 2.2 + 3.0) * 7;
-          ctx.fillStyle = cfg.thread;
-          ctx.globalAlpha = 0.7;
-          ctx.beginPath();
-          ctx.arc(bx, by, 4, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.globalAlpha = 1;
+          const bx = sx + 105, by = sy + Math.sin(lT * 2.2 + 3) * 7;
+          ctx.fillStyle = cfg.thread; ctx.globalAlpha = 0.7;
+          ctx.beginPath(); ctx.arc(bx, by, 4, 0, Math.PI * 2); ctx.fill();
           ctx.restore();
         }
 
-        function isDark() {
-          return document.documentElement.dataset.theme === "dark";
+        function catConfigs() {
+          const base = [
+            { body: "#2f2823", shade: "#221c18", hi: "rgba(190,180,170,0.16)", inner: "#d99a92", iris: "#d2a44e", blush: "#e0867e", whisker: "#cfc6ba", thread: "#c47e5e" },
+            { body: "#6f93a6", shade: "#5a7d90", hi: "rgba(255,255,255,0.22)", inner: "#dde8ed", iris: "#3f6b53", blush: "#d99a92", whisker: "rgba(255,255,255,0.7)", thread: "#9cbac9" },
+            { body: "#c47e5e", shade: "#a9684a", hi: "rgba(255,255,255,0.2)", inner: "#f2d4c2", iris: "#5a6f3f", blush: "#b85c45", whisker: "rgba(255,255,255,0.65)", thread: "#e6c060" },
+            { body: "#94ab8a", shade: "#7c9472", hi: "rgba(255,255,255,0.2)", inner: "#e0ecd6", iris: "#a8743a", blush: "#cf9f86", whisker: "rgba(255,255,255,0.65)", thread: "#d99a92" },
+            { body: "#d9c3a3", shade: "#bfa886", hi: "rgba(255,255,255,0.24)", inner: "#f3ead7", iris: "#7a5a36", blush: "#d99a92", whisker: "rgba(120,100,70,0.5)", thread: "#6f93a6" },
+          ];
+          return base;
         }
 
-        /* ── Main loop ── */
-        function frame() {
-          t += 0.016;
-          ctx.clearRect(0, 0, W, H);
-
-          /* subtle ground line */
-          const groundY = Math.round(H * 0.8);
-          ctx.strokeStyle = isDark()
-            ? "rgba(255,255,255,0.06)"
-            : "rgba(0,0,0,0.06)";
-          ctx.lineWidth = 1;
-          ctx.setLineDash([6, 8]);
-          ctx.beginPath();
-          ctx.moveTo(0, groundY);
-          ctx.lineTo(W, groundY);
-          ctx.stroke();
-          ctx.setLineDash([]);
-
-          /* threads behind cats */
-          cats.forEach(drawThread);
-
-          /* cats (back-to-front by y) */
-          [...cats]
-            .sort((a, b) => a.y - b.y)
-            .forEach((cat) => {
-              drawCat(cat);
-              cat.x -= cat.speed;
-              if (cat.x < -140) {
-                cat.x = W + 80 + Math.random() * 120;
+        /* ───────── ROAMER (walks across page bottom) ───────── */
+        (function roam() {
+          const canvas = document.getElementById("catRoamCanvas");
+          if (!canvas) return;
+          let ctx, W = 0, H = 0, t = 0, raf = null, cat = null, firstSpawn = true;
+          const CFG = catConfigs();
+          function spawn() {
+            const dir = firstSpawn ? 1 : (Math.random() > 0.5 ? -1 : 1);
+            const cfg = CFG[Math.floor(Math.random() * CFG.length)];
+            const startX = firstSpawn ? W * 0.4 : (dir === 1 ? -60 : W + 60);
+            firstSpawn = false;
+            cat = { dir, cfg, scale: 1.15, speed: 0.7 + Math.random() * 0.5, phase: Math.random() * 6, y: H - 30, x: startX, wait: 0 };
+          }
+          function resize() {
+            const r = canvas.getBoundingClientRect();
+            W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
+            ctx = setupDPR(canvas, W, H);
+            if (!cat) spawn();
+          }
+          function frame() {
+            t += 0.016; ctx.clearRect(0, 0, W, H);
+            if (cat) {
+              if (cat.wait > 0) { cat.wait -= 0.016; }
+              else {
+                ctx.save();
+                ctx.translate(cat.x, cat.y);
+                if (cat.dir === 1) ctx.scale(-1, 1); /* flip to face travel dir */
+                drawWalkingCat(ctx, { x: 0, y: 0, scale: cat.scale, cfg: cat.cfg, phase: cat.phase }, t);
+                ctx.restore();
+                cat.x += cat.dir * cat.speed;
+                if ((cat.dir === 1 && cat.x > W + 80) || (cat.dir === -1 && cat.x < -80)) { cat = null; spawnTimer = setTimeout(spawn, 4000 + Math.random() * 6000); }
               }
-            });
+            }
+            raf = requestAnimationFrame(frame);
+          }
+          let spawnTimer = null;
+          function pause() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+          function resume() { if (!raf) frame(); }
+          document.addEventListener("visibilitychange", () => document.hidden ? pause() : resume());
+          window.addEventListener("resize", resize);
+          resize(); frame();
+        })();
 
-          rafId = requestAnimationFrame(frame);
+        /* ───────── MASCOT (sitting, follows pointer) ───────── */
+        (function mascot() {
+          const canvas = document.getElementById("catMascotCanvas");
+          if (!canvas) return;
+          const CW = 138, CH = 124;
+          const ctx = setupDPR(canvas, CW, CH);
+          let t = 0, raf = null, hop = 0, happy = 0;
+          canvas.style.cursor = "pointer";
+          canvas.addEventListener("pointerdown", () => { hop = 1; happy = 1; });
+
+          function cfg() {
+            return isDark()
+              ? { body: "#6b6760", shade: "#565249", hi: "rgba(255,255,255,0.14)", inner: "#e0a59c", iris: "#e2c071", blush: "#e0a59c", nose: "#e0a59c" }
+              : { body: "#332b25", shade: "#241e19", hi: "rgba(200,190,180,0.16)", inner: "#d99a92", iris: "#d8aa50", blush: "#e0867e", nose: "#d99a92" };
+          }
+
+          function frame() {
+            t += 0.016; ctx.clearRect(0, 0, CW, CH);
+            const c = cfg();
+            const breathe = 1 + Math.sin(t * 1.6) * 0.018;
+            hop *= 0.88; happy *= 0.97;
+            const lift = hop > 0.02 ? -Math.sin((1 - hop) * Math.PI) * 7 : 0;
+
+            /* pointer direction (screen) */
+            const rect = canvas.getBoundingClientRect();
+            const cxs = rect.left + rect.width / 2, cys = rect.top + rect.height * 0.42;
+            let dx = pointer.x - cxs, dy = pointer.y - cys;
+            const dlen = Math.hypot(dx, dy) || 1;
+            const nx = dx / dlen, ny = dy / dlen;
+            const headTilt = Math.max(-0.18, Math.min(0.18, dx / 600));
+            const blink = (Math.sin(t * 0.9) > 0.92 || happy > 0.4) ? 0.12 : 1;
+            const tailSway = Math.sin(t * 2.2) * 10 + happy * Math.sin(t * 14) * 8;
+            const earTw = Math.sin(t * 0.8) > 0.9 ? -0.12 : 0;
+
+            ctx.save();
+            ctx.translate(0, lift);
+
+            /* ground shadow */
+            ctx.beginPath(); ctx.ellipse(69, 118, 34, 6, 0, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(60,50,40,0.10)"; ctx.fill();
+
+            /* tail (behind body, right side curling forward) */
+            ctx.save();
+            ctx.strokeStyle = c.body; ctx.lineWidth = 8; ctx.lineCap = "round";
+            ctx.shadowColor = c.body; ctx.shadowBlur = 4;
+            ctx.beginPath();
+            ctx.moveTo(96, 104);
+            ctx.bezierCurveTo(116 + tailSway, 100, 118 + tailSway, 74, 100 + tailSway * 0.6, 70);
+            ctx.stroke();
+            ctx.restore();
+
+            /* body (sitting) */
+            ctx.save();
+            ctx.translate(69, 96); ctx.scale(1, breathe); ctx.translate(-69, -96);
+            ctx.beginPath(); ctx.ellipse(69, 96, 33, 26, 0, 0, Math.PI * 2);
+            fillSoft(ctx, c.body, 7);
+            ctx.beginPath(); ctx.ellipse(69, 80, 25, 24, 0, 0, Math.PI * 2);
+            fillSoft(ctx, c.body, 5);
+            /* chest highlight */
+            ctx.beginPath(); ctx.ellipse(69, 90, 15, 18, 0, 0, Math.PI * 2);
+            ctx.fillStyle = c.hi; ctx.fill();
+            ctx.restore();
+
+            /* front paws */
+            ctx.fillStyle = c.body;
+            ctx.beginPath(); ctx.ellipse(57, 114, 10, 7, 0, 0, Math.PI * 2); fillSoft(ctx, c.body, 3);
+            ctx.beginPath(); ctx.ellipse(81, 114, 10, 7, 0, 0, Math.PI * 2); fillSoft(ctx, c.body, 3);
+            ctx.strokeStyle = c.shade; ctx.lineWidth = 0.8;
+            for (const px of [53, 57, 61]) { ctx.beginPath(); ctx.moveTo(px, 110); ctx.lineTo(px, 116); ctx.stroke(); }
+            for (const px of [77, 81, 85]) { ctx.beginPath(); ctx.moveTo(px, 110); ctx.lineTo(px, 116); ctx.stroke(); }
+
+            /* HEAD group (tilts toward pointer) */
+            ctx.save();
+            ctx.translate(69, 50);
+            ctx.rotate(headTilt);
+
+            /* ears */
+            ctx.fillStyle = c.body;
+            ctx.save(); ctx.translate(-20, -18); ctx.rotate(earTw);
+            ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(-6, -20); ctx.lineTo(15, -2); ctx.closePath(); fillSoft(ctx, c.body, 3); ctx.restore();
+            ctx.save(); ctx.translate(20, -18); ctx.rotate(-earTw);
+            ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(6, -20); ctx.lineTo(-15, -2); ctx.closePath(); fillSoft(ctx, c.body, 3); ctx.restore();
+            /* inner ears */
+            ctx.fillStyle = c.inner; ctx.globalAlpha = 0.7;
+            ctx.beginPath(); ctx.moveTo(-19, -15); ctx.lineTo(-22, -28); ctx.lineTo(-9, -17); ctx.closePath(); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(19, -15); ctx.lineTo(22, -28); ctx.lineTo(9, -17); ctx.closePath(); ctx.fill();
+            ctx.globalAlpha = 1;
+
+            /* head */
+            ctx.beginPath(); ctx.arc(0, 0, 30, 0, Math.PI * 2); fillSoft(ctx, c.body, 6);
+            /* cheek/forehead highlight */
+            ctx.beginPath(); ctx.ellipse(-8, -6, 14, 12, 0, 0, Math.PI * 2);
+            ctx.fillStyle = c.hi; ctx.fill();
+
+            /* eyes (big manga, follow pointer) */
+            const lookX = nx * 2.4, lookY = ny * 1.8;
+            for (const ex of [-12, 12]) {
+              ctx.save();
+              ctx.translate(ex, 2);
+              ctx.scale(1, blink);
+              /* eye almond */
+              ctx.beginPath(); ctx.ellipse(0, 0, 8, 10, 0, 0, Math.PI * 2);
+              ctx.fillStyle = c.iris; ctx.fill();
+              /* outer rim shade */
+              ctx.lineWidth = 1.2; ctx.strokeStyle = "rgba(40,30,20,0.35)"; ctx.stroke();
+              /* pupil */
+              ctx.beginPath(); ctx.ellipse(lookX, 1 + lookY, 3.4, 6.2, 0, 0, Math.PI * 2);
+              ctx.fillStyle = "#1c1714"; ctx.fill();
+              if (blink > 0.5) {
+                ctx.fillStyle = "rgba(255,255,255,0.95)";
+                ctx.beginPath(); ctx.arc(lookX - 2.4, lookY - 3, 2.2, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(lookX + 2, lookY + 2.6, 1.1, 0, Math.PI * 2); ctx.fill();
+              }
+              ctx.restore();
+            }
+
+            /* nose */
+            ctx.fillStyle = c.nose;
+            ctx.beginPath(); ctx.moveTo(0, 12); ctx.lineTo(-3, 15); ctx.lineTo(3, 15); ctx.closePath(); ctx.fill();
+            /* mouth */
+            ctx.strokeStyle = "rgba(60,45,35,0.5)"; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(0, 15); ctx.quadraticCurveTo(-4, 19, -7, 16); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, 15); ctx.quadraticCurveTo(4, 19, 7, 16); ctx.stroke();
+            /* blush */
+            ctx.fillStyle = c.blush; ctx.globalAlpha = 0.4;
+            ctx.beginPath(); ctx.ellipse(-17, 11, 5, 3, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(17, 11, 5, 3, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.globalAlpha = 1;
+            /* whiskers */
+            ctx.strokeStyle = isDark() ? "rgba(255,255,255,0.55)" : "rgba(90,75,60,0.45)"; ctx.lineWidth = 0.9;
+            for (const o of [-3, 0, 3]) {
+              ctx.beginPath(); ctx.moveTo(-9, 12 + o); ctx.lineTo(-30, 9 + o * 1.6); ctx.stroke();
+              ctx.beginPath(); ctx.moveTo(9, 12 + o); ctx.lineTo(30, 9 + o * 1.6); ctx.stroke();
+            }
+
+            ctx.restore(); /* head */
+            ctx.restore(); /* lift */
+            raf = requestAnimationFrame(frame);
+          }
+          function pause() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+          function resume() { if (!raf) frame(); }
+          document.addEventListener("visibilitychange", () => document.hidden ? pause() : resume());
+          frame();
+        })();
+      })();
+    </script>
+
+<!-- LINE chat animation (bot: johnymemo) -->
+    <script>
+      (function () {
+        const body = document.getElementById("lineChatBody");
+        if (!body) return;
+        const CAT = '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><polygon points="8,9 6,2 14,7" fill="#2f2823"/><polygon points="24,9 26,2 18,7" fill="#2f2823"/><circle cx="16" cy="17" r="11" fill="#2f2823"/><circle cx="12" cy="16" r="2.1" fill="#d8aa50"/><circle cx="20" cy="16" r="2.1" fill="#d8aa50"/><circle cx="12.3" cy="16.2" r="0.9" fill="#1c1714"/><circle cx="20.3" cy="16.2" r="0.9" fill="#1c1714"/><path d="M14.5 20.5 q1.5 1.4 3 0" stroke="#d99a92" stroke-width="1" fill="none" stroke-linecap="round"/></svg>';
+
+        const SCRIPT = [
+          { who: "in",  text: "สวัสดีครับ ผม johnymemo 🐾\nวันนี้มีอะไรให้จดไหม" },
+          { who: "out", text: "จ่ายค่ากาแฟ 75 บาท" },
+          { who: "in",  typing: 1300, text: "บันทึกแล้ว ☕️\nกาแฟ ฿75 · เครื่องดื่ม\nรายจ่ายวันนี้รวม ฿320" },
+          { who: "out", text: "เพิ่มงาน ส่งรายงาน พรุ่งนี้" },
+          { who: "in",  typing: 1400, text: 'เพิ่มงานแล้ว ✅\n"ส่งรายงาน" · พรุ่งนี้ · High' },
+          { who: "out", text: "วันนี้เหลืองานอะไรบ้าง" },
+          { who: "in",  typing: 1300, text: "เหลือ 2 งานครับ 📋\n• ส่งรายงาน (High)\n• อ่านหนังสือ Clean Code" },
+          { who: "out", text: "ขอบคุณนะ 🙏" },
+          { who: "in",  typing: 1000, text: "ยินดีครับ เดี๋ยวเตือนตอน 9 โมงเช้านะ 🐱" }
+        ];
+
+        let i = 0, timer = null;
+
+        function trim() {
+          while (body.children.length > 7) body.removeChild(body.firstChild);
+          body.scrollTop = body.scrollHeight;
         }
-
-        function pause() {
-          if (rafId) {
-            cancelAnimationFrame(rafId);
-            rafId = null;
+        function bubble(msg) {
+          const row = document.createElement("div");
+          row.className = "line-row " + (msg.who === "in" ? "in" : "out") + " line-anim";
+          const av = msg.who === "in" ? '<span class="av">' + CAT + "</span>" : "";
+          row.innerHTML = av + '<div class="line-bubble">' + msg.text.replace(/\n/g, "<br>") + "</div>";
+          body.appendChild(row);
+          trim();
+        }
+        function typing() {
+          const row = document.createElement("div");
+          row.className = "line-row in line-anim";
+          row.innerHTML = '<span class="av">' + CAT + '</span><div class="line-bubble line-typing"><i></i><i></i><i></i></div>';
+          body.appendChild(row);
+          trim();
+          return row;
+        }
+        function step() {
+          const msg = SCRIPT[i % SCRIPT.length];
+          i++;
+          if (msg.who === "in" && msg.typing) {
+            const t = typing();
+            timer = setTimeout(function () {
+              t.remove();
+              bubble(msg);
+              timer = setTimeout(step, 1700);
+            }, msg.typing);
+          } else {
+            bubble(msg);
+            timer = setTimeout(step, msg.who === "out" ? 850 : 1700);
           }
         }
-        function resume() {
-          if (!rafId) frame();
-        }
-
-        document.addEventListener("visibilitychange", () =>
-          document.hidden ? pause() : resume(),
-        );
-        window.addEventListener("resize", resize);
-
-        /* wait one frame so CSS layout sets the parent size */
-        requestAnimationFrame(() => {
-          resize();
-          frame();
-        });
+        function start() { if (!timer) step(); }
+        function stop() { if (timer) { clearTimeout(timer); timer = null; } }
+        document.addEventListener("visibilitychange", function () { document.hidden ? stop() : start(); });
+        timer = setTimeout(step, 700);
       })();
     </script>
 
