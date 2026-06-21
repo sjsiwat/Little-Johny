@@ -1,716 +1,345 @@
-# Johny OS Lite
+# Little Johny
 
-Personal digital workspace แบบประหยัดสำหรับใช้งานเองบนเว็บ static
+> Personal Digital Workspace + Productivity System
 
-Live site: https://johny.siwat.me
+A lightweight personal operating system built as a fast static web application.
 
-Phase 1 status: complete
+🌐 Live Demo
 
-## ฟีเจอร์ในเวอร์ชันแรก
+https://johny.siwat.me
 
-- Redesigned Dashboard พร้อม hero, quick start, demo data และ empty state ที่ชวนเริ่มใช้งาน
-- Dashboard สรุปงาน รายจ่าย และโน้ตล่าสุด
-- Task management พร้อม priority, due date, done/delete
-- Notes พร้อม tags
-- Expense tracker พร้อมหมวดหมู่และสรุปกราฟแบบง่าย
-- Secretary preview สำหรับลองคำสั่งก่อนต่อ LINE Bot จริง
-- Light/Dark theme
-- Web app metadata, favicon, manifest และ offline cache เบื้องต้น
-- ข้อมูลเก็บใน browser ด้วย `localStorage`
-
-## วิธีเปิดในเครื่อง
-
-เปิดไฟล์ `index.html` ด้วย browser ได้ทันที
-
-หรือถ้าต้องการเปิดผ่าน local server:
-
-```bash
-python3 -m http.server 8080
-```
-
-แล้วเข้า:
-
-```text
-http://localhost:8080
-```
-
-## วิธี deploy ฟรีบน Cloudflare Pages
-
-โปรเจกต์นี้ deploy แล้วที่ `johny.siwat.me` ถ้าต้อง deploy ใหม่ให้ใช้ขั้นตอนนี้:
-
-1. สร้าง repository ใหม่บน GitHub แล้วใส่ไฟล์ในโฟลเดอร์นี้
-2. เข้า Cloudflare Dashboard
-3. ไปที่ Workers & Pages
-4. เลือก Create application > Pages > Connect to Git
-5. เลือก repository นี้
-6. ตั้งค่า build:
-   - Framework preset: None
-   - Build command: เว้นว่าง
-   - Build output directory: `/`
-7. Deploy
-
-## ผูกกับโดเมน
-
-แนะนำให้ใช้ subdomain:
-
-```text
-johny.siwat.me
-```
-
-ใน Cloudflare Pages ให้เข้าโปรเจกต์ > Custom domains > Add custom domain แล้วใส่ `johny.siwat.me`
-
-หลังจากนั้นค่อยเอาลิงก์นี้ไปแปะในเว็บหลัก `https://siwat.me`
-
-## Phase 2 ที่แนะนำ
-
-- ต่อ Supabase เพื่อ sync ข้ามเครื่อง
-- เพิ่ม login ส่วนตัว
-- ต่อ LINE Messaging API
-- เพิ่ม reminder แบบ recurring
-- เพิ่ม AI assistant ผ่าน API
-- เพิ่ม OCR ใบเสร็จด้วย Tesseract หรือ Google Vision
-
-
-
-
-
-## NOTED อ่านศึกษาก่อนทำ  ##
-
-# PROJECT: JOHNY OS
-
-## Personal Digital Workspace + AI Assistant + LINE Secretary
-
-Version 1.0
 
 ---
 
-# 1. PROJECT VISION
+## Overview
 
-สร้างระบบ Web Application ที่ทำหน้าที่เป็น
+Little Johny is a personal digital workspace designed to help manage daily life, productivity, and personal information in one place.
 
-"พื้นที่ทำงานดิจิทัลส่วนตัว"
+The concept is inspired by:
 
-(Personal Digital Workspace)
+- Notion
+- Todoist
+- Google Calendar
+- Personal Finance Apps
 
-ที่รวมความสามารถของ
+The goal is to create a **Digital Second Brain** that helps users:
 
-* Todo List
-* Planner
-* Calendar
-* Notes
-* Reminder
-* File Tools
-* Expense Tracker
-* AI Assistant
-* LINE Secretary
+- Think
+- Plan
+- Remember
+- Track
+- Improve
 
-ไว้ในระบบเดียว
-
-โดยผู้ใช้งานสามารถจัดการชีวิต งาน เป้าหมาย ความคิด เอกสาร และการเงินส่วนตัว ผ่านทั้ง Web App และ LINE Bot
-
-ระบบต้องรองรับการขยายเป็น
-
-* Progressive Web App (PWA)
-* Mobile App
-* SaaS Platform
-
-ในอนาคต
 
 ---
 
-# 2. CORE CONCEPT
+## Current Status
 
-ระบบนี้ไม่ใช่เพียง To-do App
+## Phase 1 — Completed
 
-แต่เป็น
+The first version focuses on a lightweight, privacy-friendly browser experience.
 
-"Digital Second Brain"
+### Implemented
 
-และ
+- Personal dashboard
+- Task management
+- Notes system
+- Expense tracker
+- Light / Dark theme
+- Responsive design
+- Local browser storage
+- Progressive Web App support
+- Offline cache support
+- Web manifest
+- Custom favicon
 
-"Personal Operating System"
-
-ที่ช่วยผู้ใช้งาน
-
-* คิด
-* จดจำ
-* วางแผน
-* ติดตามงาน
-* วิเคราะห์รายจ่าย
-* จัดเก็บความรู้
-* แจ้งเตือนเรื่องสำคัญ
-
-เสมือนมีเลขาส่วนตัวทำงานตลอด 24 ชั่วโมง
 
 ---
 
-# 3. DESIGN PRINCIPLES
+# Features
 
-## UI Style
-
-Modern Digital Workspace
-
-* Modern
-* Premium
-* Minimal
-* Clean
-* Productivity Focused
-
----
-
-## Color Theme
-
-อ้างอิง Pantone Color Trend Top 10 ปี 2026
-
-รองรับ
-
-* Light Mode
-* Dark Mode
-
----
-
-## Animation
-
-Background Animation
-
-ประกอบด้วย
-
-* Parallax Scrolling
-* Floating Elements
-* Glassmorphism Effects
-* Smooth Motion
-* Interactive Transitions
-
-ต้องลื่นไหลและไม่กินทรัพยากรเครื่องมากเกินไป
-
----
-
-## Responsive Design
-
-รองรับ
-
-* Desktop
-* Tablet
-* Mobile
-
----
-
-# 4. MAIN MODULES
-
-## MODULE A : Dashboard
-
-หน้า Overview
-
-แสดงข้อมูลสรุปทั้งหมด
-
-ประกอบด้วย
-
-* งานทั้งหมด
-* งานที่เสร็จแล้ว
-* งานค้าง
-* งานสำคัญ
-* เป้าหมาย
-* รายจ่ายเดือนนี้
-* กิจกรรมล่าสุด
-* สถิติการใช้งาน
-
----
-
-## MODULE B : Task Management
-
-สามารถ
-
-* เพิ่มงาน
-* แก้ไขงาน
-* ลบงาน
-* ติดดาวงาน
-* ตั้งเวลา
-* ตั้งวันครบกำหนด
-* ตั้งลำดับความสำคัญ
-
-Priority
-
-* Low
-* Medium
-* High
-* Critical
-
-Status
-
-* Pending
-* In Progress
-* Completed
-
-รองรับ
-
-* Drag & Drop
-* Sorting
-* Filtering
-
----
-
-## MODULE C : Planner
-
-รองรับการวางแผน
-
-* รายวัน
-* รายสัปดาห์
-* รายเดือน
-* รายปี
-
-สามารถจัดลำดับงานได้
-
----
-
-## MODULE D : Calendar
-
-รองรับ
-
-* Day View
-* Week View
-* Month View
-
-เชื่อมโยงกับ Tasks และ Reminders
-
----
-
-## MODULE E : Notes
-
-ใช้เก็บ
-
-* ความคิด
-* ไอเดีย
-* ความรู้
-* บันทึกส่วนตัว
-
-รองรับ
-
-* Rich Text
-* Markdown
-
-มีระบบ
-
-* Tag
-* Folder
-* Search
-
----
-
-## MODULE F : Reminder
-
-แจ้งเตือนผ่าน
-
-* Browser Notification
-* Email
-* LINE Bot
-
-รองรับ
-
-* One Time Reminder
-* Recurring Reminder
-
----
-
-## MODULE G : Personal Workspace
-
-ผู้ใช้สามารถปรับแต่ง
-
-* Theme
-* Layout
-* Widgets
-* Dashboard
-* Colors
-
-ได้เอง
-
----
-
-# 5. EXPENSE TRACKING SYSTEM
-
-## เป้าหมาย
-
-ให้ระบบสามารถทำบัญชีรายรับรายจ่ายแบบอัตโนมัติ
-
----
-
-## การเพิ่มข้อมูล
-
-รองรับ
-
-* ถ่ายรูปใบเสร็จ
-* อัปโหลดบิล
-* PDF
-* พิมพ์ข้อความ
-* ส่งผ่าน LINE
-
----
-
-## OCR Processing
-
-ระบบจะ
-
-1. อ่านข้อมูลจากภาพ
-2. ดึงข้อความ
-3. วิเคราะห์รายการ
-4. แยกยอดเงิน
-5. ระบุวันที่
-6. จัดหมวดหมู่
-
-อัตโนมัติ
-
----
-
-## Expense Categories
-
-* อาหาร
-* เครื่องดื่ม
-* เดินทาง
-* น้ำมัน
-* ค่าไฟ
-* ค่าน้ำ
-* อินเทอร์เน็ต
-* สุขภาพ
-* ช้อปปิ้ง
-* การศึกษา
-* ลงทุน
-* อื่นๆ
-
----
 
 ## Dashboard
 
-แสดง
+Personal productivity overview.
 
-* รายวัน
-* รายสัปดาห์
-* รายเดือน
-* รายปี
+Includes:
 
-กราฟ
+- Task summary
+- Recent notes
+- Expense overview
+- Quick actions
+- Empty states
+- Demo data
 
-* Pie Chart
-* Bar Chart
-* Trend Chart
 
----
+## Task Management
 
-## Export
+Manage daily tasks.
 
-รองรับ
+Features:
 
-* CSV
-* Excel
-* PDF
+- Create tasks
+- Edit tasks
+- Delete tasks
+- Task completion
+- Priority levels
+- Due dates
 
----
 
-# 6. FILE CONVERSION CENTER
+## Notes
 
-## Document Converter
+Personal knowledge storage.
 
-รองรับ
+Features:
 
-* Word → PDF
-* PDF → Word
+- Create notes
+- Store ideas
+- Organize information
+- Tag system
 
----
 
-## Image Converter
+## Expense Tracker
 
-รองรับ
+Track personal spending.
 
-* JPG → PNG
-* PNG → JPG
-* JPEG → PNG
-* PNG → JPEG
+Features:
 
----
+- Expense categories
+- Spending records
+- Simple summaries
+- Personal finance overview
 
-## Resize Image
 
-ก่อนแปลง
+## Personalization
 
-ผู้ใช้สามารถกำหนด
+Supported:
 
-* Width
-* Height
+- Light mode
+- Dark mode
+- Responsive layout
 
-ได้เอง
 
----
+## PWA
 
-## Upload Limitation
+Progressive Web App features:
 
-ไฟล์ไม่เกิน
+- Installable web app
+- Offline cache
+- App icon
+- Web manifest
 
-30 MB ต่อไฟล์
-
----
-
-## File Retention Policy
-
-ไฟล์อัปโหลดจะถูกเก็บ
-
-ไม่เกิน 24 ชั่วโมง
-
-จากนั้นระบบจะลบอัตโนมัติ
 
 ---
 
-# 7. LINE SECRETARY SYSTEM
+# Technology Stack
 
-## เป้าหมาย
 
-ให้ LINE Bot เป็นเลขาส่วนตัว
+## Frontend
 
-ที่สามารถเข้าถึงข้อมูลของผู้ใช้ตามสิทธิ์
+- HTML5
+- CSS3
+- JavaScript
 
----
 
-## เพิ่ม Task ผ่าน LINE
+## Storage
 
-ตัวอย่าง
+Browser:
 
-เพิ่มงาน เรียน JavaScript พรุ่งนี้ 19:00
+- LocalStorage
 
----
 
-## เพิ่ม Note ผ่าน LINE
+## Deployment
 
-ตัวอย่าง
+Hosting:
 
-โน้ต:
-ซื้อจอคอม
+- Cloudflare Pages
 
----
 
-## บันทึกค่าใช้จ่ายผ่าน LINE
+## Development Tools
 
-ส่ง
+AI assisted development:
 
-* รูปใบเสร็จ
-* รูปบิล
-* PDF
+- Claude
+- Codex
+- Impeccable UI Agent
 
-ระบบจะวิเคราะห์และบันทึกอัตโนมัติ
 
 ---
 
-## เรียกดูข้อมูลผ่าน LINE
+# Project Structure
 
-ตัวอย่าง
 
-วันนี้มีงานอะไร
+```text
+Little Johny/
 
-สรุปรายจ่ายเดือนนี้
+├── index.html
+├── app.js
+├── styles.css
+│
+├── icon.svg
+├── manifest.webmanifest
+├── sw.js
+├── _headers
+│
+├── product.md
+├── design.md
+├── README.md
+│
+├── .agents/
+│   └── skills/
+│       └── impeccable/
+│           ├── agents/
+│           ├── reference/
+│           ├── scripts/
+│           └── skill.md
+│
+├── .claude/
+├── .codex/
+└── .impeccable/
 
-งานสำคัญทั้งหมด
+```
+## Local Development
 
-โน้ตเกี่ยวกับ AWS
+Clone repository:  git clone <repository-url>
 
-งานค้างทั้งหมด
+## Open project: 
+cd "Little Johny"
 
----
+## Run local server:
+python3 -m http.server 8080
 
-## แจ้งเตือนผ่าน LINE
+## Open browser:
+http://localhost:8080
 
-ตัวอย่าง
+## Deployment Workflow
+Local Development
 
-* งานใกล้ครบกำหนด
-* ค่าใช้จ่ายเกินงบ
-* บิลใกล้ถึงกำหนด
-* เป้าหมายรายเดือน
+        ↓
 
----
+     Git Commit
 
-# 8. AI ASSISTANT
+        ↓
 
-AI สามารถเข้าถึงข้อมูลในระบบเพื่อช่วยผู้ใช้งาน
+      GitHub
 
-ตัวอย่าง
+        ↓
 
-วันนี้ฉันต้องทำอะไร
+ Cloudflare Pages
 
-งานไหนสำคัญที่สุด
+        ↓
 
-สรุปรายจ่ายเดือนนี้
+ johny.siwat.me
 
-ค่าใช้จ่ายหมวดอาหาร
+ ## Documentation
 
-มีบิลอะไรต้องจ่าย
+Product Requirements
 
-เป้าหมายปีนี้คืออะไร
+## Product vision and system goals:
+product.md
+Contains:
 
----
+* Project vision
+* Feature planning
+* Future roadmap
+* System direction
 
-## AI Analysis
+## Design System
 
-วิเคราะห์
+UI/UX guidelines: design.md
+Contains:
 
-* งานค้าง
-* พฤติกรรมการใช้เงิน
-* แนวโน้มค่าใช้จ่าย
-* Productivity Trends
+* Visual direction
+* UI principles
+* Design rules
+* Experience goals
 
----
+## AI Development Rules
 
-## Weekly Review
+AI instructions: .agents/skills/impeccable/
 
-ทุกวันอาทิตย์
+Contains:
 
-AI ส่งสรุป
+* UX/UI rules
+* Design review process
+* Frontend quality guidelines
 
-* งานที่ทำเสร็จ
-* งานค้าง
-* รายจ่าย
-* เป้าหมายสัปดาห์หน้า
+##  Development Philosophy
 
----
+This project follows:
 
-# 9. SECURITY
+* Modular structure
+* Reusable code
+* Clean architecture
+* Responsive first
+* Performance focused
+* Privacy focused
 
-ระบบต้องออกแบบโดยยึดหลัก Privacy First
+AI developers should:
 
----
+* Understand existing code before editing
+* Avoid unnecessary rewrites
+* Maintain design consistency
+* Prefer simple solutions
 
-## Authentication
+## Roadmap
 
-รองรับ
+Phase 2
 
-* Email Login
-* Google Login
-* LINE Login
+Planned features:
 
----
+Cloud Sync
 
-## Security
+* Supabase database
+* User authentication
+* Multi-device sync
 
-* HTTPS Only
-* JWT Authentication
-* Encryption at Rest
-* Encryption in Transit
-* Role Based Access Control
-* Audit Logs
-
----
-
-## User Data
-
-ข้อมูลทุกอย่างเป็นของผู้ใช้
-
-ไม่มีการแชร์ข้อมูลระหว่างบัญชี
-
----
-
-# 10. TECH STACK (RECOMMENDED)
-
-Frontend
-
-* Next.js
-* React
-* TypeScript
-* Tailwind CSS
-
-Backend
-
-* Supabase
-
-Database
-
-* PostgreSQL
-
-Storage
-
-* Supabase Storage
-
-Authentication
-
-* Supabase Auth
-
-Notification
+LINE Secretary
 
 * LINE Messaging API
+* Task creation
+* Reminder notifications
+* Expense recording
 
-Charts
+AI Assistant
 
-* Recharts
+Examples:
 
-OCR
+* Daily planning
+* Task prioritization
+* Expense analysis
+* Personal insights
 
-* Google Vision API
-  หรือ
-* Tesseract OCR
+⸻
 
-AI Layer
+Phase 3
 
-* OpenAI API
+Future:
 
-Hosting
+* OCR receipt scanning
+* Advanced analytics
+* Mobile application
+* Multi-user support
+* SaaS expansion
 
-* Cloudflare
+⸻
 
----
+## Vision
 
-# 11. ARCHITECTURE RULES
+Little Johny aims to become:
 
-AI Developer ต้องปฏิบัติตาม
+A personal operating system for everyday life.
 
-1. ห้ามเขียนโค้ดซ้ำซ้อน
-2. ใช้ Modular Architecture
-3. Component Reusable
-4. Separation of Concerns
-5. Clean Code
-6. Comment สำคัญทุกส่วน
-7. Folder Structure ชัดเจน
-8. Responsive ทุกหน้า
-9. Mobile First Design
-10. ทุกฟีเจอร์ต้องตรวจสอบโค้ดซ้ำก่อนสร้างฟีเจอร์ใหม่
+A single place to manage:
 
----
+* Work
+* Ideas
+* Knowledge
+* Finance
+* Goals
 
-# 12. DEVELOPMENT WORKFLOW
+⸻
 
-ก่อนเริ่มเขียนโค้ด
+## License
 
-AI ต้องส่ง
-
-1. System Architecture
-2. Database Design
-3. ER Diagram
-4. API Design
-5. Folder Structure
-6. UI Flow
-7. Wireframe
-8. Tech Stack Justification
-
-ให้ผู้ใช้งานอนุมัติก่อน
-
-ห้ามเริ่มเขียนโค้ดทันที
-
-หาก Requirement ส่วนใดไม่ชัดเจน ต้องถามผู้ใช้งานก่อนทุกครั้ง
-
----
-
-# 13. PROJECT GOAL
-
-สร้างระบบที่รวมความสามารถของ
-
-* Notion
-* Todoist
-* Google Calendar
-* Google Keep
-* Expense Tracker
-* LINE Bot
-* AI Assistant
-
-ไว้ในแพลตฟอร์มเดียว
-
-เพื่อให้เป็น
-
-"Personal Operating System"
-
-และ
-
-"Digital Second Brain"
-
-สำหรับการใช้งานระยะยาว
+Personal project
