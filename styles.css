@@ -1540,7 +1540,7 @@ body::before {
   #bg-canvas { display: none; }
 }
 
-@media (max-width: 620px) {
+@media (max-width: 500px) {
   .workspace { padding: 1rem; }
   .dashboard-hero { padding: 1.25rem; }
   .hero-copy h2 { font-size: 1.75rem; }
