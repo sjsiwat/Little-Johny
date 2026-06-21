@@ -1,29 +1,93 @@
 const STORAGE_KEY = "johny-os-lite-state";
 
+function createDemoState() {
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  return {
+    tasks: [
+      {
+        id: crypto.randomUUID(),
+        title: "ออกแบบ Dashboard ให้เห็นภาพรวมชีวิตใน 5 นาที",
+        priority: "High",
+        due: today.toISOString().slice(0, 10),
+        status: "Pending",
+        createdAt: Date.now() - 1000
+      },
+      {
+        id: crypto.randomUUID(),
+        title: "จดไอเดียสำหรับต่อ LINE Secretary",
+        priority: "Medium",
+        due: tomorrow.toISOString().slice(0, 10),
+        status: "Pending",
+        createdAt: Date.now() - 2000
+      },
+      {
+        id: crypto.randomUUID(),
+        title: "ทดลองบันทึกรายจ่ายผ่านหน้า Expenses",
+        priority: "Low",
+        due: "",
+        status: "Completed",
+        createdAt: Date.now() - 3000
+      }
+    ],
+    notes: [
+      {
+        id: crypto.randomUUID(),
+        title: "Johny OS คือพื้นที่รวม task, note, expense และเลขาส่วนตัว",
+        body: "เวอร์ชันแรกเก็บข้อมูลใน browser ก่อน เพื่อให้ใช้งานฟรีและ deploy ง่ายบน Cloudflare Pages",
+        tags: "vision, mvp",
+        createdAt: Date.now() - 1000
+      },
+      {
+        id: crypto.randomUUID(),
+        title: "Phase 2: sync ข้ามเครื่องด้วย Supabase",
+        body: "เพิ่ม login, database, reminder และค่อยต่อ AI หลังจาก workflow หลักนิ่งแล้ว",
+        tags: "roadmap",
+        createdAt: Date.now() - 2000
+      }
+    ],
+    expenses: [
+      {
+        id: crypto.randomUUID(),
+        title: "กาแฟทำงาน",
+        amount: 75,
+        category: "เครื่องดื่ม",
+        date: today.toISOString().slice(0, 10),
+        createdAt: Date.now() - 1000
+      },
+      {
+        id: crypto.randomUUID(),
+        title: "เดินทาง",
+        amount: 120,
+        category: "เดินทาง",
+        date: today.toISOString().slice(0, 10),
+        createdAt: Date.now() - 2000
+      },
+      {
+        id: crypto.randomUUID(),
+        title: "มื้อกลางวัน",
+        amount: 95,
+        category: "อาหาร",
+        date: yesterday.toISOString().slice(0, 10),
+        createdAt: Date.now() - 3000
+      }
+    ],
+    logs: [
+      "ลองพิมพ์: เพิ่มงาน อ่านหนังสือคืนนี้",
+      "ลองพิมพ์: จ่าย กาแฟ 75 เครื่องดื่ม",
+      "Johny OS Lite พร้อมช่วยจัดระเบียบวันของคุณแล้ว"
+    ]
+  };
+}
+
 const defaultState = {
   theme: "light",
   taskFilter: "all",
-  tasks: [
-    {
-      id: crypto.randomUUID(),
-      title: "วางแผน Johny OS Lite เวอร์ชันแรก",
-      priority: "High",
-      due: new Date().toISOString().slice(0, 10),
-      status: "Pending",
-      createdAt: Date.now()
-    }
-  ],
-  notes: [
-    {
-      id: crypto.randomUUID(),
-      title: "แนวทางลดค่าใช้จ่าย",
-      body: "เริ่มจาก localStorage + Cloudflare Pages ก่อน แล้วค่อยต่อ Supabase, LINE และ AI ภายหลัง",
-      tags: "project, mvp",
-      createdAt: Date.now()
-    }
-  ],
-  expenses: [],
-  logs: ["Johny OS Lite พร้อมใช้งานในเครื่องแล้ว"]
+  ...createDemoState()
 };
 
 let state = loadState();
@@ -107,6 +171,10 @@ function renderShell() {
 
   const focusItems = state.tasks.filter((task) => task.status !== "Completed");
   document.getElementById("focusCount").textContent = `${focusItems.length} focus items`;
+  const heroFocusTitle = document.getElementById("heroFocusTitle");
+  if (heroFocusTitle) {
+    heroFocusTitle.textContent = focusItems[0]?.title || "เริ่มจากเพิ่มงานแรกของวันนี้";
+  }
 }
 
 function renderDashboard() {
@@ -129,7 +197,7 @@ function renderDashboard() {
 
   document.getElementById("focusList").innerHTML = focus.length
     ? focus.map(renderSimpleTask).join("")
-    : emptyState("ยังไม่มีงานค้าง");
+    : emptyState("ยังไม่มีงานค้าง ลองกดเพิ่มงานแรกเพื่อเริ่มจัดลำดับวันของคุณ", "tasks", "เพิ่มงานแรก");
 
   document.getElementById("recentNotes").innerHTML = state.notes.length
     ? [...state.notes]
@@ -137,7 +205,7 @@ function renderDashboard() {
         .slice(0, 4)
         .map(renderSimpleNote)
         .join("")
-    : emptyState("ยังไม่มีโน้ต");
+    : emptyState("ยังไม่มีโน้ต ลองบันทึกไอเดียหรือความคิดแรกของ Johny OS", "notes", "เขียนโน้ต");
 
   renderExpenseBars();
 }
@@ -165,7 +233,7 @@ function renderExpenseBars() {
           `;
         })
         .join("")
-    : emptyState("ยังไม่มีรายจ่ายให้สรุป");
+    : emptyState("ยังไม่มีรายจ่ายให้สรุป ลองบันทึกกาแฟ มื้อกลางวัน หรือค่าเดินทางรายการแรก", "expenses", "บันทึกรายจ่าย");
 }
 
 function renderTasks() {
@@ -195,7 +263,7 @@ function renderTasks() {
           `
         )
         .join("")
-    : emptyState("ยังไม่มีงานในมุมมองนี้");
+    : emptyState("ยังไม่มีงานในมุมมองนี้", "tasks", "เพิ่มงาน");
 }
 
 function renderNotes() {
@@ -217,7 +285,7 @@ function renderNotes() {
           `
         )
         .join("")
-    : emptyState("ยังไม่มีโน้ต");
+    : emptyState("ยังไม่มีโน้ต", "notes", "เขียนโน้ต");
 }
 
 function renderExpenses() {
@@ -238,7 +306,7 @@ function renderExpenses() {
           `
         )
         .join("")
-    : emptyState("ยังไม่มีรายจ่าย");
+    : emptyState("ยังไม่มีรายจ่าย", "expenses", "บันทึกรายจ่าย");
 }
 
 function renderSecretary() {
@@ -248,7 +316,7 @@ function renderSecretary() {
         .reverse()
         .map((line) => `<div class="log-line">${escapeHtml(line)}</div>`)
         .join("")
-    : emptyState("ยังไม่มีประวัติคำสั่ง");
+    : emptyState("ยังไม่มีประวัติคำสั่ง ลองพิมพ์ เพิ่มงาน หรือ จ่าย ตามด้วยรายการ", "secretary", "ลองส่งคำสั่ง");
 }
 
 function renderSimpleTask(task) {
@@ -273,8 +341,13 @@ function renderSimpleNote(note) {
   `;
 }
 
-function emptyState(message) {
-  return `<div class="empty-state">${message}</div>`;
+function emptyState(message, view = "dashboard", action = "เริ่มใช้งาน") {
+  return `
+    <div class="empty-state">
+      <strong>${escapeHtml(message)}</strong>
+      <button class="empty-action" type="button" data-view-jump="${view}">${escapeHtml(action)}</button>
+    </div>
+  `;
 }
 
 function escapeHtml(value) {
@@ -316,6 +389,19 @@ function addExpense(title, amount, category = "อื่นๆ", date = new Date
     date,
     createdAt: Date.now()
   });
+}
+
+
+function loadDemoData() {
+  const demo = createDemoState();
+  state = {
+    ...state,
+    tasks: demo.tasks,
+    notes: demo.notes,
+    expenses: demo.expenses,
+    logs: demo.logs
+  };
+  render();
 }
 
 function parseCommand(rawText) {
@@ -378,6 +464,8 @@ document.getElementById("themeToggle").addEventListener("click", () => {
   render();
 });
 
+document.getElementById("loadDemoData")?.addEventListener("click", loadDemoData);
+
 document.getElementById("taskForm").addEventListener("submit", (event) => {
   event.preventDefault();
   addTask(
@@ -438,10 +526,15 @@ document.addEventListener("click", (event) => {
   const target = event.target;
   if (!(target instanceof HTMLElement)) return;
 
+  const viewJump = target.dataset.viewJump;
   const toggleId = target.dataset.toggleTask;
   const deleteTaskId = target.dataset.deleteTask;
   const deleteNoteId = target.dataset.deleteNote;
   const deleteExpenseId = target.dataset.deleteExpense;
+
+  if (viewJump) {
+    setView(viewJump);
+  }
 
   if (toggleId) {
     state.tasks = state.tasks.map((task) =>

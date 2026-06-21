@@ -8,6 +8,7 @@ Phase 1 status: complete
 
 ## ฟีเจอร์ในเวอร์ชันแรก
 
+- Redesigned Dashboard พร้อม hero, quick start, demo data และ empty state ที่ชวนเริ่มใช้งาน
 - Dashboard สรุปงาน รายจ่าย และโน้ตล่าสุด
 - Task management พร้อม priority, due date, done/delete
 - Notes พร้อม tags
