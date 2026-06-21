@@ -1,4 +1,4 @@
-const STORAGE_KEY = "johny-os-lite-state";
+/* STORAGE_KEY moved to storage.js */
 
 let toastTimer = null;
 function showToast(message, type = "success") {
@@ -105,7 +105,7 @@ const defaultState = {
   ...createDemoState()
 };
 
-let state = loadState();
+let state = Storage.loadLocal(defaultState);
 
 const views = {
   dashboard: document.getElementById("dashboard"),
@@ -123,17 +123,8 @@ const viewTitles = {
   secretary: "Secretary"
 };
 
-function loadState() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return saved ? { ...defaultState, ...saved } : defaultState;
-  } catch {
-    return defaultState;
-  }
-}
-
 function saveState() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  Storage.save(state);
 }
 
 function formatMoney(amount) {
@@ -617,6 +608,109 @@ setView(location.hash.replace("#", "") && views[location.hash.replace("#", "")]
   ? location.hash.replace("#", "")
   : "dashboard");
 render();
+
+/* ── Auth UI ── */
+function updateAuthBar(user) {
+  const loginBtn = document.getElementById("authLoginBtn");
+  const userEl   = document.getElementById("authUser");
+  const emailEl  = document.getElementById("authUserEmail");
+  if (user) {
+    loginBtn.hidden = true;
+    userEl.hidden   = false;
+    if (emailEl) emailEl.textContent = user.email;
+  } else {
+    loginBtn.hidden = false;
+    userEl.hidden   = true;
+  }
+}
+
+async function onSignedIn(user) {
+  updateAuthBar(user);
+  showToast("กำลังโหลดข้อมูลจาก cloud…");
+  const cloud = await Storage.loadCloud();
+  if (cloud) {
+    state = { ...state, tasks: cloud.tasks, notes: cloud.notes, expenses: cloud.expenses };
+    render();
+    showToast(`ซิงค์ข้อมูลจาก cloud สำเร็จ (${cloud.tasks.length} งาน)`);
+  }
+}
+
+async function initAuth() {
+  const user = await Auth.init();
+  updateAuthBar(user);
+  if (user) onSignedIn(user);
+
+  Auth.onChange((event, user) => {
+    updateAuthBar(user);
+    if (event === "SIGNED_IN") onSignedIn(user);
+    if (event === "SIGNED_OUT") showToast("ออกจากระบบแล้ว — ข้อมูล local ยังอยู่");
+  });
+
+  /* Auth modal */
+  const modal      = document.getElementById("authModal");
+  const form       = document.getElementById("authForm");
+  const loginBtn   = document.getElementById("authLoginBtn");
+  const closeBtn   = document.getElementById("authModalClose");
+  const signupBtn  = document.getElementById("authSwitchSignup");
+  const logoutBtn  = document.getElementById("authLogoutBtn");
+  const modeLabel  = document.getElementById("authModeLabel");
+  const errEl      = document.getElementById("authError");
+  let isSignup = false;
+
+  loginBtn.addEventListener("click", () => {
+    isSignup = false;
+    modeLabel.textContent = "เข้าสู่ระบบ";
+    if (signupBtn) signupBtn.textContent = "ยังไม่มีบัญชี? สมัครใช้งาน";
+    errEl.textContent = "";
+    modal.showModal();
+  });
+
+  closeBtn.addEventListener("click", () => modal.close());
+  modal.addEventListener("click", e => { if (e.target === modal) modal.close(); });
+
+  if (signupBtn) {
+    signupBtn.addEventListener("click", () => {
+      isSignup = !isSignup;
+      modeLabel.textContent = isSignup ? "สมัครใช้งาน" : "เข้าสู่ระบบ";
+      signupBtn.textContent = isSignup ? "มีบัญชีแล้ว? เข้าสู่ระบบ" : "ยังไม่มีบัญชี? สมัครใช้งาน";
+      errEl.textContent = "";
+    });
+  }
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const email    = document.getElementById("authEmail").value.trim();
+    const password = document.getElementById("authPassword").value;
+    const submitBtn = form.querySelector("button[type='submit']");
+    submitBtn.disabled = true;
+    errEl.textContent = "";
+    try {
+      if (isSignup) {
+        await Auth.signUp(email, password);
+        errEl.style.color = "var(--primary)";
+        errEl.textContent = "สมัครแล้ว! กรุณาตรวจสอบอีเมลเพื่อยืนยัน";
+      } else {
+        await Auth.signIn(email, password);
+        modal.close();
+      }
+    } catch (err) {
+      errEl.style.color = "";
+      errEl.textContent = err.message || "เกิดข้อผิดพลาด";
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
+      await Auth.signOut();
+      state = Storage.loadLocal(defaultState);
+      render();
+    });
+  }
+}
+
+initAuth();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
