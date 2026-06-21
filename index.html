@@ -12,6 +12,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
+    <!-- Supabase JS client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   </head>
   <body>
 
@@ -97,6 +99,15 @@
         <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">
           <span aria-hidden="true">◐</span> Theme
         </button>
+
+        <!-- Auth bar -->
+        <div class="auth-bar">
+          <button class="auth-login-btn" id="authLoginBtn" type="button">☁ Sync / Sign in</button>
+          <div class="auth-user" id="authUser" hidden>
+            <span class="auth-user-email" id="authUserEmail"></span>
+            <button class="auth-logout-btn" id="authLogoutBtn" type="button">Sign out</button>
+          </div>
+        </div>
       </aside>
 
       <!-- ── Workspace ── -->
@@ -139,15 +150,15 @@
           </section>
 
           <div class="quick-start-grid" aria-label="Quick start actions">
-            <button class="quick-card" type="button" data-view-jump="tasks">
+            <button class="quick-card" type="button" data-view-jump="tasks" data-icon="✓">
               <strong>Capture a task</strong>
               <small>เพิ่มสิ่งที่ต้องทำพร้อม priority</small>
             </button>
-            <button class="quick-card" type="button" data-view-jump="notes">
+            <button class="quick-card" type="button" data-view-jump="notes" data-icon="✎">
               <strong>Save a thought</strong>
               <small>เก็บไอเดียหรือบันทึกส่วนตัว</small>
             </button>
-            <button class="quick-card" type="button" data-view-jump="expenses">
+            <button class="quick-card" type="button" data-view-jump="expenses" data-icon="฿">
               <strong>Track spending</strong>
               <small>บันทึกรายจ่ายและดูภาพรวม</small>
             </button>
@@ -188,7 +199,7 @@
         <!-- TASKS -->
         <section class="view" id="tasks" aria-label="Task management">
           <form class="composer" id="taskForm">
-            <input id="taskTitle" type="text" placeholder="เพิ่มงาน เช่น สรุปค่าใช้จ่ายวันนี้" required />
+            <input id="taskTitle" type="text" placeholder="เพิ่มงาน เช่น สรุปค่าใช้จ่ายวันนี้" maxlength="200" required />
             <select id="taskPriority" aria-label="Priority">
               <option value="Low">Low</option>
               <option value="Medium" selected>Medium</option>
@@ -209,7 +220,7 @@
         <!-- NOTES -->
         <section class="view" id="notes" aria-label="Notes">
           <form class="note-editor" id="noteForm">
-            <input id="noteTitle" type="text" placeholder="หัวข้อโน้ต" required />
+            <input id="noteTitle" type="text" placeholder="หัวข้อโน้ต" maxlength="160" required />
             <textarea id="noteBody" rows="7" placeholder="เขียนความคิด ไอเดีย หรือความรู้ไว้ตรงนี้"></textarea>
             <div class="editor-actions">
               <input id="noteTags" type="text" placeholder="tags เช่น work, idea" />
@@ -222,7 +233,7 @@
         <!-- EXPENSES -->
         <section class="view" id="expenses" aria-label="Expense tracker">
           <form class="composer" id="expenseForm">
-            <input id="expenseTitle" type="text" placeholder="รายการ เช่น กาแฟ" required />
+            <input id="expenseTitle" type="text" placeholder="รายการ เช่น กาแฟ" maxlength="80" required />
             <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="จำนวนเงิน" required />
             <select id="expenseCategory" aria-label="Category">
               <option>อาหาร</option><option>เครื่องดื่ม</option><option>เดินทาง</option>
@@ -241,14 +252,14 @@
           <div class="secretary-layout">
             <section class="panel">
               <h2>Personal Secretary</h2>
-              <form id="commandForm" class="command-box secretary-form">
+              <form id="commandForm" class="command-box" style="margin-top:1rem">
                 <textarea id="commandText" rows="5" placeholder="ตัวอย่าง: เพิ่มงาน เรียน JavaScript พรุ่งนี้ 19:00&#10;โน้ต: ซื้อจอคอม&#10;จ่าย กาแฟ 75 เครื่องดื่ม"></textarea>
                 <button type="submit">ส่งคำสั่ง</button>
               </form>
             </section>
             <section class="panel">
-              <h3>ผลลัพธ์</h3>
-              <div class="assistant-log" id="assistantLog"></div>
+              <h2>ผลลัพธ์</h2>
+              <div class="assistant-log" id="assistantLog" style="margin-top:1rem"></div>
             </section>
           </div>
         </section>
@@ -526,6 +537,8 @@
       }
 
       /* ── Main loop ── */
+      let rafId = null;
+
       function init() {
         resize();
         initBlobs(); initRings(); initParticles(); initSketches();
@@ -542,8 +555,15 @@
         drawRings(p);
         drawConnections(p);
         drawParticles(p);
-        requestAnimationFrame(draw);
+        rafId = requestAnimationFrame(draw);
       }
+
+      function pause() { if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
+      function resume() { if (!rafId) draw(); }
+
+      document.addEventListener('visibilitychange', () => {
+        document.hidden ? pause() : resume();
+      });
 
       window.addEventListener('resize', init);
       init();
@@ -551,6 +571,30 @@
     })();
     </script>
 
+    <!-- Auth modal -->
+    <dialog class="auth-modal" id="authModal" aria-labelledby="authModeLabel">
+      <form class="auth-modal-form" id="authForm" novalidate>
+        <h2 id="authModeLabel">เข้าสู่ระบบ</h2>
+        <p class="auth-modal-hint">ซิงค์ข้อมูลข้ามอุปกรณ์ด้วย Supabase · Guest mode ยังใช้งานได้ปกติ</p>
+        <label class="auth-label">
+          Email
+          <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email" required />
+        </label>
+        <label class="auth-label">
+          Password
+          <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password" required />
+        </label>
+        <p class="auth-error" id="authError" aria-live="polite"></p>
+        <div class="auth-modal-actions">
+          <button type="submit" class="auth-submit-btn">เข้าสู่ระบบ</button>
+          <button type="button" id="authSwitchSignup" class="auth-switch-btn">ยังไม่มีบัญชี? สมัครใช้งาน</button>
+          <button type="button" id="authModalClose" class="auth-close-btn">ยกเลิก</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="./auth.js"></script>
+    <script src="./storage.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>
