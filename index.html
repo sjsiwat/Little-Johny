@@ -18,6 +18,12 @@
     <title>Johny OS Lite</title>
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
     <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Noto+Sans+Thai:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -58,6 +64,49 @@
         </header>
 
         <section class="view active" id="dashboard" aria-labelledby="viewTitle">
+          <section class="dashboard-hero" aria-label="Johny OS introduction">
+            <div class="hero-copy">
+              <span class="hero-kicker">Personal OS in your browser</span>
+              <h2>จัดงาน โน้ต และรายจ่ายให้อยู่ในที่เดียว</h2>
+              <p>
+                Johny OS Lite คือพื้นที่ทำงานส่วนตัวที่เริ่มได้ทันที เก็บข้อมูลใน browser ก่อน แล้วค่อยต่อ LINE, AI และ cloud sync ภายหลัง
+              </p>
+              <div class="hero-actions">
+                <button class="primary-action" type="button" data-view-jump="tasks">เพิ่มงานแรก</button>
+                <button class="secondary-action" type="button" id="loadDemoData">โหลดข้อมูลตัวอย่าง</button>
+              </div>
+            </div>
+            <div class="hero-preview" aria-hidden="true">
+              <div class="preview-card primary-preview">
+                <span>Today focus</span>
+                <strong id="heroFocusTitle">Plan your next move</strong>
+              </div>
+              <div class="preview-stack">
+                <span>Tasks</span>
+                <span>Notes</span>
+                <span>Expenses</span>
+              </div>
+            </div>
+          </section>
+
+          <div class="quick-start-grid" aria-label="Quick start actions">
+            <button class="quick-card" type="button" data-view-jump="tasks">
+              <span>01</span>
+              <strong>Capture a task</strong>
+              <small>เพิ่มสิ่งที่ต้องทำพร้อม priority</small>
+            </button>
+            <button class="quick-card" type="button" data-view-jump="notes">
+              <span>02</span>
+              <strong>Save a thought</strong>
+              <small>เก็บไอเดียหรือบันทึกส่วนตัว</small>
+            </button>
+            <button class="quick-card" type="button" data-view-jump="expenses">
+              <span>03</span>
+              <strong>Track spending</strong>
+              <small>บันทึกรายจ่ายและดูภาพรวม</small>
+            </button>
+          </div>
+
           <div class="stats-grid">
             <article class="stat-card">
               <span>งานทั้งหมด</span>
@@ -80,7 +129,10 @@
           <div class="dashboard-grid">
             <section class="panel">
               <div class="panel-head">
-                <h2>วันนี้ควรโฟกัส</h2>
+                <div>
+                  <span class="section-label">Priority queue</span>
+                  <h2>วันนี้ควรโฟกัส</h2>
+                </div>
                 <button class="ghost-button" type="button" data-view-jump="tasks">ดูงาน</button>
               </div>
               <div class="item-list" id="focusList"></div>
@@ -88,7 +140,10 @@
 
             <section class="panel">
               <div class="panel-head">
-                <h2>สรุปรายจ่าย</h2>
+                <div>
+                  <span class="section-label">Money snapshot</span>
+                  <h2>สรุปรายจ่าย</h2>
+                </div>
                 <button class="ghost-button" type="button" data-view-jump="expenses">เพิ่มรายการ</button>
               </div>
               <div class="expense-bars" id="expenseBars"></div>
@@ -96,7 +151,10 @@
 
             <section class="panel wide">
               <div class="panel-head">
-                <h2>บันทึกล่าสุด</h2>
+                <div>
+                  <span class="section-label">Knowledge base</span>
+                  <h2>บันทึกล่าสุด</h2>
+                </div>
                 <button class="ghost-button" type="button" data-view-jump="notes">เปิด Notes</button>
               </div>
               <div class="item-list compact" id="recentNotes"></div>
