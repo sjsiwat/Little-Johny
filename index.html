@@ -7,7 +7,7 @@
       name="description"
       content="Johny OS Lite - personal digital workspace for tasks, notes, expenses, and daily planning."
     />
-    <meta name="theme-color" content="#1f7a6d" />
+    <meta name="theme-color" content="#2d6a4f" />
     <meta property="og:title" content="Johny OS Lite" />
     <meta
       property="og:description"
@@ -18,16 +18,19 @@
     <title>Johny OS Lite</title>
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
     <link rel="manifest" href="./manifest.webmanifest" />
+    <!-- Fonts: Caveat (hand-drawn) + Inter + Noto Sans Thai -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Noto+Sans+Thai:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <div class="app-shell">
+
+      <!-- ── Sidebar ── -->
       <aside class="sidebar" aria-label="Main navigation">
         <div class="brand">
           <div class="brand-mark" aria-hidden="true">J</div>
@@ -39,10 +42,10 @@
 
         <nav class="nav-list">
           <a href="#dashboard" class="nav-link active" data-view="dashboard">Dashboard</a>
-          <a href="#tasks" class="nav-link" data-view="tasks">Tasks</a>
-          <a href="#notes" class="nav-link" data-view="notes">Notes</a>
-          <a href="#expenses" class="nav-link" data-view="expenses">Expenses</a>
-          <a href="#secretary" class="nav-link" data-view="secretary">Secretary</a>
+          <a href="#tasks"     class="nav-link"        data-view="tasks">Tasks</a>
+          <a href="#notes"     class="nav-link"        data-view="notes">Notes</a>
+          <a href="#expenses"  class="nav-link"        data-view="expenses">Expenses</a>
+          <a href="#secretary" class="nav-link"        data-view="secretary">Secretary</a>
         </nav>
 
         <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">
@@ -51,7 +54,10 @@
         </button>
       </aside>
 
+      <!-- ── Workspace ── -->
       <main class="workspace">
+
+        <!-- Topbar -->
         <header class="topbar">
           <div>
             <p class="eyebrow">Johny OS Lite</p>
@@ -63,7 +69,12 @@
           </div>
         </header>
 
+        <!-- ══════════════════════════════════
+             DASHBOARD
+        ══════════════════════════════════ -->
         <section class="view active" id="dashboard" aria-labelledby="viewTitle">
+
+          <!-- Hero -->
           <section class="dashboard-hero" aria-label="Johny OS introduction">
             <div class="hero-copy">
               <span class="hero-kicker">Personal OS in your browser</span>
@@ -89,6 +100,7 @@
             </div>
           </section>
 
+          <!-- Quick start -->
           <div class="quick-start-grid" aria-label="Quick start actions">
             <button class="quick-card" type="button" data-view-jump="tasks">
               <span>01</span>
@@ -107,6 +119,7 @@
             </button>
           </div>
 
+          <!-- Stats -->
           <div class="stats-grid">
             <article class="stat-card">
               <span>งานทั้งหมด</span>
@@ -126,6 +139,7 @@
             </article>
           </div>
 
+          <!-- Panels -->
           <div class="dashboard-grid">
             <section class="panel">
               <div class="panel-head">
@@ -162,6 +176,9 @@
           </div>
         </section>
 
+        <!-- ══════════════════════════════════
+             TASKS
+        ══════════════════════════════════ -->
         <section class="view" id="tasks" aria-label="Task management">
           <form class="composer" id="taskForm">
             <input id="taskTitle" type="text" placeholder="เพิ่มงาน เช่น สรุปค่าใช้จ่ายวันนี้" required />
@@ -174,15 +191,17 @@
             <input id="taskDue" type="date" aria-label="Due date" />
             <button type="submit">เพิ่มงาน</button>
           </form>
-
           <div class="toolbar">
             <button class="chip active" type="button" data-task-filter="all">ทั้งหมด</button>
-            <button class="chip" type="button" data-task-filter="open">ค้าง</button>
-            <button class="chip" type="button" data-task-filter="done">เสร็จแล้ว</button>
+            <button class="chip"        type="button" data-task-filter="open">ค้าง</button>
+            <button class="chip"        type="button" data-task-filter="done">เสร็จแล้ว</button>
           </div>
           <div class="item-list" id="taskList"></div>
         </section>
 
+        <!-- ══════════════════════════════════
+             NOTES
+        ══════════════════════════════════ -->
         <section class="view" id="notes" aria-label="Notes">
           <form class="note-editor" id="noteForm">
             <input id="noteTitle" type="text" placeholder="หัวข้อโน้ต" required />
@@ -195,10 +214,13 @@
           <div class="item-list" id="noteList"></div>
         </section>
 
+        <!-- ══════════════════════════════════
+             EXPENSES
+        ══════════════════════════════════ -->
         <section class="view" id="expenses" aria-label="Expense tracker">
           <form class="composer" id="expenseForm">
-            <input id="expenseTitle" type="text" placeholder="รายการ เช่น กาแฟ" required />
-            <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="จำนวนเงิน" required />
+            <input id="expenseTitle"    type="text"   placeholder="รายการ เช่น กาแฟ" required />
+            <input id="expenseAmount"   type="number" min="0" step="0.01" placeholder="จำนวนเงิน" required />
             <select id="expenseCategory" aria-label="Category">
               <option>อาหาร</option>
               <option>เครื่องดื่ม</option>
@@ -219,11 +241,14 @@
           <div class="item-list" id="expenseList"></div>
         </section>
 
+        <!-- ══════════════════════════════════
+             SECRETARY
+        ══════════════════════════════════ -->
         <section class="view" id="secretary" aria-label="LINE secretary preview">
           <div class="secretary-layout">
             <section class="panel">
               <h2>Personal Secretary</h2>
-              <form id="commandForm" class="command-box">
+              <form id="commandForm" class="command-box" style="margin-top:1rem">
                 <textarea
                   id="commandText"
                   rows="5"
@@ -234,10 +259,11 @@
             </section>
             <section class="panel">
               <h2>ผลลัพธ์</h2>
-              <div class="assistant-log" id="assistantLog"></div>
+              <div class="assistant-log" id="assistantLog" style="margin-top:1rem"></div>
             </section>
           </div>
         </section>
+
       </main>
     </div>
 
