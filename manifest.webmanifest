@@ -1,0 +1,17 @@
+{
+  "name": "Johny OS Lite",
+  "short_name": "Johny OS",
+  "description": "Personal digital workspace for tasks, notes, expenses, and daily planning.",
+  "start_url": "/#dashboard",
+  "display": "standalone",
+  "background_color": "#f7f5ef",
+  "theme_color": "#1f7a6d",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
