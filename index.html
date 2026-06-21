@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Johny OS Lite - personal digital workspace for tasks, notes, expenses, and daily planning."
+    />
+    <title>Johny OS Lite</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Main navigation">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">J</div>
+          <div>
+            <strong>Johny OS</strong>
+            <span>Personal workspace</span>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <a href="#dashboard" class="nav-link active" data-view="dashboard">Dashboard</a>
+          <a href="#tasks" class="nav-link" data-view="tasks">Tasks</a>
+          <a href="#notes" class="nav-link" data-view="notes">Notes</a>
+          <a href="#expenses" class="nav-link" data-view="expenses">Expenses</a>
+          <a href="#secretary" class="nav-link" data-view="secretary">Secretary</a>
+        </nav>
+
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">
+          <span aria-hidden="true">◐</span>
+          Theme
+        </button>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Johny OS Lite</p>
+            <h1 id="viewTitle">Dashboard</h1>
+          </div>
+          <div class="today-card">
+            <span id="todayLabel"></span>
+            <strong id="focusCount">0 focus items</strong>
+          </div>
+        </header>
+
+        <section class="view active" id="dashboard" aria-labelledby="viewTitle">
+          <div class="stats-grid">
+            <article class="stat-card">
+              <span>งานทั้งหมด</span>
+              <strong id="statTotalTasks">0</strong>
+            </article>
+            <article class="stat-card">
+              <span>งานค้าง</span>
+              <strong id="statOpenTasks">0</strong>
+            </article>
+            <article class="stat-card">
+              <span>เสร็จแล้ว</span>
+              <strong id="statDoneTasks">0</strong>
+            </article>
+            <article class="stat-card">
+              <span>รายจ่ายเดือนนี้</span>
+              <strong id="statMonthExpense">฿0</strong>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel">
+              <div class="panel-head">
+                <h2>วันนี้ควรโฟกัส</h2>
+                <button class="ghost-button" type="button" data-view-jump="tasks">ดูงาน</button>
+              </div>
+              <div class="item-list" id="focusList"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <h2>สรุปรายจ่าย</h2>
+                <button class="ghost-button" type="button" data-view-jump="expenses">เพิ่มรายการ</button>
+              </div>
+              <div class="expense-bars" id="expenseBars"></div>
+            </section>
+
+            <section class="panel wide">
+              <div class="panel-head">
+                <h2>บันทึกล่าสุด</h2>
+                <button class="ghost-button" type="button" data-view-jump="notes">เปิด Notes</button>
+              </div>
+              <div class="item-list compact" id="recentNotes"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="tasks" aria-label="Task management">
+          <form class="composer" id="taskForm">
+            <input id="taskTitle" type="text" placeholder="เพิ่มงาน เช่น สรุปค่าใช้จ่ายวันนี้" required />
+            <select id="taskPriority" aria-label="Priority">
+              <option value="Low">Low</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="High">High</option>
+              <option value="Critical">Critical</option>
+            </select>
+            <input id="taskDue" type="date" aria-label="Due date" />
+            <button type="submit">เพิ่มงาน</button>
+          </form>
+
+          <div class="toolbar">
+            <button class="chip active" type="button" data-task-filter="all">ทั้งหมด</button>
+            <button class="chip" type="button" data-task-filter="open">ค้าง</button>
+            <button class="chip" type="button" data-task-filter="done">เสร็จแล้ว</button>
+          </div>
+          <div class="item-list" id="taskList"></div>
+        </section>
+
+        <section class="view" id="notes" aria-label="Notes">
+          <form class="note-editor" id="noteForm">
+            <input id="noteTitle" type="text" placeholder="หัวข้อโน้ต" required />
+            <textarea id="noteBody" rows="7" placeholder="เขียนความคิด ไอเดีย หรือความรู้ไว้ตรงนี้"></textarea>
+            <div class="editor-actions">
+              <input id="noteTags" type="text" placeholder="tags เช่น work, idea" />
+              <button type="submit">บันทึกโน้ต</button>
+            </div>
+          </form>
+          <div class="item-list" id="noteList"></div>
+        </section>
+
+        <section class="view" id="expenses" aria-label="Expense tracker">
+          <form class="composer" id="expenseForm">
+            <input id="expenseTitle" type="text" placeholder="รายการ เช่น กาแฟ" required />
+            <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="จำนวนเงิน" required />
+            <select id="expenseCategory" aria-label="Category">
+              <option>อาหาร</option>
+              <option>เครื่องดื่ม</option>
+              <option>เดินทาง</option>
+              <option>น้ำมัน</option>
+              <option>ค่าไฟ</option>
+              <option>ค่าน้ำ</option>
+              <option>อินเทอร์เน็ต</option>
+              <option>สุขภาพ</option>
+              <option>ช้อปปิ้ง</option>
+              <option>การศึกษา</option>
+              <option>ลงทุน</option>
+              <option>อื่นๆ</option>
+            </select>
+            <input id="expenseDate" type="date" aria-label="Expense date" />
+            <button type="submit">บันทึก</button>
+          </form>
+          <div class="item-list" id="expenseList"></div>
+        </section>
+
+        <section class="view" id="secretary" aria-label="LINE secretary preview">
+          <div class="secretary-layout">
+            <section class="panel">
+              <h2>Personal Secretary</h2>
+              <form id="commandForm" class="command-box">
+                <textarea
+                  id="commandText"
+                  rows="5"
+                  placeholder="ตัวอย่าง: เพิ่มงาน เรียน JavaScript พรุ่งนี้ 19:00&#10;โน้ต: ซื้อจอคอม&#10;จ่าย กาแฟ 75 เครื่องดื่ม"
+                ></textarea>
+                <button type="submit">ส่งคำสั่ง</button>
+              </form>
+            </section>
+            <section class="panel">
+              <h2>ผลลัพธ์</h2>
+              <div class="assistant-log" id="assistantLog"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
