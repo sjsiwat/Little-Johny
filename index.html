@@ -3,39 +3,85 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Johny OS Lite - personal digital workspace for tasks, notes, expenses, and daily planning."
-    />
+    <meta name="description" content="Johny Memo - personal digital workspace for tasks, notes, expenses, and daily planning." />
     <meta name="theme-color" content="#2d6a4f" />
-    <meta property="og:title" content="Johny OS Lite" />
-    <meta
-      property="og:description"
-      content="Personal digital workspace for tasks, notes, expenses, and daily planning."
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://johny.siwat.me" />
-    <title>Johny OS Lite</title>
+    <title>Johny Memo</title>
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <!-- Fonts: Caveat (hand-drawn) + Inter + Noto Sans Thai -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
+
+    <!-- Animated background canvas -->
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
     <div class="app-shell">
 
       <!-- ── Sidebar ── -->
       <aside class="sidebar" aria-label="Main navigation">
+
+        <!-- Cat mascot SVG animation -->
+        <div class="cat-mascot" aria-hidden="true">
+          <svg class="cat-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+            <!-- Body -->
+            <ellipse class="cat-body" cx="40" cy="52" rx="18" ry="16" fill="#1a1814" stroke="#1a1814" stroke-width="1.5"/>
+            <!-- Head -->
+            <circle class="cat-head" cx="40" cy="32" r="14" fill="#1a1814" stroke="#1a1814" stroke-width="1.5"/>
+            <!-- Left ear -->
+            <polygon class="cat-ear-l" points="28,22 24,10 34,18" fill="#1a1814" stroke="#1a1814" stroke-width="1.5" stroke-linejoin="round"/>
+            <!-- Right ear -->
+            <polygon class="cat-ear-r" points="52,22 56,10 46,18" fill="#1a1814" stroke="#1a1814" stroke-width="1.5" stroke-linejoin="round"/>
+            <!-- Inner ear left -->
+            <polygon points="29,20 26,13 33,18" fill="#e8a0a0" opacity="0.7"/>
+            <!-- Inner ear right -->
+            <polygon points="51,20 54,13 47,18" fill="#e8a0a0" opacity="0.7"/>
+            <!-- Eyes -->
+            <ellipse class="cat-eye-l" cx="35" cy="30" rx="2.5" ry="3" fill="#fdfaf4"/>
+            <ellipse class="cat-eye-r" cx="45" cy="30" rx="2.5" ry="3" fill="#fdfaf4"/>
+            <!-- Pupils -->
+            <ellipse class="cat-pupil-l" cx="35" cy="31" rx="1.2" ry="2" fill="#1a1814"/>
+            <ellipse class="cat-pupil-r" cx="45" cy="31" rx="1.2" ry="2" fill="#1a1814"/>
+            <!-- Eye shine -->
+            <circle cx="36" cy="29.5" r="0.6" fill="white"/>
+            <circle cx="46" cy="29.5" r="0.6" fill="white"/>
+            <!-- Nose -->
+            <polygon points="40,35 38.5,37 41.5,37" fill="#e8a0a0"/>
+            <!-- Mouth -->
+            <path d="M38.5,37 Q40,39 41.5,37" stroke="#555" stroke-width="0.8" fill="none"/>
+            <!-- Whiskers left -->
+            <line class="whisker" x1="26" y1="35" x2="36" y2="36" stroke="#888" stroke-width="0.8"/>
+            <line class="whisker" x1="25" y1="37.5" x2="36" y2="37.5" stroke="#888" stroke-width="0.8"/>
+            <line class="whisker" x1="26" y1="40" x2="36" y2="39" stroke="#888" stroke-width="0.8"/>
+            <!-- Whiskers right -->
+            <line class="whisker" x1="54" y1="35" x2="44" y2="36" stroke="#888" stroke-width="0.8"/>
+            <line class="whisker" x1="55" y1="37.5" x2="44" y2="37.5" stroke="#888" stroke-width="0.8"/>
+            <line class="whisker" x1="54" y1="40" x2="44" y2="39" stroke="#888" stroke-width="0.8"/>
+            <!-- Tail -->
+            <path class="cat-tail" d="M58,60 Q72,52 68,42 Q64,34 58,40" stroke="#1a1814" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <!-- Front paws -->
+            <ellipse cx="32" cy="67" rx="6" ry="4" fill="#1a1814"/>
+            <ellipse cx="48" cy="67" rx="6" ry="4" fill="#1a1814"/>
+            <!-- Paw lines -->
+            <line x1="30" y1="69" x2="30" y2="71" stroke="#555" stroke-width="0.8"/>
+            <line x1="32" y1="70" x2="32" y2="72" stroke="#555" stroke-width="0.8"/>
+            <line x1="34" y1="69" x2="34" y2="71" stroke="#555" stroke-width="0.8"/>
+            <line x1="46" y1="69" x2="46" y2="71" stroke="#555" stroke-width="0.8"/>
+            <line x1="48" y1="70" x2="48" y2="72" stroke="#555" stroke-width="0.8"/>
+            <line x1="50" y1="69" x2="50" y2="71" stroke="#555" stroke-width="0.8"/>
+            <!-- Blush -->
+            <ellipse cx="31" cy="36" rx="4" ry="2.5" fill="#f4a0a0" opacity="0.35"/>
+            <ellipse cx="49" cy="36" rx="4" ry="2.5" fill="#f4a0a0" opacity="0.35"/>
+          </svg>
+        </div>
+
+        <!-- Brand -->
         <div class="brand">
           <div class="brand-mark" aria-hidden="true">J</div>
           <div>
-            <strong>Johny OS</strong>
+            <strong>Johny Memo</strong>
             <span>Personal workspace</span>
           </div>
         </div>
@@ -49,18 +95,15 @@
         </nav>
 
         <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">
-          <span aria-hidden="true">◐</span>
-          Theme
+          <span aria-hidden="true">◐</span> Theme
         </button>
       </aside>
 
       <!-- ── Workspace ── -->
       <main class="workspace">
 
-        <!-- Topbar -->
         <header class="topbar">
           <div>
-            <p class="eyebrow">Johny OS Lite</p>
             <h1 id="viewTitle">Dashboard</h1>
           </div>
           <div class="today-card">
@@ -69,19 +112,14 @@
           </div>
         </header>
 
-        <!-- ══════════════════════════════════
-             DASHBOARD
-        ══════════════════════════════════ -->
+        <!-- DASHBOARD -->
         <section class="view active" id="dashboard" aria-labelledby="viewTitle">
 
-          <!-- Hero -->
-          <section class="dashboard-hero" aria-label="Johny OS introduction">
+          <section class="dashboard-hero" aria-label="Johny Memo introduction">
             <div class="hero-copy">
               <span class="hero-kicker">Personal OS in your browser</span>
-              <h2>จัดงาน โน้ต และรายจ่ายให้อยู่ในที่เดียว</h2>
-              <p>
-                Johny OS Lite คือพื้นที่ทำงานส่วนตัวที่เริ่มได้ทันที เก็บข้อมูลใน browser ก่อน แล้วค่อยต่อ LINE, AI และ cloud sync ภายหลัง
-              </p>
+              <h2>จัดงาน โน้ต และรายจ่าย<br>ให้อยู่ในที่เดียว</h2>
+              <p>Johny Memo คือพื้นที่ทำงานส่วนตัวที่เริ่มได้ทันที เก็บข้อมูลใน browser ก่อน แล้วค่อยต่อ LINE, AI และ cloud sync ภายหลัง</p>
               <div class="hero-actions">
                 <button class="primary-action" type="button" data-view-jump="tasks">เพิ่มงานแรก</button>
                 <button class="secondary-action" type="button" id="loadDemoData">โหลดข้อมูลตัวอย่าง</button>
@@ -100,75 +138,46 @@
             </div>
           </section>
 
-          <!-- Quick start -->
           <div class="quick-start-grid" aria-label="Quick start actions">
             <button class="quick-card" type="button" data-view-jump="tasks">
-              <span>01</span>
               <strong>Capture a task</strong>
               <small>เพิ่มสิ่งที่ต้องทำพร้อม priority</small>
             </button>
             <button class="quick-card" type="button" data-view-jump="notes">
-              <span>02</span>
               <strong>Save a thought</strong>
               <small>เก็บไอเดียหรือบันทึกส่วนตัว</small>
             </button>
             <button class="quick-card" type="button" data-view-jump="expenses">
-              <span>03</span>
               <strong>Track spending</strong>
               <small>บันทึกรายจ่ายและดูภาพรวม</small>
             </button>
           </div>
 
-          <!-- Stats -->
           <div class="stats-grid">
-            <article class="stat-card">
-              <span>งานทั้งหมด</span>
-              <strong id="statTotalTasks">0</strong>
-            </article>
-            <article class="stat-card">
-              <span>งานค้าง</span>
-              <strong id="statOpenTasks">0</strong>
-            </article>
-            <article class="stat-card">
-              <span>เสร็จแล้ว</span>
-              <strong id="statDoneTasks">0</strong>
-            </article>
-            <article class="stat-card">
-              <span>รายจ่ายเดือนนี้</span>
-              <strong id="statMonthExpense">฿0</strong>
-            </article>
+            <article class="stat-card"><span>งานทั้งหมด</span><strong id="statTotalTasks">0</strong></article>
+            <article class="stat-card"><span>งานค้าง</span><strong id="statOpenTasks">0</strong></article>
+            <article class="stat-card"><span>เสร็จแล้ว</span><strong id="statDoneTasks">0</strong></article>
+            <article class="stat-card"><span>รายจ่ายเดือนนี้</span><strong id="statMonthExpense">฿0</strong></article>
           </div>
 
-          <!-- Panels -->
           <div class="dashboard-grid">
             <section class="panel">
               <div class="panel-head">
-                <div>
-                  <span class="section-label">Priority queue</span>
-                  <h2>วันนี้ควรโฟกัส</h2>
-                </div>
+                <div><span class="section-label">Priority queue</span><h2>วันนี้ควรโฟกัส</h2></div>
                 <button class="ghost-button" type="button" data-view-jump="tasks">ดูงาน</button>
               </div>
               <div class="item-list" id="focusList"></div>
             </section>
-
             <section class="panel">
               <div class="panel-head">
-                <div>
-                  <span class="section-label">Money snapshot</span>
-                  <h2>สรุปรายจ่าย</h2>
-                </div>
+                <div><span class="section-label">Money snapshot</span><h2>สรุปรายจ่าย</h2></div>
                 <button class="ghost-button" type="button" data-view-jump="expenses">เพิ่มรายการ</button>
               </div>
               <div class="expense-bars" id="expenseBars"></div>
             </section>
-
             <section class="panel wide">
               <div class="panel-head">
-                <div>
-                  <span class="section-label">Knowledge base</span>
-                  <h2>บันทึกล่าสุด</h2>
-                </div>
+                <div><span class="section-label">Knowledge base</span><h2>บันทึกล่าสุด</h2></div>
                 <button class="ghost-button" type="button" data-view-jump="notes">เปิด Notes</button>
               </div>
               <div class="item-list compact" id="recentNotes"></div>
@@ -176,9 +185,7 @@
           </div>
         </section>
 
-        <!-- ══════════════════════════════════
-             TASKS
-        ══════════════════════════════════ -->
+        <!-- TASKS -->
         <section class="view" id="tasks" aria-label="Task management">
           <form class="composer" id="taskForm">
             <input id="taskTitle" type="text" placeholder="เพิ่มงาน เช่น สรุปค่าใช้จ่ายวันนี้" required />
@@ -193,15 +200,13 @@
           </form>
           <div class="toolbar">
             <button class="chip active" type="button" data-task-filter="all">ทั้งหมด</button>
-            <button class="chip"        type="button" data-task-filter="open">ค้าง</button>
-            <button class="chip"        type="button" data-task-filter="done">เสร็จแล้ว</button>
+            <button class="chip" type="button" data-task-filter="open">ค้าง</button>
+            <button class="chip" type="button" data-task-filter="done">เสร็จแล้ว</button>
           </div>
           <div class="item-list" id="taskList"></div>
         </section>
 
-        <!-- ══════════════════════════════════
-             NOTES
-        ══════════════════════════════════ -->
+        <!-- NOTES -->
         <section class="view" id="notes" aria-label="Notes">
           <form class="note-editor" id="noteForm">
             <input id="noteTitle" type="text" placeholder="หัวข้อโน้ต" required />
@@ -214,26 +219,16 @@
           <div class="item-list" id="noteList"></div>
         </section>
 
-        <!-- ══════════════════════════════════
-             EXPENSES
-        ══════════════════════════════════ -->
+        <!-- EXPENSES -->
         <section class="view" id="expenses" aria-label="Expense tracker">
           <form class="composer" id="expenseForm">
-            <input id="expenseTitle"    type="text"   placeholder="รายการ เช่น กาแฟ" required />
-            <input id="expenseAmount"   type="number" min="0" step="0.01" placeholder="จำนวนเงิน" required />
+            <input id="expenseTitle" type="text" placeholder="รายการ เช่น กาแฟ" required />
+            <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="จำนวนเงิน" required />
             <select id="expenseCategory" aria-label="Category">
-              <option>อาหาร</option>
-              <option>เครื่องดื่ม</option>
-              <option>เดินทาง</option>
-              <option>น้ำมัน</option>
-              <option>ค่าไฟ</option>
-              <option>ค่าน้ำ</option>
-              <option>อินเทอร์เน็ต</option>
-              <option>สุขภาพ</option>
-              <option>ช้อปปิ้ง</option>
-              <option>การศึกษา</option>
-              <option>ลงทุน</option>
-              <option>อื่นๆ</option>
+              <option>อาหาร</option><option>เครื่องดื่ม</option><option>เดินทาง</option>
+              <option>น้ำมัน</option><option>ค่าไฟ</option><option>ค่าน้ำ</option>
+              <option>อินเทอร์เน็ต</option><option>สุขภาพ</option><option>ช้อปปิ้ง</option>
+              <option>การศึกษา</option><option>ลงทุน</option><option>อื่นๆ</option>
             </select>
             <input id="expenseDate" type="date" aria-label="Expense date" />
             <button type="submit">บันทึก</button>
@@ -241,31 +236,320 @@
           <div class="item-list" id="expenseList"></div>
         </section>
 
-        <!-- ══════════════════════════════════
-             SECRETARY
-        ══════════════════════════════════ -->
+        <!-- SECRETARY -->
         <section class="view" id="secretary" aria-label="LINE secretary preview">
           <div class="secretary-layout">
             <section class="panel">
               <h2>Personal Secretary</h2>
-              <form id="commandForm" class="command-box" style="margin-top:1rem">
-                <textarea
-                  id="commandText"
-                  rows="5"
-                  placeholder="ตัวอย่าง: เพิ่มงาน เรียน JavaScript พรุ่งนี้ 19:00&#10;โน้ต: ซื้อจอคอม&#10;จ่าย กาแฟ 75 เครื่องดื่ม"
-                ></textarea>
+              <form id="commandForm" class="command-box secretary-form">
+                <textarea id="commandText" rows="5" placeholder="ตัวอย่าง: เพิ่มงาน เรียน JavaScript พรุ่งนี้ 19:00&#10;โน้ต: ซื้อจอคอม&#10;จ่าย กาแฟ 75 เครื่องดื่ม"></textarea>
                 <button type="submit">ส่งคำสั่ง</button>
               </form>
             </section>
             <section class="panel">
-              <h2>ผลลัพธ์</h2>
-              <div class="assistant-log" id="assistantLog" style="margin-top:1rem"></div>
+              <h3>ผลลัพธ์</h3>
+              <div class="assistant-log" id="assistantLog"></div>
             </section>
           </div>
         </section>
 
       </main>
     </div>
+
+    <!-- ═══════════════════════════════════════
+         ANIMATED BACKGROUND — Multi-layer canvas
+    ═══════════════════════════════════════ -->
+    <script>
+    (function () {
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
+      let W, H;
+
+      /* ── Palette: vivid contrasting colors ── */
+      function getPalette() {
+        const dark = document.documentElement.dataset.theme === 'dark';
+        return dark ? {
+          blobs: [
+            'rgba(116,198,157,0.18)',   // teal
+            'rgba(240,128,96,0.16)',    // coral
+            'rgba(123,168,238,0.16)',   // blue
+            'rgba(230,192,96,0.14)',    // amber
+            'rgba(200,120,220,0.14)',   // violet
+          ],
+          rings:   ['rgba(116,198,157,0.28)', 'rgba(240,128,96,0.24)', 'rgba(123,168,238,0.22)', 'rgba(230,192,96,0.20)'],
+          dots:    ['rgba(116,198,157,0.55)', 'rgba(240,128,96,0.50)', 'rgba(123,168,238,0.50)', 'rgba(230,192,96,0.45)', 'rgba(200,120,220,0.45)'],
+          lines:   'rgba(116,198,157,0.14)',
+          stroke:  'rgba(116,198,157,0.18)',
+          tri:     ['rgba(116,198,157,0.20)', 'rgba(240,128,96,0.18)', 'rgba(200,120,220,0.16)'],
+          cross:   'rgba(230,192,96,0.22)',
+        } : {
+          blobs: [
+            'rgba(45,106,79,0.13)',    // green
+            'rgba(193,68,14,0.11)',    // red-orange
+            'rgba(38,85,160,0.11)',    // blue
+            'rgba(154,107,0,0.10)',    // amber
+            'rgba(140,50,170,0.09)',   // purple
+          ],
+          rings:   ['rgba(45,106,79,0.22)', 'rgba(193,68,14,0.20)', 'rgba(38,85,160,0.18)', 'rgba(154,107,0,0.17)'],
+          dots:    ['rgba(45,106,79,0.45)', 'rgba(193,68,14,0.40)', 'rgba(38,85,160,0.40)', 'rgba(154,107,0,0.36)', 'rgba(140,50,170,0.36)'],
+          lines:   'rgba(45,106,79,0.10)',
+          stroke:  'rgba(45,106,79,0.12)',
+          tri:     ['rgba(45,106,79,0.16)', 'rgba(193,68,14,0.14)', 'rgba(140,50,170,0.12)'],
+          cross:   'rgba(154,107,0,0.18)',
+        };
+      }
+
+      /* ── Helpers ── */
+      function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+
+      function wrap(obj, pad = 200) {
+        if (obj.x > W + pad) obj.x = -pad;
+        else if (obj.x < -pad) obj.x = W + pad;
+        if (obj.y > H + pad) obj.y = -pad;
+        else if (obj.y < -pad) obj.y = H + pad;
+      }
+
+      function rand(min, max) { return min + Math.random() * (max - min); }
+      function randInt(min, max) { return Math.floor(rand(min, max)); }
+
+      /* ── Blobs ── */
+      let blobs;
+      function initBlobs() {
+        blobs = [
+          { x: W*0.10, y: H*0.15, r: Math.min(W,H)*0.30, dx:0.18, dy:0.12, ci:0 },
+          { x: W*0.80, y: H*0.10, r: Math.min(W,H)*0.26, dx:-0.14,dy:0.16, ci:1 },
+          { x: W*0.55, y: H*0.70, r: Math.min(W,H)*0.22, dx:0.11, dy:-0.13,ci:2 },
+          { x: W*0.92, y: H*0.55, r: Math.min(W,H)*0.20, dx:-0.16,dy:-0.10,ci:3 },
+          { x: W*0.15, y: H*0.82, r: Math.min(W,H)*0.18, dx:0.13, dy:0.17, ci:4 },
+          { x: W*0.45, y: H*0.30, r: Math.min(W,H)*0.15, dx:-0.12,dy:-0.08,ci:1 },
+        ];
+      }
+
+      function drawBlobs(p) {
+        ctx.save();
+        ctx.filter = 'blur(55px)';
+        blobs.forEach(b => {
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+          ctx.fillStyle = p.blobs[b.ci];
+          ctx.fill();
+          b.x += b.dx; b.y += b.dy;
+          wrap(b, 300);
+        });
+        ctx.filter = 'none';
+        ctx.restore();
+      }
+
+      /* ── Rings ── */
+      let rings;
+      function initRings() {
+        rings = Array.from({length: 14}, (_, i) => ({
+          x: rand(0, W), y: rand(0, H),
+          r: rand(20, 110),
+          dx: rand(-0.35, 0.35), dy: rand(-0.28, 0.28),
+          rot: rand(0, Math.PI*2), drot: rand(-0.005, 0.005),
+          lw: rand(1, 2.5),
+          dash: Math.random() > 0.45,
+          ci: randInt(0, 4),
+        }));
+      }
+
+      function drawRings(p) {
+        rings.forEach(r => {
+          ctx.save();
+          ctx.translate(r.x, r.y);
+          ctx.rotate(r.rot);
+          ctx.beginPath();
+          ctx.arc(0, 0, r.r, 0, Math.PI*2);
+          ctx.strokeStyle = p.rings[r.ci];
+          ctx.lineWidth = r.lw;
+          ctx.setLineDash(r.dash ? [8,12] : []);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.restore();
+          r.x += r.dx; r.y += r.dy; r.rot += r.drot;
+          wrap(r, 150);
+        });
+      }
+
+      /* ── Particles ── */
+      let pts;
+      function initParticles() {
+        pts = Array.from({length: 70}, (_, i) => ({
+          x: rand(0, W), y: rand(0, H),
+          r: rand(2, 5),
+          dx: rand(-0.45, 0.45), dy: rand(-0.40, 0.40),
+          pulse: rand(0, Math.PI*2), dp: rand(0.014, 0.025),
+          ci: randInt(0, 5),
+        }));
+      }
+
+      function drawParticles(p) {
+        pts.forEach(pt => {
+          pt.pulse += pt.dp;
+          const s = 0.65 + Math.sin(pt.pulse) * 0.35;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, pt.r * s, 0, Math.PI*2);
+          ctx.fillStyle = p.dots[pt.ci];
+          ctx.fill();
+          pt.x += pt.dx; pt.y += pt.dy;
+          wrap(pt, 50);
+        });
+      }
+
+      /* ── Connection lines between nearby particles ── */
+      function drawConnections(p) {
+        const thresh = 140;
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i+1; j < pts.length; j++) {
+            const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+            const d = Math.sqrt(dx*dx + dy*dy);
+            if (d < thresh) {
+              ctx.beginPath();
+              ctx.moveTo(pts[i].x, pts[i].y);
+              ctx.lineTo(pts[j].x, pts[j].y);
+              const a = (1 - d/thresh) * 0.18;
+              ctx.strokeStyle = p.lines.replace(/[\d.]+\)$/, a + ')');
+              ctx.lineWidth = 0.6;
+              ctx.stroke();
+            }
+          }
+        }
+      }
+
+      /* ── Wavy sketch lines ── */
+      let sketches;
+      function initSketches() {
+        sketches = Array.from({length: 7}, () => {
+          const sx = rand(0, W), sy = rand(0, H);
+          return {
+            pts: Array.from({length:7}, (_, j) => ({
+              x: sx + (j-3)*100 + rand(-40,40),
+              y: sy + rand(-60,60)
+            })),
+            dx: rand(-0.22,0.22), dy: rand(-0.18,0.18),
+            t: rand(0, Math.PI*2), dt: rand(0.007,0.013),
+          };
+        });
+      }
+
+      function drawSketches(p) {
+        sketches.forEach(s => {
+          s.t += s.dt;
+          ctx.beginPath();
+          ctx.strokeStyle = p.stroke;
+          ctx.lineWidth = 1.2;
+          ctx.setLineDash([5,10]);
+          const pp = s.pts;
+          ctx.moveTo(pp[0].x + Math.sin(s.t)*10, pp[0].y + Math.cos(s.t*0.7)*6);
+          for (let i=1;i<pp.length;i++) {
+            const cpx = pp[i-1].x + (pp[i].x-pp[i-1].x)*0.5 + Math.sin(s.t+i)*18;
+            const cpy = pp[i-1].y + Math.sin(s.t*0.9+i)*22;
+            ctx.quadraticCurveTo(cpx, cpy, pp[i].x + Math.sin(s.t+i*0.5)*12, pp[i].y + Math.cos(s.t+i)*10);
+          }
+          ctx.stroke();
+          ctx.setLineDash([]);
+          pp.forEach(pt => { pt.x += s.dx; pt.y += s.dy; });
+          const cx = pp.reduce((a,pt)=>a+pt.x,0)/pp.length;
+          const cy = pp.reduce((a,pt)=>a+pt.y,0)/pp.length;
+          if (cx>W+400||cx<-400) pp.forEach(pt=>{pt.x -= s.dx*W*2;});
+          if (cy>H+400||cy<-400) pp.forEach(pt=>{pt.y -= s.dy*H*2;});
+        });
+      }
+
+      /* ── Floating triangles ── */
+      let tris;
+      function initTris() {
+        tris = Array.from({length: 8}, () => ({
+          x: rand(0,W), y: rand(0,H),
+          size: rand(12,40),
+          dx: rand(-0.3,0.3), dy: rand(-0.25,0.25),
+          rot: rand(0,Math.PI*2), drot: rand(-0.006,0.006),
+          ci: randInt(0,3),
+          filled: Math.random() > 0.5,
+        }));
+      }
+
+      function drawTris(p) {
+        tris.forEach(t => {
+          ctx.save();
+          ctx.translate(t.x, t.y);
+          ctx.rotate(t.rot);
+          ctx.beginPath();
+          ctx.moveTo(0, -t.size);
+          ctx.lineTo(t.size*0.866, t.size*0.5);
+          ctx.lineTo(-t.size*0.866, t.size*0.5);
+          ctx.closePath();
+          if (t.filled) {
+            ctx.fillStyle = p.tri[t.ci];
+            ctx.fill();
+          } else {
+            ctx.strokeStyle = p.tri[t.ci];
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          }
+          ctx.restore();
+          t.x += t.dx; t.y += t.dy; t.rot += t.drot;
+          wrap(t, 60);
+        });
+      }
+
+      /* ── Floating crosses / plus signs ── */
+      let crosses;
+      function initCrosses() {
+        crosses = Array.from({length: 10}, () => ({
+          x: rand(0,W), y: rand(0,H),
+          size: rand(6,20),
+          dx: rand(-0.28,0.28), dy: rand(-0.22,0.22),
+          rot: rand(0,Math.PI*2), drot: rand(-0.008,0.008),
+          pulse: rand(0,Math.PI*2), dp: rand(0.01,0.02),
+        }));
+      }
+
+      function drawCrosses(p) {
+        crosses.forEach(c => {
+          c.pulse += c.dp;
+          const s = c.size * (0.8 + Math.sin(c.pulse)*0.2);
+          ctx.save();
+          ctx.translate(c.x, c.y);
+          ctx.rotate(c.rot);
+          ctx.strokeStyle = p.cross;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(-s,0); ctx.lineTo(s,0);
+          ctx.moveTo(0,-s); ctx.lineTo(0,s);
+          ctx.stroke();
+          ctx.restore();
+          c.x += c.dx; c.y += c.dy; c.rot += c.drot;
+          wrap(c, 30);
+        });
+      }
+
+      /* ── Main loop ── */
+      function init() {
+        resize();
+        initBlobs(); initRings(); initParticles(); initSketches();
+        initTris(); initCrosses();
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        const p = getPalette();
+        drawBlobs(p);
+        drawSketches(p);
+        drawTris(p);
+        drawCrosses(p);
+        drawRings(p);
+        drawConnections(p);
+        drawParticles(p);
+        requestAnimationFrame(draw);
+      }
+
+      window.addEventListener('resize', init);
+      init();
+      draw();
+    })();
+    </script>
 
     <script src="./app.js"></script>
   </body>
