@@ -1,5 +1,20 @@
 const STORAGE_KEY = "johny-os-lite-state";
 
+let toastTimer = null;
+function showToast(message, type = "success") {
+  const existing = document.getElementById("app-toast");
+  if (existing) existing.remove();
+  if (toastTimer) clearTimeout(toastTimer);
+  const toast = document.createElement("div");
+  toast.id = "app-toast";
+  toast.className = `app-toast${type === "error" ? " app-toast--error" : ""}`;
+  toast.setAttribute("role", "status");
+  toast.setAttribute("aria-live", "polite");
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  toastTimer = setTimeout(() => toast.remove(), 3000);
+}
+
 function createDemoState() {
   const today = new Date();
   const tomorrow = new Date(today);
@@ -247,20 +262,24 @@ function renderTasks() {
     ? filtered
         .sort((a, b) => (a.due || "9999").localeCompare(b.due || "9999"))
         .map(
-          (task) => `
-            <article class="list-item ${task.status === "Completed" ? "done" : ""}">
+          (task) => {
+            const done = task.status === "Completed";
+            return `
+            <article class="list-item ${done ? "done" : ""}" aria-label="${escapeHtml(task.title)}${done ? " (เสร็จแล้ว)" : ""}">
               <div>
                 <span class="item-title">${escapeHtml(task.title)}</span>
                 <span class="item-meta">
-                  <span class="priority-${task.priority}">${task.priority}</span> · ${formatDate(task.due)} · ${task.status}
+                  <span class="priority-${task.priority}">${task.priority}</span> · ${formatDate(task.due)}${done ? " · ✓ เสร็จแล้ว" : ""}
                 </span>
               </div>
               <div class="item-actions">
-                <button class="icon-button" type="button" data-toggle-task="${task.id}" title="Toggle done">✓</button>
-                <button class="icon-button" type="button" data-delete-task="${task.id}" title="Delete">×</button>
+                <button class="icon-button" type="button" data-toggle-task="${task.id}"
+                  aria-pressed="${done}" title="${done ? "เปิดงานอีกครั้ง" : "ทำเครื่องหมายเสร็จ"}">✓</button>
+                <button class="icon-button" type="button" data-delete-task="${task.id}" title="ลบงาน">×</button>
               </div>
             </article>
-          `
+          `;
+          }
         )
         .join("")
     : emptyState("ยังไม่มีงานในมุมมองนี้", "tasks", "เพิ่มงาน");
@@ -468,14 +487,13 @@ document.getElementById("loadDemoData")?.addEventListener("click", loadDemoData)
 
 document.getElementById("taskForm").addEventListener("submit", (event) => {
   event.preventDefault();
-  addTask(
-    document.getElementById("taskTitle").value.trim(),
-    document.getElementById("taskPriority").value,
-    document.getElementById("taskDue").value
-  );
+  const title = document.getElementById("taskTitle").value.trim();
+  if (!title) return;
+  addTask(title, document.getElementById("taskPriority").value, document.getElementById("taskDue").value);
   event.currentTarget.reset();
   document.getElementById("taskPriority").value = "Medium";
   render();
+  showToast(`เพิ่มงาน "${title}" แล้ว`);
 });
 
 document.querySelectorAll("[data-task-filter]").forEach((button) => {
@@ -490,27 +508,25 @@ document.querySelectorAll("[data-task-filter]").forEach((button) => {
 
 document.getElementById("noteForm").addEventListener("submit", (event) => {
   event.preventDefault();
-  addNote(
-    document.getElementById("noteTitle").value.trim(),
-    document.getElementById("noteBody").value.trim(),
-    document.getElementById("noteTags").value.trim()
-  );
+  const title = document.getElementById("noteTitle").value.trim();
+  if (!title) return;
+  addNote(title, document.getElementById("noteBody").value.trim(), document.getElementById("noteTags").value.trim());
   event.currentTarget.reset();
   render();
+  showToast(`บันทึกโน้ต "${title}" แล้ว`);
 });
 
 document.getElementById("expenseDate").value = new Date().toISOString().slice(0, 10);
 document.getElementById("expenseForm").addEventListener("submit", (event) => {
   event.preventDefault();
-  addExpense(
-    document.getElementById("expenseTitle").value.trim(),
-    document.getElementById("expenseAmount").value,
-    document.getElementById("expenseCategory").value,
-    document.getElementById("expenseDate").value
-  );
+  const title = document.getElementById("expenseTitle").value.trim();
+  const amount = document.getElementById("expenseAmount").value;
+  if (!title || !amount) return;
+  addExpense(title, amount, document.getElementById("expenseCategory").value, document.getElementById("expenseDate").value);
   event.currentTarget.reset();
   document.getElementById("expenseDate").value = new Date().toISOString().slice(0, 10);
   render();
+  showToast(`บันทึก ${title} ${formatMoney(Number(amount))} แล้ว`);
 });
 
 document.getElementById("commandForm").addEventListener("submit", (event) => {
@@ -537,27 +553,63 @@ document.addEventListener("click", (event) => {
   }
 
   if (toggleId) {
-    state.tasks = state.tasks.map((task) =>
-      task.id === toggleId
-        ? { ...task, status: task.status === "Completed" ? "Pending" : "Completed" }
-        : task
+    const task = state.tasks.find((t) => t.id === toggleId);
+    state.tasks = state.tasks.map((t) =>
+      t.id === toggleId ? { ...t, status: t.status === "Completed" ? "Pending" : "Completed" } : t
     );
     render();
+    if (task) {
+      const nowDone = state.tasks.find((t) => t.id === toggleId)?.status === "Completed";
+      showToast(nowDone ? `เสร็จแล้ว: ${task.title}` : `เปิดงานอีกครั้ง: ${task.title}`);
+    }
   }
 
   if (deleteTaskId) {
-    state.tasks = state.tasks.filter((task) => task.id !== deleteTaskId);
+    const task = state.tasks.find((t) => t.id === deleteTaskId);
+    if (!task || !confirm(`ลบงาน "${task.title}"?`)) return;
+    state.tasks = state.tasks.filter((t) => t.id !== deleteTaskId);
     render();
+    showToast("ลบงานแล้ว");
   }
 
   if (deleteNoteId) {
-    state.notes = state.notes.filter((note) => note.id !== deleteNoteId);
+    const note = state.notes.find((n) => n.id === deleteNoteId);
+    if (!note || !confirm(`ลบโน้ต "${note.title}"?`)) return;
+    state.notes = state.notes.filter((n) => n.id !== deleteNoteId);
     render();
+    showToast("ลบโน้ตแล้ว");
   }
 
   if (deleteExpenseId) {
-    state.expenses = state.expenses.filter((expense) => expense.id !== deleteExpenseId);
+    const expense = state.expenses.find((e) => e.id === deleteExpenseId);
+    if (!expense || !confirm(`ลบรายการ "${expense.title}"?`)) return;
+    state.expenses = state.expenses.filter((e) => e.id !== deleteExpenseId);
     render();
+    showToast("ลบรายจ่ายแล้ว");
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.matches("input, textarea, select")) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+  const viewKeys = { "1": "dashboard", "2": "tasks", "3": "notes", "4": "expenses", "5": "secretary" };
+  if (viewKeys[e.key]) {
+    e.preventDefault();
+    setView(viewKeys[e.key]);
+    return;
+  }
+
+  if (e.key === "n" || e.key === "N") {
+    e.preventDefault();
+    const activeView = document.querySelector(".view.active");
+    const firstInput = activeView?.querySelector('input[type="text"], input[type="number"], textarea');
+    if (firstInput) { firstInput.focus(); firstInput.select(); }
+    return;
+  }
+
+  if (e.key === "Escape") {
+    document.activeElement?.blur();
   }
 });
 

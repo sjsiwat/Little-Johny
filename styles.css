@@ -1,25 +1,28 @@
 /* ============================================================
-   JOHNY OS LITE — Hand-Drawn Style Redesign v2
-   Fixes: sidebar width, font readability, line-height, card fonts
-   New:   layered animated background (floating shapes + particles)
+   JOHNY OS LITE — Hand-Drawn Redesign v3
+   Fixes from screenshot feedback:
+   1. Sidebar narrower (ด้านซ้ายเล็กลง)
+   2. Today-card font อ่านง่ายขึ้น
+   3. กล่องทุกใบ — ใช้ Inter ไม่ใช่ Caveat (อ่านง่าย)
+   4. Quick-card title ใหญ่ขึ้น + description อ่านชัด
+   5. เพิ่ม line-height / spacing ระหว่างบรรทัด
+   New: layered animated bg (blobs + rings + particles + lines)
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap');
 
-/* ============================================================
-   DESIGN TOKENS
-   ============================================================ */
+/* ── Tokens ── */
 :root {
   color-scheme: light;
-  --bg:              #f5f0e8;
-  --surface:         #fdfaf4;
-  --surface-raised:  #fffef9;
-  --surface-soft:    #eee8d8;
+  --bg:              #f0f3f0;
+  --surface:         #f8faf8;
+  --surface-raised:  #fcfdfc;
+  --surface-soft:    #e8ede8;
   --ink:             #1a1814;
   --ink-muted:       #6b6357;
-  --ink-faint:       #b0a898;
-  --line:            #c8bfae;
-  --line-soft:       #ddd6c8;
+  --ink-faint:       #706457;
+  --line:            #c4cac4;
+  --line-soft:       #d8ddd8;
   --primary:         #2d6a4f;
   --primary-light:   #52b788;
   --primary-soft:    #d8f3dc;
@@ -27,16 +30,16 @@
   --accent-soft:     #fde8df;
   --amber:           #9a6b00;
   --blue:            #2655a0;
-  --shadow-sketch:   4px 4px 0 #c8bfae;
-  --shadow-sketch-sm: 2px 2px 0 #c8bfae;
-  --shadow-hover:    6px 6px 0 #b0a898;
-  --radius-sm:  10px;
-  --radius-md:  16px;
-  --radius-lg:  22px;
-  --radius-xl:  30px;
-  --font-hand:  'Caveat', cursive;
-  --font-body:  Inter, 'Noto Sans Thai', ui-sans-serif, system-ui, sans-serif;
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --shadow-sketch:    4px 4px 0 #c4cac4;
+  --shadow-sketch-sm: 2px 2px 0 #c4cac4;
+  --shadow-hover:     6px 6px 0 #b0b8b0;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 30px;
+  --font-hand: 'Caveat', cursive;
+  --font-body: Inter, 'Noto Sans Thai', ui-sans-serif, system-ui, sans-serif;
+  --ease-snap:   cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
   --t-fast: 140ms;
   --t-mid:  260ms;
@@ -50,7 +53,7 @@
   --surface-soft:    #2a2720;
   --ink:             #f0ebe0;
   --ink-muted:       #a89e8e;
-  --ink-faint:       #6a6058;
+  --ink-faint:       #9a8e82;
   --line:            #3c3830;
   --line-soft:       #302d25;
   --primary:         #74c69d;
@@ -60,14 +63,12 @@
   --accent-soft:     #3d1c0f;
   --amber:           #e6c060;
   --blue:            #7ba8ee;
-  --shadow-sketch:   4px 4px 0 #0a0907;
+  --shadow-sketch:    4px 4px 0 #0a0907;
   --shadow-sketch-sm: 2px 2px 0 #0a0907;
-  --shadow-hover:    6px 6px 0 #050403;
+  --shadow-hover:     6px 6px 0 #050403;
 }
 
-/* ============================================================
-   RESET
-   ============================================================ */
+/* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -76,7 +77,7 @@ a { text-decoration: none; }
 h1, h2, h3, p { margin: 0; }
 
 /* ============================================================
-   BACKGROUND — dot grid + animated canvas layer
+   BACKGROUND — dot grid paper + animated canvas
    ============================================================ */
 body {
   min-height: 100vh;
@@ -89,7 +90,7 @@ body {
   line-height: 1.65;
 }
 
-/* Canvas sits behind everything */
+/* ── Canvas layer ── */
 #bg-canvas {
   position: fixed;
   inset: 0;
@@ -97,23 +98,18 @@ body {
   height: 100%;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.55;
+  opacity: 0.6;
 }
 
-[data-theme="dark"] #bg-canvas { opacity: 0.35; }
+[data-theme="dark"] #bg-canvas { opacity: 0.4; }
 
+/* ── App shell sits above canvas ── */
 .app-shell {
   position: relative;
   z-index: 1;
-}
-
-/* ============================================================
-   APP SHELL
-   ============================================================ */
-.app-shell {
   display: grid;
-  /* FIX 1: sidebar narrower — 13.5rem instead of 17rem */
-  grid-template-columns: 13.5rem minmax(0, 1fr);
+  /* FIX 1: narrower sidebar */
+  grid-template-columns: 13rem minmax(0, 1fr);
   min-height: 100vh;
 }
 
@@ -124,10 +120,9 @@ body {
   position: sticky;
   top: 0;
   height: 100vh;
-  /* FIX 1b: tighter padding to match smaller width */
   padding: 1.25rem 1rem;
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
-  backdrop-filter: blur(16px);
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  backdrop-filter: blur(18px);
   border-right: 2px solid var(--line);
   display: flex;
   flex-direction: column;
@@ -137,15 +132,15 @@ body {
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  margin-bottom: 1.75rem;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 2px dashed var(--line);
 }
 
 .brand-mark {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.4rem;
+  height: 2.4rem;
   flex-shrink: 0;
   display: grid;
   place-items: center;
@@ -153,11 +148,11 @@ body {
   background: var(--primary);
   color: #fff;
   font-family: var(--font-hand);
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   font-weight: 700;
   border: 2px solid var(--ink);
   box-shadow: var(--shadow-sketch-sm);
-  animation: brand-pop 0.6s var(--ease-spring) both;
+  animation: brand-pop 0.6s var(--ease-snap) both;
 }
 
 @keyframes brand-pop {
@@ -168,50 +163,144 @@ body {
 .brand strong {
   display: block;
   font-family: var(--font-hand);
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .brand span {
   display: block;
-  /* FIX 2: smaller subtitle, Inter not Caveat */
   font-family: var(--font-body);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--ink-muted);
 }
 
+/* ── Cat Mascot ── */
+.cat-mascot {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  margin-top: -0.25rem;
+}
+
+.cat-svg {
+  width: 72px;
+  height: 72px;
+  /* Idle: subtle float up-down */
+  animation: cat-float 3.5s ease-in-out infinite;
+  filter: drop-shadow(1px 3px 4px rgba(0,0,0,0.18));
+  transform-origin: center bottom;
+}
+
+@keyframes cat-float {
+  0%,100% { transform: translateY(0) rotate(-1deg); }
+  25%      { transform: translateY(-5px) rotate(0deg); }
+  50%      { transform: translateY(-8px) rotate(1deg); }
+  75%      { transform: translateY(-4px) rotate(0deg); }
+}
+
+/* Tail wag */
+.cat-tail {
+  transform-origin: 58px 60px;
+  animation: tail-wag 1.8s ease-in-out infinite;
+}
+
+@keyframes tail-wag {
+  0%,100% { transform: rotate(0deg); }
+  30%     { transform: rotate(18deg); }
+  70%     { transform: rotate(-12deg); }
+}
+
+/* Blink eyes */
+.cat-eye-l, .cat-eye-r,
+.cat-pupil-l, .cat-pupil-r {
+  animation: cat-blink 4s ease-in-out infinite;
+}
+
+@keyframes cat-blink {
+  0%,45%,55%,100% { transform: scaleY(1); }
+  48%,52%         { transform: scaleY(0.05); }
+}
+
+/* Ear twitch */
+.cat-ear-l {
+  transform-origin: 29px 22px;
+  animation: ear-l 5s ease-in-out infinite;
+}
+.cat-ear-r {
+  transform-origin: 51px 22px;
+  animation: ear-r 5s ease-in-out infinite 0.6s;
+}
+
+@keyframes ear-l {
+  0%,80%,100% { transform: rotate(0deg); }
+  85%         { transform: rotate(-8deg); }
+  92%         { transform: rotate(4deg); }
+}
+@keyframes ear-r {
+  0%,80%,100% { transform: rotate(0deg); }
+  85%         { transform: rotate(8deg); }
+  92%         { transform: rotate(-4deg); }
+}
+
+/* Whisker twitch */
+.whisker {
+  animation: whisker-twitch 3s ease-in-out infinite;
+}
+
+@keyframes whisker-twitch {
+  0%,70%,100% { opacity: 1; }
+  75%         { opacity: 0.4; }
+  80%         { opacity: 1; }
+}
+
+/* Dark mode cat: lighter outline */
+[data-theme="dark"] .cat-svg ellipse.cat-body,
+[data-theme="dark"] .cat-svg circle.cat-head,
+[data-theme="dark"] .cat-svg polygon.cat-ear-l,
+[data-theme="dark"] .cat-svg polygon.cat-ear-r,
+[data-theme="dark"] .cat-svg ellipse[cx="32"],
+[data-theme="dark"] .cat-svg ellipse[cx="48"] {
+  fill: #c0bab0;
+  stroke: #a09890;
+}
+
+[data-theme="dark"] .cat-tail {
+  stroke: #c0bab0;
+}
+
+/* ── Nav list ── */
 .nav-list {
   display: grid;
-  gap: 0.35rem;
+  gap: 0.28rem;
   flex: 1;
 }
 
 .nav-link {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  /* FIX 1c: compact nav padding */
-  padding: 0.6rem 0.75rem;
-  border-radius: var(--radius-md);
+  gap: 0.5rem;
+  /* ลดความสูง nav item */
+  padding: 0.42rem 0.7rem;
+  border-radius: var(--radius-sm);
   border: 1.5px solid transparent;
   color: var(--ink-muted);
-  /* FIX 3: body font for nav, not Caveat */
   font-family: var(--font-body);
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 500;
   transition:
     color var(--t-fast) var(--ease-out),
     background var(--t-fast) var(--ease-out),
     border-color var(--t-fast) var(--ease-out),
-    transform var(--t-fast) var(--ease-spring),
+    transform var(--t-fast) var(--ease-snap),
     box-shadow var(--t-fast) var(--ease-out);
 }
 
-.nav-link[data-view="dashboard"]::before { content: "⊞"; font-size: 0.95rem; }
-.nav-link[data-view="tasks"]::before     { content: "✓"; font-size: 0.95rem; }
-.nav-link[data-view="notes"]::before     { content: "✎"; font-size: 0.95rem; }
-.nav-link[data-view="expenses"]::before  { content: "฿"; font-size: 0.95rem; }
-.nav-link[data-view="secretary"]::before { content: "✦"; font-size: 0.85rem; }
+.nav-link[data-view="dashboard"]::before { content: "⊞"; font-size: 0.9rem; }
+.nav-link[data-view="tasks"]::before     { content: "✓"; font-size: 0.9rem; }
+.nav-link[data-view="notes"]::before     { content: "✎"; font-size: 0.9rem; }
+.nav-link[data-view="expenses"]::before  { content: "฿"; font-size: 0.9rem; }
+.nav-link[data-view="secretary"]::before { content: "✦"; font-size: 0.8rem; }
 
 .nav-link:hover {
   color: var(--ink);
@@ -232,16 +321,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.55rem 0.9rem;
+  gap: 0.45rem;
+  padding: 0.55rem 0.8rem;
   margin-top: 1rem;
   border-radius: var(--radius-md);
   border: 1.5px dashed var(--line);
   background: var(--surface-soft);
   color: var(--ink-muted);
   font-family: var(--font-body);
-  font-size: 0.84rem;
-  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast) var(--ease-spring);
+  font-size: 0.82rem;
+  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast) var(--ease-snap);
 }
 
 .theme-toggle:hover {
@@ -269,11 +358,9 @@ body {
 
 .eyebrow {
   font-family: var(--font-body);
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--ink-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--ink-faint);
   margin-bottom: 0.3rem;
 }
 
@@ -290,36 +377,33 @@ h1 {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* FIX 2: today-card — larger, more readable text */
+/* FIX 2: today-card — bigger, readable */
 .today-card {
   min-width: 14rem;
   padding: 1rem 1.25rem;
-  border-radius: var(--radius-lg);
-  border: 2px solid var(--line);
-  background: var(--surface);
-  box-shadow: var(--shadow-sketch);
-  animation: slide-down 0.5s 0.1s var(--ease-out) both;
 }
 
 .today-card span {
   display: block;
-  /* FIX 2a: bigger label text */
   font-family: var(--font-body);
-  font-size: 0.82rem;
+  /* FIX 2a: larger muted label */
+  font-size: 0.84rem;
   color: var(--ink-muted);
   margin-bottom: 0.3rem;
+  line-height: 1.5;
 }
 
 .today-card strong {
   display: block;
-  font-family: var(--font-hand);
-  /* FIX 2b: bigger bold text */
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1.2;
+  /* ใช้ Inter อ่านง่าย ไม่ใช้ Caveat */
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
 }
 
-/* VIEW SWITCHING */
+/* View switching */
 .view { display: none; }
 .view.active {
   display: block;
@@ -332,7 +416,7 @@ h1 {
 }
 
 /* ============================================================
-   SHARED CARD BASE
+   SHARED SKETCH CARD BASE
    ============================================================ */
 .today-card,
 .stat-card,
@@ -349,7 +433,7 @@ h1 {
   box-shadow: var(--shadow-sketch);
   transition:
     box-shadow var(--t-fast) var(--ease-out),
-    transform var(--t-fast) var(--ease-spring);
+    transform var(--t-fast) var(--ease-snap);
 }
 
 .stat-card:hover,
@@ -377,7 +461,6 @@ h1 {
   overflow: hidden;
 }
 
-/* Decorative spinning rings — keep from original */
 .dashboard-hero::before,
 .dashboard-hero::after {
   content: '';
@@ -405,21 +488,22 @@ h1 {
   to   { transform: rotate(360deg); }
 }
 
-.hero-kicker,
-.section-label {
-  display: inline-block;
-  /* FIX 3: body font for labels */
+.hero-kicker {
+  display: block;
   font-family: var(--font-body);
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--primary);
-  background: var(--primary-soft);
-  border: 1.5px solid var(--primary-light);
-  border-radius: 999px;
-  padding: 0.2rem 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--ink-muted);
   margin-bottom: 0.25rem;
+}
+
+.section-label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--ink-faint);
+  margin-bottom: 0.12rem;
 }
 
 .hero-copy {
@@ -430,19 +514,21 @@ h1 {
   z-index: 1;
 }
 
+/* Hero h2 — Caveat ขนาดพอดี line-height สวย */
 .hero-copy h2 {
   font-family: var(--font-hand);
-  font-size: 2.3rem;
-  line-height: 1.1;
+  font-size: 2.1rem;
+  line-height: 1.25;
   max-width: 34rem;
+  letter-spacing: 0.01em;
 }
 
+/* Hero paragraph — Inter อ่านสบาย */
 .hero-copy p {
-  /* FIX 5: body font + proper line-height */
   font-family: var(--font-body);
   color: var(--ink-muted);
-  font-size: 0.9rem;
-  line-height: 1.85;
+  font-size: 0.92rem;
+  line-height: 1.95;
   max-width: 36rem;
 }
 
@@ -462,7 +548,7 @@ h1 {
   font-weight: 600;
   font-size: 0.9rem;
   border: 2px solid;
-  transition: transform var(--t-fast) var(--ease-spring), box-shadow var(--t-fast) var(--ease-out);
+  transition: transform var(--t-fast) var(--ease-snap), box-shadow var(--t-fast) var(--ease-out);
 }
 
 .primary-action {
@@ -472,10 +558,7 @@ h1 {
   box-shadow: var(--shadow-sketch-sm);
 }
 
-.primary-action:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-sketch);
-}
+.primary-action:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-sketch); }
 
 .secondary-action {
   background: var(--surface);
@@ -484,10 +567,7 @@ h1 {
   box-shadow: var(--shadow-sketch-sm);
 }
 
-.secondary-action:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-sketch);
-}
+.secondary-action:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-sketch); }
 
 .hero-preview {
   display: grid;
@@ -511,7 +591,6 @@ h1 {
 }
 
 .preview-card span, .preview-stack span {
-  /* FIX 3: body font in preview */
   font-family: var(--font-body);
   color: var(--ink-muted);
   font-size: 0.8rem;
@@ -539,10 +618,9 @@ h1 {
   border-radius: var(--radius-sm);
   background: var(--surface-soft);
   border: 1.5px solid var(--line-soft);
-  /* FIX 3: body font, not Caveat */
   font-family: var(--font-body);
   font-size: 0.84rem;
-  transition: transform var(--t-fast) var(--ease-spring);
+  transition: transform var(--t-fast) var(--ease-snap);
 }
 
 .preview-stack span:hover { transform: translateY(-3px); }
@@ -559,13 +637,13 @@ h1 {
 
 .quick-card {
   display: grid;
-  gap: 0.4rem;
+  gap: 0.45rem;
   min-height: 8.5rem;
-  padding: 1.25rem;
+  padding: 1.3rem;
   text-align: left;
   color: var(--ink);
   cursor: pointer;
-  animation: card-rise 0.5s var(--ease-spring) both;
+  animation: card-rise 0.5s var(--ease-snap) both;
 }
 
 .quick-card:nth-child(1) { animation-delay: 0.08s; }
@@ -577,27 +655,22 @@ h1 {
   to   { opacity: 1; transform: translateY(0) rotate(0); }
 }
 
-.quick-card span {
-  font-family: var(--font-hand);
-  color: var(--primary);
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-/* FIX 4: quick card title bigger */
+/* Title — Caveat เฉพาะ headline */
 .quick-card strong {
   font-family: var(--font-hand);
-  font-size: 1.35rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
 }
 
-/* FIX 4b: quick card description — body font, bigger */
+/* Description — Inter อ่านง่ายชัดเจน */
 .quick-card small {
   font-family: var(--font-body);
   color: var(--ink-muted);
-  font-size: 0.86rem;
-  line-height: 1.55;
+  font-size: 0.87rem;
+  line-height: 1.65;
+  margin-top: 0.15rem;
 }
 
 /* ============================================================
@@ -612,7 +685,7 @@ h1 {
 
 .stat-card {
   padding: 1.3rem;
-  animation: card-rise 0.5s var(--ease-spring) both;
+  animation: card-rise 0.5s var(--ease-snap) both;
 }
 
 .stat-card:nth-child(1) { animation-delay: 0.05s; }
@@ -620,26 +693,24 @@ h1 {
 .stat-card:nth-child(3) { animation-delay: 0.15s; }
 .stat-card:nth-child(4) { animation-delay: 0.20s; }
 
-/* FIX 3: stat labels — body font */
 .stat-card span {
   display: block;
   font-family: var(--font-body);
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.78rem;
+  font-weight: 500;
   color: var(--ink-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   margin-bottom: 0.5rem;
+  line-height: 1.5;
 }
 
-/* Numbers stay Caveat — they're meant to be big & hand-drawn */
+/* Numbers stay Caveat — that's the design signature */
 .stat-card strong {
   display: block;
   font-family: var(--font-hand);
   font-size: 2.6rem;
   font-weight: 700;
   line-height: 1;
-  animation: number-pop 0.5s var(--ease-spring) both;
+  animation: number-pop 0.5s var(--ease-snap) both;
 }
 
 @keyframes number-pop {
@@ -648,7 +719,7 @@ h1 {
 }
 
 /* ============================================================
-   DASHBOARD GRID
+   DASHBOARD GRID & PANEL
    ============================================================ */
 .dashboard-grid {
   display: grid;
@@ -658,9 +729,6 @@ h1 {
 
 .wide { grid-column: 1 / -1; }
 
-/* ============================================================
-   PANEL
-   ============================================================ */
 .panel { padding: 1.4rem; }
 
 .panel-head {
@@ -673,20 +741,19 @@ h1 {
   border-bottom: 2px dashed var(--line-soft);
 }
 
-/* FIX 5: panel h2 — body font, smaller, tighter */
+/* panel headings — body font, compact */
 .panel h2,
-.panel-head h2 {
+.panel-head h2,
+.panel h3 {
   font-family: var(--font-body);
   font-size: 0.97rem;
   font-weight: 600;
   color: var(--ink);
   line-height: 1.3;
+  margin-top: 0.25rem;
 }
 
-/* Section labels (PRIORITY QUEUE etc) */
-.section-label {
-  margin-bottom: 0.2rem;
-}
+.secretary-form { margin-top: 1rem; }
 
 /* ============================================================
    BUTTONS
@@ -705,7 +772,7 @@ button[type="submit"],
   font-weight: 500;
   font-size: 0.84rem;
   transition:
-    transform var(--t-fast) var(--ease-spring),
+    transform var(--t-fast) var(--ease-snap),
     box-shadow var(--t-fast) var(--ease-out),
     background var(--t-fast),
     color var(--t-fast);
@@ -767,15 +834,8 @@ input, select, textarea {
   transition: border-color var(--t-fast), box-shadow var(--t-fast);
 }
 
-input, select {
-  min-height: 2.6rem;
-  padding: 0 0.85rem;
-}
-
-textarea {
-  resize: vertical;
-  padding: 0.75rem 0.9rem;
-}
+input, select { min-height: 2.6rem; padding: 0 0.85rem; }
+textarea { resize: vertical; padding: 0.75rem 0.9rem; }
 
 input:focus, select:focus, textarea:focus {
   outline: none;
@@ -805,8 +865,8 @@ input:focus, select:focus, textarea:focus {
    ============================================================ */
 .item-list {
   display: grid;
-  /* FIX 5: more breathing room between items */
-  gap: 0.85rem;
+  /* FIX 5: breathing room */
+  gap: 0.9rem;
   min-height: 3rem;
 }
 
@@ -816,7 +876,7 @@ input:focus, select:focus, textarea:focus {
   gap: 0.75rem;
   align-items: center;
   padding: 1rem 1.1rem;
-  animation: item-in 0.35s var(--ease-spring) both;
+  animation: item-in 0.35s var(--ease-snap) both;
 }
 
 @keyframes item-in {
@@ -824,19 +884,16 @@ input:focus, select:focus, textarea:focus {
   to   { opacity: 1; transform: translateX(0); }
 }
 
-.list-item.done {
-  opacity: 0.52;
-  background: var(--surface-soft);
-}
+.list-item.done { opacity: 0.52; background: var(--surface-soft); }
 
-/* FIX 3: item title — body font (not Caveat) */
+/* FIX 3: item title — body font, readable */
 .item-title {
   display: block;
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 0.95rem;
-  /* FIX 5: line-height */
-  line-height: 1.5;
+  /* FIX 5 */
+  line-height: 1.55;
   margin-bottom: 0.25rem;
 }
 
@@ -862,7 +919,7 @@ input:focus, select:focus, textarea:focus {
   background: var(--surface-soft);
   color: var(--ink-muted);
   font-size: 1rem;
-  transition: transform var(--t-fast) var(--ease-spring), box-shadow var(--t-fast), background var(--t-fast);
+  transition: transform var(--t-fast) var(--ease-snap), box-shadow var(--t-fast), background var(--t-fast);
 }
 
 .icon-button:hover {
@@ -873,7 +930,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ============================================================
-   PRIORITY COLORS
+   PRIORITY
    ============================================================ */
 .priority-Critical { color: var(--accent); font-weight: 700; }
 .priority-High     { color: var(--amber);  font-weight: 600; }
@@ -898,7 +955,7 @@ input:focus, select:focus, textarea:focus {
   font-size: 0.9rem;
   color: var(--ink);
   font-weight: 400;
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
 .empty-action { width: fit-content; }
@@ -906,12 +963,7 @@ input:focus, select:focus, textarea:focus {
 /* ============================================================
    EXPENSE BARS
    ============================================================ */
-.expense-bars {
-  display: grid;
-  gap: 0.9rem;
-  margin-top: 0.75rem;
-}
-
+.expense-bars { display: grid; gap: 0.9rem; margin-top: 0.75rem; }
 .bar-row { display: grid; gap: 0.4rem; }
 
 .bar-label {
@@ -963,7 +1015,7 @@ input:focus, select:focus, textarea:focus {
   background: var(--surface-soft);
   font-family: var(--font-body);
   font-size: 0.88rem;
-  line-height: 1.6;
+  line-height: 1.65;
   animation: item-in 0.3s var(--ease-out) both;
 }
 
@@ -976,7 +1028,7 @@ input:focus, select:focus, textarea:focus {
 ::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
 
 /* ============================================================
-   PAGE LOADER BAR
+   PAGE LOADER
    ============================================================ */
 body::before {
   content: '';
@@ -1018,7 +1070,6 @@ body::before {
   }
 
   .nav-link::before { display: none; }
-
   .theme-toggle { max-width: 11rem; }
 
   .dashboard-hero,
@@ -1028,6 +1079,85 @@ body::before {
   .secretary-layout { grid-template-columns: 1fr; }
 
   .composer { grid-template-columns: 1fr 1fr; }
+}
+
+/* ============================================================
+   TOAST NOTIFICATIONS
+   ============================================================ */
+.app-toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-sketch);
+  z-index: 200;
+  max-width: 22rem;
+  animation: toast-in 0.22s var(--ease-out) both;
+}
+
+.app-toast--error {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Keyboard shortcut hint in footer */
+.kbd-hint {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid var(--line-soft);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s var(--ease-out);
+  z-index: 100;
+}
+
+.kbd-hint kbd {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: var(--surface-soft);
+  border: 1.5px solid var(--line);
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  #bg-canvas { display: none; }
 }
 
 @media (max-width: 620px) {
