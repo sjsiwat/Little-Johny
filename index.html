@@ -17,7 +17,7 @@
       href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=2" />
+    <link rel="stylesheet" href="./styles.css?v=3" />
     <!-- Supabase JS client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
   </head>
@@ -26,23 +26,183 @@
     <canvas id="bg-canvas" aria-hidden="true"></canvas>
     <div class="paper-grain" aria-hidden="true"></div>
 
-    <div class="app-shell">
+    <!-- ══════════════════════════════════════════════════════
+         HOMEPAGE — public face of Johny Memo
+         Shown when unauthenticated. Hidden once user enters app.
+         ══════════════════════════════════════════════════════ -->
+    <div id="homepage" class="hp">
+
+      <!-- sticky nav -->
+      <nav class="hp-nav" aria-label="Site navigation">
+        <div class="hp-nav-inner">
+          <a class="hp-logo" href="#" aria-label="Johny Memo home">
+            <img src="./johny-cat.svg" class="hp-logo-cat" alt="" aria-hidden="true" />
+            <span class="hp-logo-name">Johny Memo</span>
+          </a>
+          <button class="hp-nav-btn" id="hpNavLoginBtn" type="button">Log in</button>
+        </div>
+      </nav>
+
+      <!-- hero -->
+      <section class="hp-hero" aria-label="Welcome">
+        <div class="hp-hero-inner">
+          <div class="hp-hero-mascot" aria-hidden="true">
+            <img src="./johny-cat.svg" class="hp-hero-cat" alt="" />
+            <div class="hp-hero-shadow"></div>
+          </div>
+          <h1 class="hp-hero-title">Your Personal<br>Digital Workspace</h1>
+          <p class="hp-hero-desc">Capture ideas, manage tasks, track expenses<br class="hp-desk-br">and plan your day — all in one place.</p>
+          <div class="hp-hero-cta">
+            <button class="hp-cta-primary" id="hpGuestBtn" type="button">Enter Guest Mode</button>
+            <button class="hp-cta-ghost" id="hpLoginBtn" type="button">Log in</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- demo workspace preview -->
+      <section class="hp-preview" aria-label="Product preview">
+        <div class="hp-preview-inner">
+          <div class="hp-preview-header">
+            <span class="hp-badge">Demo Preview</span>
+            <h2 class="hp-preview-title">Everything in one place</h2>
+            <p class="hp-preview-caption">A snapshot of your workspace. Enter guest mode to try it live.</p>
+          </div>
+          <div class="hp-cards" aria-hidden="true">
+
+            <!-- tasks -->
+            <div class="hp-card hp-card--tasks">
+              <div class="hp-card-head">
+                <span class="hp-card-icon hp-icon-blue">
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1.5" y="1.5" width="12" height="12" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M4 7.5l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="hp-card-label">Tasks</span>
+                <span class="hp-card-chip">3 pending</span>
+              </div>
+              <ul class="hp-task-list">
+                <li><span class="hp-dot hp-dot--high"></span><span class="hp-task-text">Finish AWS Project</span><span class="hp-tag hp-tag--high">High</span></li>
+                <li><span class="hp-dot hp-dot--med"></span><span class="hp-task-text">Workout</span><span class="hp-tag hp-tag--med">Med</span></li>
+                <li><span class="hp-dot hp-dot--low"></span><span class="hp-task-text">Update Resume</span><span class="hp-tag hp-tag--low">Low</span></li>
+              </ul>
+            </div>
+
+            <!-- notes -->
+            <div class="hp-card hp-card--notes">
+              <div class="hp-card-head">
+                <span class="hp-card-icon hp-icon-amber">
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="2" y="1" width="11" height="13" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 5h6M4.5 7.5h6M4.5 10h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <span class="hp-card-label">Notes</span>
+              </div>
+              <div class="hp-note">
+                <strong>Second Brain</strong>
+                <p>Building a second brain in the browser. Capture everything, forget nothing.</p>
+                <span class="hp-note-tag">#productivity</span>
+              </div>
+            </div>
+
+            <!-- expenses -->
+            <div class="hp-card hp-card--expenses">
+              <div class="hp-card-head">
+                <span class="hp-card-icon hp-icon-sage">
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M7.5 4v7M6 5.5h3a1 1 0 0 1 0 2H6.5a1 1 0 0 0 0 2H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <span class="hp-card-label">Expenses</span>
+              </div>
+              <ul class="hp-exp-list">
+                <li><span>Coffee</span><strong>฿70</strong></li>
+                <li><span>Lunch</span><strong>฿60</strong></li>
+              </ul>
+              <div class="hp-exp-total"><span>Today</span><strong>฿130</strong></div>
+            </div>
+
+            <!-- planning / calendar -->
+            <div class="hp-card hp-card--plan">
+              <div class="hp-card-head">
+                <span class="hp-card-icon hp-icon-rose">
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1.5" y="3" width="12" height="10.5" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 1.5v3M10 1.5v3M1.5 6.5h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <span class="hp-card-label">Planning</span>
+                <span class="hp-card-chip">Jun 2026</span>
+              </div>
+              <div class="hp-mini-cal">
+                <div class="hp-cal-row hp-cal-wdays"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+                <div class="hp-cal-row"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                <div class="hp-cal-row"><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span></div>
+                <div class="hp-cal-row"><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span></div>
+                <div class="hp-cal-row"><span class="hp-cal-today">22</span><span>23</span><span>24</span><span class="hp-cal-event">25</span><span>26</span><span>27</span><span>28</span></div>
+                <div class="hp-cal-row"><span>29</span><span>30</span></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- features -->
+      <section class="hp-features" aria-label="Product features">
+        <div class="hp-features-inner">
+          <h2 class="hp-features-title">Simple tools. Powerful habits.</h2>
+          <div class="hp-features-grid">
+            <article class="hp-feature">
+              <div class="hp-feat-icon hp-feat-icon--blue">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5" stroke="currentColor" stroke-width="2"/><path d="M7 12l3.5 3.5 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <h3>Tasks</h3>
+              <p>Organize your day with priorities, due dates, and a focused view of what matters now.</p>
+            </article>
+            <article class="hp-feature">
+              <div class="hp-feat-icon hp-feat-icon--amber">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="2" width="18" height="20" rx="4.5" stroke="currentColor" stroke-width="2"/><path d="M7.5 8h9M7.5 12h9M7.5 16h5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <h3>Notes</h3>
+              <p>Capture thoughts, ideas, and knowledge in a clean and searchable personal notebook.</p>
+            </article>
+            <article class="hp-feature">
+              <div class="hp-feat-icon hp-feat-icon--sage">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="2"/><path d="M12 5.5v13M9.5 8.5h5a2 2 0 0 1 0 4h-3.5a2 2 0 0 0 0 4H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <h3>Expenses</h3>
+              <p>Track spending by category with instant summaries and a clear monthly overview.</p>
+            </article>
+            <article class="hp-feature">
+              <div class="hp-feat-icon hp-feat-icon--rose">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="4" width="19" height="17.5" rx="4.5" stroke="currentColor" stroke-width="2"/><path d="M7 2v4M17 2v4M2.5 10.5h19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="8" cy="15.5" r="1.5" fill="currentColor" opacity=".5"/><circle cx="12" cy="15.5" r="1.5" fill="currentColor" opacity=".3"/><circle cx="16" cy="15.5" r="1.5" fill="currentColor" opacity=".3"/></svg>
+              </div>
+              <h3>Daily Planning</h3>
+              <p>Start each day with clarity. Your priorities, tasks, and goals — front and center.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- footer -->
+      <footer class="hp-footer">
+        <div class="hp-footer-inner">
+          <div class="hp-footer-brand">
+            <img src="./johny-cat.svg" class="hp-footer-cat" alt="" aria-hidden="true" />
+            <span>Johny Memo</span>
+          </div>
+          <p class="hp-footer-copy">Your personal digital workspace</p>
+          <button class="hp-cta-primary hp-cta-sm" id="hpFooterGuestBtn" type="button">Enter Guest Mode</button>
+        </div>
+      </footer>
+
+    </div><!-- /#homepage -->
+
+    <div class="app-shell" style="display:none">
       <!-- ── Sidebar ── -->
       <aside class="sidebar" aria-label="Main navigation">
-        <!-- Sidebar header: brand only -->
+        <!-- Sidebar header: cat + brand -->
         <div class="sidebar-header">
           <div class="brand">
-            <div class="brand-mark" aria-hidden="true">J</div>
+            <div class="brand-cat" aria-hidden="true">
+              <img src="./johny-cat.svg" alt="" class="brand-cat-img" />
+            </div>
             <div class="brand-text">
               <strong>Johny Memo</strong>
               <span id="brandSubtitle">Personal workspace</span>
             </div>
           </div>
-        </div>
-
-        <!-- Cat mascot — painterly manga cat (canvas) -->
-        <div class="cat-mascot" aria-hidden="true">
-          <canvas id="catMascotCanvas" width="276" height="248"></canvas>
         </div>
 
         <nav class="nav-list">
@@ -53,7 +213,7 @@
           <a href="#notes" class="nav-link" data-view="notes">Notes</a>
           <a href="#expenses" class="nav-link" data-view="expenses">Expenses</a>
           <a href="#secretary" class="nav-link" data-view="secretary"
-            >Secretary</a
+            >Assistant</a
           >
         </nav>
 
@@ -101,12 +261,13 @@
         <section class="view active" id="dashboard" aria-labelledby="viewTitle">
           <section class="dashboard-hero" aria-label="Johny Memo introduction">
             <div class="hero-copy">
-              <span class="hero-kicker"></span>Best Friend in your browser</span>
+              <span class="hero-kicker">Best Friend in your browser</span>
               <h2>จัดงาน โน้ต และรายจ่าย<br />ให้อยู่ในที่เดียว</h2>
-              <p>
-                Johny Memo คือพื้นที่ทำงานส่วนตัวที่เริ่มได้ทันที เก็บข้อมูลต่างๆไว้ใน
-                Browser ก่อน แล้วส่งต่อผ่าน LINE และ Cloud Sync ให้ผู้ใช้ สามารถเข้าถึงข้อมูลได้จากทุกอุปกรณ์ 
-              </p>
+              <div class="hero-chips">
+                <span class="hero-chip hero-chip--blue" id="heroChipTasks">0 งานค้าง</span>
+                <span class="hero-chip hero-chip--amber" id="heroChipExpense">฿0 วันนี้</span>
+                <span class="hero-chip hero-chip--sage" id="heroChipFocus">กำหนดเป้าหมาย</span>
+              </div>
               <div class="hero-today">
                 <span class="section-label">Today focus</span>
                 <span id="heroFocusTitle">Plan your next move</span>
@@ -121,7 +282,7 @@
                 </button>
               </div>
             </div>
-            
+
             <div class="hero-visual" aria-hidden="true">
               <div class="line-chat">
                 <div class="line-topbar">
@@ -129,8 +290,8 @@
                   <span class="line-ava">
                     <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><polygon points="8,9 6,2 14,7" fill="#2f2823"/><polygon points="24,9 26,2 18,7" fill="#2f2823"/><circle cx="16" cy="17" r="11" fill="#2f2823"/><circle cx="12" cy="16" r="2.1" fill="#d8aa50"/><circle cx="20" cy="16" r="2.1" fill="#d8aa50"/><circle cx="12.3" cy="16.2" r="0.9" fill="#1c1714"/><circle cx="20.3" cy="16.2" r="0.9" fill="#1c1714"/><path d="M14.5 20.5 q1.5 1.4 3 0" stroke="#d99a92" stroke-width="1" fill="none" stroke-linecap="round"/></svg>
                   </span>
-                  <div class="line-title"><strong>johnymemo</strong><span>online</span></div>
-                  <span class="line-menu">⋮</span>
+                  <div class="line-title"><strong>Johny Memo</strong><span>online</span></div>
+                  <span class="line-menu">⊞ video</span>
                 </div>
                 <div class="line-body" id="lineChatBody"></div>
                 <div class="line-inputbar">
@@ -346,8 +507,8 @@
       </main>
     </div>
 
-    <!-- Free-roaming cat that walks across the bottom of the page -->
-    <canvas id="catRoamCanvas" class="cat-roam" aria-hidden="true"></canvas>
+    <!-- Floating Johny cat — sine-wave drift behind content -->
+    <img src="./johny-cat.svg" class="cat-roam-float" aria-hidden="true" alt="" />
 
     <!-- ═══════════════════════════════════════
          ANIMATED BACKGROUND — soft watercolour drift
@@ -662,10 +823,9 @@
       </div>
     </dialog>
 
-    <!-- ═══════════════════════════════════════
-         CATS — painterly manga cats (parade · mascot · roamer)
-    ═══════════════════════════════════════ -->
+    <!-- CATS script removed — replaced by CSS-animated johny-float.png -->
     <script>
+      (function () { return; /* legacy cat canvas code removed */
       (function () {
         /* ───────── shared painterly helpers ───────── */
         function fillSoft(ctx, color, blur) {
@@ -1121,8 +1281,8 @@
       })();
     </script>
 
-    <script src="./auth.js"></script>
-    <script src="./storage.js"></script>
-    <script src="./app.js"></script>
+    <script src="./auth.js?v=8"></script>
+    <script src="./storage.js?v=8"></script>
+    <script src="./app.js?v=8"></script>
   </body>
 </html>
