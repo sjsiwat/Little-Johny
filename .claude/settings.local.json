@@ -1,5 +1,13 @@
 {
-  "description": "Impeccable design detector: runs after Edit/Write/MultiEdit on UI files and surfaces findings as system reminders.",
+  "permissions": {
+    "allow": [
+      "Read(//Users/siwat/Library/Application Support/Claude/local-agent-mode-sessions/skills-plugin/f5dafed3-2e65-4fc8-be23-2b275c8208db/44105964-579c-48b6-8c18-074195111cc0/skills/web-artifacts-builder/**)",
+      "Bash(bash scripts/init-artifact.sh johny-os)",
+      "Bash(cp \"/Users/siwat/Downloads/johnymemo.svg\" \"/Users/siwat/Library/Application Support/Claude/local-agent-mode-sessions/skills-plugin/f5dafed3-2e65-4fc8-be23-2b275c8208db/44105964-579c-48b6-8c18-074195111cc0/skills/web-artifacts-builder/johny-os/src/assets/johny-cat.svg\")",
+      "Bash(node /Users/siwat/Documents/GitHub/Little-Johny/.claude/skills/impeccable/scripts/context.mjs)",
+      "mcp__Claude_in_Chrome__navigate"
+    ]
+  },
   "hooks": {
     "PostToolUse": [
       {
@@ -14,5 +22,6 @@
         ]
       }
     ]
-  }
+  },
+  "description": "Impeccable design detector: runs after Edit/Write/MultiEdit on UI files and surfaces findings as system reminders."
 }

@@ -120,7 +120,7 @@ const viewTitles = {
   tasks: "Tasks",
   notes: "Notes",
   expenses: "Expenses",
-  secretary: "Secretary"
+  secretary: "Assistant"
 };
 
 function saveState() {
@@ -185,11 +185,33 @@ function renderShell() {
 
   updateClock();
 
-  const focusItems = state.tasks.filter((task) => task.status !== "Completed");
-  document.getElementById("focusCount").textContent = `${focusItems.length} focus items`;
+  const openItems = state.tasks.filter((task) => task.status !== "Completed");
+  document.getElementById("focusCount").textContent = `${openItems.length} focus items`;
+
   const heroFocusTitle = document.getElementById("heroFocusTitle");
   if (heroFocusTitle) {
-    heroFocusTitle.textContent = focusItems[0]?.title || "เริ่มจากเพิ่มงานแรกของวันนี้";
+    heroFocusTitle.textContent = openItems[0]?.title || "เริ่มจากเพิ่มงานแรกของวันนี้";
+  }
+
+  // ── Hero chips ──────────────────────────────────────────
+  const chipTasks = document.getElementById("heroChipTasks");
+  if (chipTasks) chipTasks.textContent = `${openItems.length} งานค้าง`;
+
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const todayExpense = state.expenses
+    .filter((e) => e.date === todayKey)
+    .reduce((s, e) => s + Number(e.amount), 0);
+  const chipExpense = document.getElementById("heroChipExpense");
+  if (chipExpense) chipExpense.textContent = `฿${todayExpense.toLocaleString("th-TH")} วันนี้`;
+
+  const priorityRank = { Critical: 0, High: 1, Medium: 2, Low: 3 };
+  const topFocus = [...openItems].sort(
+    (a, b) => (priorityRank[a.priority] ?? 9) - (priorityRank[b.priority] ?? 9)
+  )[0];
+  const chipFocus = document.getElementById("heroChipFocus");
+  if (chipFocus) {
+    const label = topFocus?.title || "กำหนดเป้าหมาย";
+    chipFocus.textContent = label.length > 22 ? label.slice(0, 22) + "…" : label;
   }
 }
 
@@ -379,6 +401,26 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+/* ── Homepage ↔ App routing ── */
+let _inApp = false; // true once user enters the app (guest or signed in)
+
+function showApp() {
+  _inApp = true;
+  document.getElementById("homepage")?.style.setProperty("display", "none");
+  document.querySelector(".app-shell")?.style.removeProperty("display");
+}
+
+function showHomepage() {
+  _inApp = false;
+  document.getElementById("homepage")?.style.removeProperty("display");
+  document.querySelector(".app-shell")?.style.setProperty("display", "none");
+}
+
+function enterGuestMode() {
+  showApp();
+  setView("dashboard");
 }
 
 function addTask(title, priority = "Medium", due = "") {
@@ -635,6 +677,7 @@ function updateAuthBar(user) {
 }
 
 async function onSignedIn(user) {
+  showApp();
   updateAuthBar(user);
   showToast("กำลังโหลดข้อมูลจาก cloud…");
   const cloud = await Storage.loadCloud();
@@ -648,12 +691,19 @@ async function onSignedIn(user) {
 async function initAuth() {
   const user = await Auth.init();
   updateAuthBar(user);
-  if (user) onSignedIn(user);
+  if (user) {
+    onSignedIn(user);
+  } else if (!_inApp) {
+    showHomepage();
+  }
 
   Auth.onChange((event, u) => {
     updateAuthBar(u);
     if (event === "SIGNED_IN")  onSignedIn(u);
-    if (event === "SIGNED_OUT") showToast("ออกจากระบบแล้ว — ข้อมูล local ยังอยู่");
+    if (event === "SIGNED_OUT") {
+      showToast("ออกจากระบบแล้ว — ข้อมูล local ยังอยู่");
+      showHomepage();
+    }
   });
 
   /* ── Modal elements ── */
@@ -687,6 +737,7 @@ async function initAuth() {
     await Auth.signOut();
     state = Storage.loadLocal(defaultState);
     render();
+    showHomepage();
   });
 
   /* close on backdrop click */
@@ -701,7 +752,10 @@ async function initAuth() {
   document.getElementById("authModalClose")?.addEventListener("click", () => modal.close());
 
   /* guest mode button */
-  document.getElementById("authGuestBtn")?.addEventListener("click", () => modal.close());
+  document.getElementById("authGuestBtn")?.addEventListener("click", () => {
+    modal.close();
+    enterGuestMode();
+  });
 
   /* switch to signup */
   document.getElementById("authSwitchSignup")?.addEventListener("click", () => {
@@ -771,6 +825,7 @@ async function initAuth() {
     state = Storage.loadLocal(defaultState);
     render();
     modal.close();
+    showHomepage();
   });
 
   /* logout from sidebar user panel */
@@ -778,8 +833,22 @@ async function initAuth() {
     await Auth.signOut();
     state = Storage.loadLocal(defaultState);
     render();
+    showHomepage();
   });
 }
+
+/* ── Homepage button wiring ──
+   hpNavLoginBtn / hpLoginBtn: open auth modal (dialog goes to top-layer,
+   visible even while app-shell is display:none)
+   hpGuestBtn / hpFooterGuestBtn: enter guest mode instantly ── */
+document.getElementById("hpNavLoginBtn")?.addEventListener("click", () => {
+  document.getElementById("authLoginBtn")?.click();
+});
+document.getElementById("hpLoginBtn")?.addEventListener("click", () => {
+  document.getElementById("authLoginBtn")?.click();
+});
+document.getElementById("hpGuestBtn")?.addEventListener("click", enterGuestMode);
+document.getElementById("hpFooterGuestBtn")?.addEventListener("click", enterGuestMode);
 
 initAuth();
 

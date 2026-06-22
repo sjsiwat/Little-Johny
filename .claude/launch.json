@@ -4,8 +4,8 @@
     {
       "name": "johny-memo",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", "-p", "4321", "--no-clipboard", "/Users/siwat/Documents/GitHub/Little-Johny"],
-      "port": 4321
+      "runtimeArgs": ["serve", "-p", "5173", "."],
+      "port": 5173
     }
   ]
 }
