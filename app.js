@@ -623,17 +623,15 @@ render();
 
 /* ── Auth UI ── */
 function updateAuthBar(user) {
-  const label    = document.getElementById("authBtnLabel");
-  const status   = document.getElementById("authOnlineStatus");
-  const emailEl  = document.getElementById("authUserEmailTopbar");
-  const subtitle = document.getElementById("brandSubtitle");
-  const btn      = document.getElementById("authLoginBtn");
+  const loggedInRow = document.getElementById("authLoggedInRow");
+  const guestRow    = document.getElementById("authGuestRow");
+  const emailEl     = document.getElementById("authUserEmailTopbar");
+  const subtitle    = document.getElementById("brandSubtitle");
 
-  if (label)    label.textContent = user ? "ออกจากระบบ" : "เข้าสู่ระบบ";
-  if (status)   status.hidden = !user;
-  if (emailEl)  { emailEl.textContent = user ? user.email : ""; emailEl.hidden = !user; }
+  if (loggedInRow) loggedInRow.hidden = !user;
+  if (guestRow)    guestRow.hidden = !!user;
+  if (emailEl) { emailEl.textContent = user ? user.email : ""; emailEl.hidden = !user; }
   if (subtitle) subtitle.textContent = user ? user.email : "Personal workspace";
-  if (btn)      btn.classList.toggle("auth-dot-btn--danger", !!user);
 }
 
 async function onSignedIn(user) {
@@ -676,18 +674,19 @@ async function initAuth() {
     if (map[name]) map[name].hidden = false;
   }
 
-  /* auth button: login → open modal, logout → sign out directly */
-  document.getElementById("authLoginBtn").addEventListener("click", async () => {
-    if (Auth.isLoggedIn()) {
-      await Auth.signOut();
-      state = Storage.loadLocal(defaultState);
-      render();
-    } else {
-      if (loginErr)  loginErr.textContent = "";
-      if (loginForm) loginForm.reset();
-      showPanel("login");
-      modal.showModal();
-    }
+  /* Login button (guest state) → open modal */
+  document.getElementById("authLoginBtn").addEventListener("click", () => {
+    if (loginErr)  loginErr.textContent = "";
+    if (loginForm) loginForm.reset();
+    showPanel("login");
+    modal.showModal();
+  });
+
+  /* Logout button (logged-in state) → sign out directly */
+  document.getElementById("authLogoutTopBtn").addEventListener("click", async () => {
+    await Auth.signOut();
+    state = Storage.loadLocal(defaultState);
+    render();
   });
 
   /* close on backdrop click */
