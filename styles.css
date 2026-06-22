@@ -76,6 +76,7 @@
 
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
 html { scroll-behavior: smooth; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
@@ -441,12 +442,42 @@ body {
   max-width: 14rem;
 }
 
+/* Guest mode label — non-interactive text badge */
+.auth-guest-label {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ink-faint);
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  border: 1.5px dashed var(--line);
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* Login button style */
+.auth-dot-btn--login {
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  font-weight: 600 !important;
+  background: var(--primary-soft) !important;
+}
+
+.auth-dot-btn--login:hover {
+  background: color-mix(in srgb, var(--primary) 18%, transparent) !important;
+}
+
+/* Logged in → logout button style */
 .auth-dot-btn--danger {
-  border-color: var(--accent) !important;
-  color: var(--accent) !important;
+  border-color: var(--line) !important;
+  color: var(--ink-muted) !important;
 }
 
 .auth-dot-btn--danger:hover {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
   background: var(--accent-soft) !important;
 }
 
@@ -522,7 +553,6 @@ h1 {
    SHARED SKETCH CARD BASE
    ============================================================ */
 .today-card,
-.stat-card,
 .panel,
 .composer,
 .note-editor,
@@ -539,7 +569,6 @@ h1 {
     transform var(--t-fast) var(--ease-snap);
 }
 
-.stat-card:hover,
 .panel:hover,
 .quick-card:hover,
 .list-item:hover {
@@ -860,27 +889,93 @@ h1 {
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 1.5rem;
+  margin: 0.5rem 0 2rem;
+  padding-top: 0.7rem;
 }
 
+/* ============================================================
+   STAT CARDS — paper sticky-notes (tape + tilt + curled paper)
+   ============================================================ */
 .stat-card {
-  padding: 1.3rem;
-  animation: card-rise 0.5s var(--ease-snap) both;
+  --note-paper: #fdf0b8;
+  --note-edge:  #f1dc83;
+  position: relative;
+  padding: 1.55rem 1.2rem 1.4rem;
+  border: none;
+  border-radius: 2px;
+  background: var(--note-paper);
+  box-shadow:
+    0 12px 20px -10px rgba(74,64,54,0.42),
+    0 3px 6px rgba(74,64,54,0.16);
+  color: #4a4036;
+  transition:
+    transform var(--t-mid) var(--ease-snap),
+    box-shadow var(--t-mid) var(--ease-out);
 }
 
-.stat-card:nth-child(1) { animation-delay: 0.05s; }
-.stat-card:nth-child(2) { animation-delay: 0.10s; }
-.stat-card:nth-child(3) { animation-delay: 0.15s; }
-.stat-card:nth-child(4) { animation-delay: 0.20s; }
+/* paper sheen + curled bottom-right corner */
+.stat-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    linear-gradient(160deg, rgba(255,255,255,0.45), transparent 32%),
+    linear-gradient(315deg, rgba(90,74,52,0.22) 0 13px, transparent 13px);
+}
+
+/* washi tape strip across the top */
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 54px;
+  height: 19px;
+  transform: translateX(-50%) rotate(-5deg);
+  background: rgba(255,255,255,0.42);
+  border-left: 1px solid rgba(255,255,255,0.55);
+  border-right: 1px solid rgba(255,255,255,0.55);
+  box-shadow: 0 1px 3px rgba(74,64,54,0.18);
+  z-index: 2;
+}
+
+/* each note: its own colour + jaunty rotation */
+.stat-card:nth-child(1) { --note-paper:#fdf0b8; --note-edge:#f1dc83; transform: rotate(-2.2deg); }
+.stat-card:nth-child(2) { --note-paper:#cfe6f2; --note-edge:#a9cfe2; transform: rotate(1.6deg); }
+.stat-card:nth-child(3) { --note-paper:#d8ecd2; --note-edge:#aed3a6; transform: rotate(-1.1deg); }
+.stat-card:nth-child(4) { --note-paper:#f7ddcc; --note-edge:#eebfa3; transform: rotate(2.4deg); }
+.stat-card:nth-child(2)::before { transform: translateX(-50%) rotate(4deg); }
+.stat-card:nth-child(4)::before { transform: translateX(-50%) rotate(3deg); }
+
+.stat-card:hover {
+  transform: rotate(0deg) translateY(-6px) scale(1.02);
+  box-shadow:
+    0 22px 32px -12px rgba(74,64,54,0.48),
+    0 5px 10px rgba(74,64,54,0.2);
+}
+
+@keyframes note-drop {
+  from { opacity: 0.6; transform: translateY(-10px) rotate(0deg); }
+  to   { opacity: 1; }
+}
+
+/* icon chip blends onto coloured paper */
+.stat-card .stat-icon {
+  background: rgba(255,255,255,0.5);
+  border: 1.5px solid rgba(74,64,54,0.16);
+  color: #5a4d3f;
+}
 
 .stat-card span {
   display: block;
   font-family: var(--font-body);
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: var(--ink-muted);
-  margin-bottom: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #6f5f49;
+  margin-bottom: 0.35rem;
   line-height: 1.5;
 }
 
@@ -888,11 +983,21 @@ h1 {
 .stat-card strong {
   display: block;
   font-family: var(--font-hand);
-  font-size: 2.6rem;
+  font-size: 2.7rem;
   font-weight: 700;
   line-height: 1;
-  animation: number-pop 0.5s var(--ease-snap) both;
+  color: #3c332a;
 }
+
+/* dark theme: notes stay bright paper, just a touch deeper */
+[data-theme="dark"] .stat-card { color: #2a241e; }
+[data-theme="dark"] .stat-card:nth-child(1) { --note-paper:#dcc97e; --note-edge:#bca85c; }
+[data-theme="dark"] .stat-card:nth-child(2) { --note-paper:#a6c5d6; --note-edge:#7fa3b8; }
+[data-theme="dark"] .stat-card:nth-child(3) { --note-paper:#aecaa6; --note-edge:#86a87e; }
+[data-theme="dark"] .stat-card:nth-child(4) { --note-paper:#dcb9a0; --note-edge:#c0977e; }
+[data-theme="dark"] .stat-card span { color: #3a3026; }
+[data-theme="dark"] .stat-card strong { color: #241f19; }
+[data-theme="dark"] .stat-card .stat-icon { background: rgba(255,255,255,0.45); color: #34291f; }
 
 @keyframes number-pop {
   from { opacity: 0; transform: scale(0.7); }
