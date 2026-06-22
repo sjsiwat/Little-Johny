@@ -168,12 +168,22 @@ function render() {
   saveState();
 }
 
+function updateClock() {
+  const now = new Date();
+  const timeEl = document.getElementById("todayTime");
+  if (timeEl) {
+    timeEl.textContent = now.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  }
+}
+
 function renderShell() {
   document.getElementById("todayLabel").textContent = new Intl.DateTimeFormat("th-TH", {
     weekday: "long",
     day: "numeric",
     month: "long"
   }).format(new Date());
+
+  updateClock();
 
   const focusItems = state.tasks.filter((task) => task.status !== "Completed");
   document.getElementById("focusCount").textContent = `${focusItems.length} focus items`;
@@ -182,6 +192,8 @@ function renderShell() {
     heroFocusTitle.textContent = focusItems[0]?.title || "เริ่มจากเพิ่มงานแรกของวันนี้";
   }
 }
+
+setInterval(updateClock, 1000);
 
 function renderDashboard() {
   const openTasks = state.tasks.filter((task) => task.status !== "Completed");
@@ -611,12 +623,17 @@ render();
 
 /* ── Auth UI ── */
 function updateAuthBar(user) {
-  const dot    = document.getElementById("statusDot");
-  const userEl = document.getElementById("authUser");
-  const emailEl = document.getElementById("authUserEmail");
-  if (dot)    dot.classList.toggle("status-dot--online", !!user);
-  if (userEl) userEl.hidden = !user;
-  if (emailEl && user) emailEl.textContent = user.email;
+  const label    = document.getElementById("authBtnLabel");
+  const status   = document.getElementById("authOnlineStatus");
+  const emailEl  = document.getElementById("authUserEmailTopbar");
+  const subtitle = document.getElementById("brandSubtitle");
+  const btn      = document.getElementById("authLoginBtn");
+
+  if (label)    label.textContent = user ? "ออกจากระบบ" : "เข้าสู่ระบบ";
+  if (status)   status.hidden = !user;
+  if (emailEl)  { emailEl.textContent = user ? user.email : ""; emailEl.hidden = !user; }
+  if (subtitle) subtitle.textContent = user ? user.email : "Personal workspace";
+  if (btn)      btn.classList.toggle("auth-dot-btn--danger", !!user);
 }
 
 async function onSignedIn(user) {
@@ -659,18 +676,18 @@ async function initAuth() {
     if (map[name]) map[name].hidden = false;
   }
 
-  /* dot button → open correct panel */
-  document.getElementById("authLoginBtn").addEventListener("click", () => {
+  /* auth button: login → open modal, logout → sign out directly */
+  document.getElementById("authLoginBtn").addEventListener("click", async () => {
     if (Auth.isLoggedIn()) {
-      const el = document.getElementById("authSignedInEmail");
-      if (el) el.textContent = Auth.getUser().email;
-      showPanel("signedIn");
+      await Auth.signOut();
+      state = Storage.loadLocal(defaultState);
+      render();
     } else {
-      if (loginErr)  loginErr.textContent  = "";
+      if (loginErr)  loginErr.textContent = "";
       if (loginForm) loginForm.reset();
       showPanel("login");
+      modal.showModal();
     }
-    modal.showModal();
   });
 
   /* close on backdrop click */

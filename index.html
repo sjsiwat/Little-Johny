@@ -29,32 +29,14 @@
     <div class="app-shell">
       <!-- ── Sidebar ── -->
       <aside class="sidebar" aria-label="Main navigation">
-        <!-- Sidebar header: brand + top-right controls -->
+        <!-- Sidebar header: brand only -->
         <div class="sidebar-header">
           <div class="brand">
             <div class="brand-mark" aria-hidden="true">J</div>
-            <div>
+            <div class="brand-text">
               <strong>Johny Memo</strong>
-              <span>Personal workspace</span>
+              <span id="brandSubtitle">Personal workspace</span>
             </div>
-          </div>
-          <div class="sidebar-controls">
-            <button
-              class="theme-toggle-icon"
-              id="themeToggle"
-              type="button"
-              aria-label="Toggle theme"
-            >
-              ◐
-            </button>
-            <button
-              class="auth-dot-btn"
-              id="authLoginBtn"
-              type="button"
-              aria-label="Account"
-            >
-              <span class="status-dot" id="statusDot"></span>
-            </button>
           </div>
         </div>
 
@@ -75,29 +57,6 @@
           >
         </nav>
 
-        <!-- Decorative plant note -->
-        <div class="sidebar-plant" aria-hidden="true">
-          <svg class="plant-svg" viewBox="0 0 60 70" xmlns="http://www.w3.org/2000/svg">
-            <ellipse cx="30" cy="62" rx="14" ry="6" fill="#5a8a3a" opacity="0.3"/>
-            <rect x="28" y="30" width="4" height="32" rx="2" fill="#6b7c3a"/>
-            <path d="M30,48 Q18,38 14,26 Q22,28 30,40" fill="#7ab648" opacity="0.85"/>
-            <path d="M30,42 Q42,32 46,20 Q38,23 30,36" fill="#95c95a" opacity="0.8"/>
-            <path d="M30,54 Q20,46 16,36 Q24,37 30,48" fill="#7ab648" opacity="0.7"/>
-          </svg>
-          <div class="plant-note">
-            <span>Focus on</span>
-            <em>what matters</em>
-            <span>today</span>
-          </div>
-        </div>
-
-        <!-- Auth user panel — visible when signed in -->
-        <div class="auth-user" id="authUser" hidden>
-          <span class="auth-user-email" id="authUserEmail"></span>
-          <button class="auth-logout-btn" id="authLogoutBtn" type="button">
-            Sign out
-          </button>
-        </div>
       </aside>
 
       <!-- ── Workspace ── -->
@@ -106,9 +65,27 @@
           <div>
             <h1 id="viewTitle">Dashboard</h1>
           </div>
-          <div class="today-card">
-            <span id="todayLabel"></span>
-            <strong id="focusCount">0 focus items</strong>
+          <div class="topbar-right">
+            <div class="today-card">
+              <span id="todayLabel"></span>
+              <span class="today-time" id="todayTime"></span>
+              <strong id="focusCount">0 focus items</strong>
+            </div>
+            <div class="topbar-controls">
+              <button class="theme-toggle-icon" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
+              <div class="auth-control-wrap">
+                <div class="auth-control-row">
+                  <span class="auth-online-status" id="authOnlineStatus" hidden>
+                    <span class="status-dot status-dot--online"></span>
+                    อยู่ในระบบ
+                  </span>
+                  <button class="auth-dot-btn" id="authLoginBtn" type="button" aria-label="Account">
+                    <span class="auth-btn-label" id="authBtnLabel">เข้าสู่ระบบ</span>
+                  </button>
+                </div>
+                <span class="auth-user-email-topbar" id="authUserEmailTopbar" hidden></span>
+              </div>
+            </div>
           </div>
         </header>
 
