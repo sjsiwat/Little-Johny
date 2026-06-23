@@ -319,6 +319,93 @@ body {
 .focus-timer-btn.running { background: rgba(255,69,58,0.85); }
 .focus-timer-btn.running:hover { background: #d93025; }
 
+/* ── Focus task picker ── */
+#focusTaskPicker { margin-top: 0.55rem; }
+
+.focus-task-select {
+  width: 100%;
+  font-size: 0.72rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  outline: none;
+  cursor: pointer;
+}
+.focus-task-select:focus { border-color: var(--teal); }
+
+.focus-task-selected {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: color-mix(in srgb, var(--teal) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--teal) 35%, transparent);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.5rem;
+}
+.focus-task-name {
+  flex: 1;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--teal);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.focus-task-clear {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  padding: 0 0.1rem;
+  line-height: 1;
+}
+.focus-task-clear:hover { color: var(--ink); }
+
+/* ── Focus done prompt ── */
+.focus-done-prompt {
+  margin-top: 0.65rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.7rem 0.75rem 0.65rem;
+}
+.focus-done-question {
+  font-size: 0.68rem;
+  color: var(--ink-faint);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.15rem;
+}
+.focus-done-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 0.55rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.focus-done-actions { display: flex; gap: 0.4rem; }
+.focus-done-yes, .focus-done-no {
+  flex: 1;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.35rem 0.4rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.focus-done-yes { background: var(--teal); color: #fff; border-color: var(--teal); }
+.focus-done-yes:hover { filter: brightness(1.1); }
+.focus-done-no { background: var(--surface-soft); color: var(--ink-faint); }
+.focus-done-no:hover { background: var(--border); color: var(--ink); }
+
 /* Sidebar quote */
 .sidebar-quote {
   margin-top: auto;
@@ -1425,6 +1512,10 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 
 .icon-button--edit { display: flex; align-items: center; justify-content: center; }
 .icon-button--edit:hover { color: var(--blue); border-color: var(--blue); }
+
+.icon-button--focus { display: flex; align-items: center; justify-content: center; color: var(--ink-faint); }
+.icon-button--focus:hover { color: var(--teal); border-color: var(--teal); }
+.icon-button--focus.is-focusing { color: var(--teal); border-color: var(--teal); background: color-mix(in srgb, var(--teal) 10%, transparent); }
 
 /* ── Inline task edit form ── */
 .list-item--editing {
