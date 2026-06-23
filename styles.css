@@ -4635,6 +4635,47 @@ body::before {
 }
 .modal-confirm:disabled { opacity: 0.5; cursor: default; }
 
+/* ── LINE Add Friend button ── */
+.line-add-friend-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: #06C755;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: filter var(--t-fast) var(--ease-ios);
+}
+.line-add-friend-btn:hover { filter: brightness(1.1); }
+.line-add-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.line-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.55rem 0 0.4rem;
+}
+.line-divider::before,
+.line-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.line-divider span {
+  font-size: 0.68rem;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
 /* ============================================================
    GOALS
    ============================================================ */
