@@ -1,4 +1,4 @@
-const CACHE_NAME = "johny-os-lite-v2";
+const CACHE_NAME = "johny-os-lite-v3";
 const APP_ASSETS = ["/", "/index.html", "/styles.css", "/app.js", "/icon.svg", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {

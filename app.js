@@ -100,7 +100,7 @@ function createDemoState() {
 }
 
 const defaultState = {
-  theme: "light",
+  theme: "dark",
   taskFilter: "all",
   ...createDemoState()
 };
@@ -188,30 +188,53 @@ function renderShell() {
   const openItems = state.tasks.filter((task) => task.status !== "Completed");
   document.getElementById("focusCount").textContent = `${openItems.length} focus items`;
 
-  const heroFocusTitle = document.getElementById("heroFocusTitle");
-  if (heroFocusTitle) {
-    heroFocusTitle.textContent = openItems[0]?.title || "เริ่มจากเพิ่มงานแรกของวันนี้";
-  }
-
-  // ── Hero chips ──────────────────────────────────────────
-  const chipTasks = document.getElementById("heroChipTasks");
-  if (chipTasks) chipTasks.textContent = `${openItems.length} งานค้าง`;
-
+  // ── Quick-tiles (dashboard top) ─────────────────────────
   const todayKey = new Date().toISOString().slice(0, 10);
   const todayExpense = state.expenses
     .filter((e) => e.date === todayKey)
     .reduce((s, e) => s + Number(e.amount), 0);
-  const chipExpense = document.getElementById("heroChipExpense");
-  if (chipExpense) chipExpense.textContent = `฿${todayExpense.toLocaleString("th-TH")} วันนี้`;
+  const doneTasks = state.tasks.filter((t) => t.status === "Completed");
 
-  const priorityRank = { Critical: 0, High: 1, Medium: 2, Low: 3 };
-  const topFocus = [...openItems].sort(
-    (a, b) => (priorityRank[a.priority] ?? 9) - (priorityRank[b.priority] ?? 9)
-  )[0];
-  const chipFocus = document.getElementById("heroChipFocus");
-  if (chipFocus) {
-    const label = topFocus?.title || "กำหนดเป้าหมาย";
-    chipFocus.textContent = label.length > 22 ? label.slice(0, 22) + "…" : label;
+  const sbTotal   = document.getElementById("sbStatTotal");
+  const sbOpen    = document.getElementById("sbStatOpen");
+  const sbDone    = document.getElementById("sbStatDone");
+  const sbExpense = document.getElementById("sbStatExpense");
+  if (sbTotal)   sbTotal.textContent   = state.tasks.length;
+  if (sbOpen)    sbOpen.textContent    = openItems.length;
+  if (sbDone)    sbDone.textContent    = doneTasks.length;
+  if (sbExpense) sbExpense.textContent = `฿${todayExpense.toLocaleString("th-TH")}`;
+
+  // ── Today Command Center ─────────────────────────────────
+  const hour = new Date().getHours();
+  const greetingMap = [
+    [5,  11, "สวัสดีตอนเช้า",  "Good morning"],
+    [12, 17, "สวัสดีตอนบ่าย", "Good afternoon"],
+    [18, 23, "สวัสดีตอนเย็น", "Good evening"],
+    [0,   4, "ดึกแล้วนะ",      "Late night"]
+  ];
+  const [,, thaiGreet, enGreet] = greetingMap.find(([s, e]) => hour >= s && hour <= e) ?? greetingMap[0];
+
+  const greetingHeading = document.getElementById("greetingHeading");
+  if (greetingHeading) greetingHeading.textContent = thaiGreet;
+  const greetingKicker = document.getElementById("greetingKicker");
+  if (greetingKicker) greetingKicker.textContent = enGreet;
+  const greetingDate = document.getElementById("greetingDate");
+  if (greetingDate) greetingDate.textContent = new Intl.DateTimeFormat("th-TH", {
+    weekday: "long", day: "numeric", month: "long", year: "numeric"
+  }).format(new Date());
+
+  const signalTasks = document.getElementById("signalTasks");
+  if (signalTasks) signalTasks.textContent = `${openItems.length} งานค้าง`;
+
+  const signalExpense = document.getElementById("signalExpense");
+  if (signalExpense) signalExpense.textContent = `฿${todayExpense.toLocaleString("th-TH")} วันนี้`;
+
+  const signalNotes = document.getElementById("signalNotes");
+  if (signalNotes) {
+    const lastNote = [...state.notes].sort((a, b) => b.createdAt - a.createdAt)[0];
+    signalNotes.textContent = lastNote
+      ? `โน้ต: ${lastNote.title.length > 22 ? lastNote.title.slice(0, 22) + "…" : lastNote.title}`
+      : "ยังไม่มีโน้ต";
   }
 }
 
@@ -225,10 +248,6 @@ function renderDashboard() {
     .filter((expense) => expense.date?.startsWith(monthKey))
     .reduce((sum, expense) => sum + Number(expense.amount), 0);
 
-  document.getElementById("statTotalTasks").textContent = state.tasks.length;
-  document.getElementById("statOpenTasks").textContent = openTasks.length;
-  document.getElementById("statDoneTasks").textContent = doneTasks.length;
-  document.getElementById("statMonthExpense").textContent = formatMoney(monthExpense);
 
   const priorityRank = { Critical: 0, High: 1, Medium: 2, Low: 3 };
   const focus = [...openTasks]
@@ -247,7 +266,55 @@ function renderDashboard() {
         .join("")
     : emptyState("ยังไม่มีโน้ต ลองบันทึกไอเดียหรือความคิดแรกของ Johny OS", "notes", "เขียนโน้ต");
 
+  // Calendar heading
+  const calHead = document.getElementById("calTodayHeading");
+  if (calHead) {
+    calHead.textContent = new Intl.DateTimeFormat("th-TH", {
+      day: "numeric", month: "long", year: "numeric"
+    }).format(new Date());
+  }
+
   renderExpenseBars();
+  renderActivityFeed();
+}
+
+function renderActivityFeed() {
+  const feed = document.getElementById("activityFeed");
+  if (!feed) return;
+
+  const iconTask = `<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><rect x="1" y="1" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 5.5l1.5 1.5 2.5-2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const iconNote = `<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><rect x="1.5" y="1" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 4h4M3.5 6h4M3.5 8h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`;
+  const iconExp  = `<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 3v5M4.25 4.25h2a.75.75 0 0 1 0 1.5H4.75a.75.75 0 0 0 0 1.5H7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`;
+
+  const items = [
+    ...state.tasks.map(t => ({ type: "task", title: t.title, sub: t.priority, ts: t.createdAt })),
+    ...state.notes.map(n => ({ type: "note", title: n.title, sub: n.tags || "โน้ต", ts: n.createdAt })),
+    ...state.expenses.map(e => ({ type: "expense", title: e.title, sub: formatMoney(e.amount), ts: e.createdAt }))
+  ].sort((a, b) => b.ts - a.ts).slice(0, 5);
+
+  if (!items.length) {
+    feed.innerHTML = `<p style="font-size:0.78rem;color:var(--ink-faint);text-align:center;padding:1rem 0">ยังไม่มีกิจกรรม</p>`;
+    return;
+  }
+
+  const typeMap = {
+    task:    { icon: iconTask,    cls: "activity-icon--task",    label: "เพิ่มงาน" },
+    note:    { icon: iconNote,    cls: "activity-icon--note",    label: "เพิ่มโน้ต" },
+    expense: { icon: iconExp,     cls: "activity-icon--expense", label: "บันทึกรายจ่าย" }
+  };
+
+  feed.innerHTML = items.map(item => {
+    const m = typeMap[item.type];
+    return `
+      <div class="activity-row">
+        <span class="activity-icon ${m.cls}" aria-hidden="true">${m.icon}</span>
+        <span class="activity-body">
+          <span class="activity-title">${escapeHtml(item.title)}</span>
+          <span class="activity-sub">${escapeHtml(item.sub)}</span>
+        </span>
+        <span class="activity-time">${relativeTime(item.ts)}</span>
+      </div>`;
+  }).join("");
 }
 
 function renderExpenseBars() {
@@ -366,21 +433,35 @@ function renderSecretary() {
 function renderSimpleTask(task) {
   return `
     <article class="list-item">
-      <div>
-        <span class="item-title">${escapeHtml(task.title)}</span>
-        <span class="item-meta"><span class="priority-${task.priority}">${task.priority}</span> · ${formatDate(task.due)}</span>
+      <div class="task-row">
+        <span class="task-dot task-dot--${task.priority}" aria-hidden="true"></span>
+        <div>
+          <span class="item-title">${escapeHtml(task.title)}</span>
+          <span class="item-meta"><span class="priority-${task.priority}">${task.priority}</span>${task.due ? " · " + formatDate(task.due) : ""}</span>
+        </div>
       </div>
     </article>
   `;
 }
 
+function relativeTime(ts) {
+  if (!ts) return "";
+  const diff = Date.now() - ts;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins || 1} นาทีที่แล้ว`;
+  const hrs = Math.floor(diff / 3600000);
+  if (hrs < 24) return `${hrs} ชั่วโมงที่แล้ว`;
+  const days = Math.floor(diff / 86400000);
+  if (days === 1) return "เมื่อวาน";
+  if (days < 7) return `${days} วันที่แล้ว`;
+  return new Intl.DateTimeFormat("th-TH", { day: "numeric", month: "short" }).format(new Date(ts));
+}
+
 function renderSimpleNote(note) {
   return `
     <article class="list-item">
-      <div>
-        <span class="item-title">${escapeHtml(note.title)}</span>
-        <span class="item-meta">${escapeHtml(note.tags || "no tags")}</span>
-      </div>
+      <span class="item-title">${escapeHtml(note.title)}</span>
+      <span class="item-meta">${relativeTime(note.createdAt)}${note.tags ? " · " + escapeHtml(note.tags) : ""}</span>
     </article>
   `;
 }
@@ -410,12 +491,18 @@ function showApp() {
   _inApp = true;
   document.getElementById("homepage")?.style.setProperty("display", "none");
   document.querySelector(".app-shell")?.style.removeProperty("display");
+  document.getElementById("bg-canvas")?.style.setProperty("display", "none");
+  document.querySelector(".paper-grain")?.style.setProperty("display", "none");
+  document.querySelector(".cat-roam-float")?.style.setProperty("display", "none");
 }
 
 function showHomepage() {
   _inApp = false;
   document.getElementById("homepage")?.style.removeProperty("display");
   document.querySelector(".app-shell")?.style.setProperty("display", "none");
+  document.getElementById("bg-canvas")?.style.removeProperty("display");
+  document.querySelector(".paper-grain")?.style.removeProperty("display");
+  document.querySelector(".cat-roam-float")?.style.removeProperty("display");
 }
 
 function enterGuestMode() {
@@ -587,6 +674,16 @@ document.addEventListener("click", (event) => {
   const target = event.target;
   if (!(target instanceof HTMLElement)) return;
 
+  // Sidebar toggle
+  if (target.closest("#sidebarToggle")) {
+    const shell = document.querySelector(".app-shell");
+    if (shell) {
+      shell.classList.toggle("sidebar-collapsed");
+      localStorage.setItem("sidebarCollapsed", shell.classList.contains("sidebar-collapsed") ? "1" : "0");
+    }
+    return;
+  }
+
   const viewJump = target.dataset.viewJump;
   const toggleId = target.dataset.toggleTask;
   const deleteTaskId = target.dataset.deleteTask;
@@ -655,6 +752,91 @@ document.addEventListener("keydown", (e) => {
 
   if (e.key === "Escape") {
     document.activeElement?.blur();
+  }
+});
+
+/* ── Sidebar toggle — restore persisted state ── */
+(function() {
+  const shell = document.querySelector(".app-shell");
+  if (shell && localStorage.getItem("sidebarCollapsed") === "1") {
+    shell.classList.add("sidebar-collapsed");
+  }
+})();
+
+/* ── Focus timer (Pomodoro) ── */
+(function initFocusTimer() {
+  const btn   = document.getElementById("focusTimerBtn");
+  const label = document.getElementById("focusTimerLabel");
+  const arc   = document.getElementById("focusArc");
+  if (!btn || !label || !arc) return;
+
+  const TOTAL = 25 * 60;
+  const CIRCUMFERENCE = 2 * Math.PI * 28;
+  arc.style.strokeDasharray = CIRCUMFERENCE;
+
+  let remaining = TOTAL;
+  let interval  = null;
+  let running   = false;
+
+  function updateDisplay() {
+    const m = String(Math.floor(remaining / 60)).padStart(2, "0");
+    const s = String(remaining % 60).padStart(2, "0");
+    label.textContent = `${m}:${s}`;
+    arc.style.strokeDashoffset = CIRCUMFERENCE * (1 - remaining / TOTAL);
+  }
+
+  function stop() {
+    clearInterval(interval);
+    interval = null;
+    running = false;
+    btn.textContent = "▶ Start";
+    btn.classList.remove("running");
+  }
+
+  btn.addEventListener("click", () => {
+    if (running) {
+      stop();
+    } else {
+      if (remaining === 0) { remaining = TOTAL; updateDisplay(); }
+      running = true;
+      btn.textContent = "⏸ Pause";
+      btn.classList.add("running");
+      interval = setInterval(() => {
+        remaining--;
+        updateDisplay();
+        if (remaining <= 0) {
+          stop();
+          showToast("⏰ Focus session เสร็จแล้ว! พักสักครู่");
+        }
+      }, 1000);
+    }
+  });
+
+  updateDisplay();
+})();
+
+/* ── Dashboard assistant chips ── */
+document.querySelectorAll(".dash-assist-chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    const input = document.getElementById("dashAssistInput");
+    if (input) { input.value = chip.dataset.assist || ""; input.focus(); }
+  });
+});
+
+document.getElementById("dashAssistSend")?.addEventListener("click", () => {
+  const input = document.getElementById("dashAssistInput");
+  if (!input?.value.trim()) return;
+  const result = parseCommand(input.value);
+  state.logs.push(result);
+  input.value = "";
+  render();
+  showToast(result.length < 60 ? result : "ดำเนินการเรียบร้อย");
+});
+
+document.getElementById("dashAssistInput")?.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    document.getElementById("dashAssistSend")?.click();
   }
 });
 
