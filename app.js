@@ -20,85 +20,134 @@ function showToast(message, type = "success") {
 }
 
 function createDemoState() {
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
+  const d = (offsetDays) => {
+    const dt = new Date();
+    dt.setDate(dt.getDate() + offsetDays);
+    return dt.toISOString().slice(0, 10);
+  };
+  const t = (offsetMs) => Date.now() - Math.abs(offsetMs);
 
   return {
     tasks: [
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "ออกแบบ Dashboard ให้เห็นภาพรวมชีวิตใน 5 นาที",
+        title: "ส่งสรุปรายงานยอดขายให้ทีม",
+        priority: "Critical",
+        due: d(0),
+        status: "Pending",
+        createdAt: t(1000)
+      },
+      {
+        id: crypto.randomUUID(), _isDemo: true,
+        title: "ประชุม Product Sync 14:00 — เตรียม slide ก่อนนะ",
         priority: "High",
-        due: today.toISOString().slice(0, 10),
+        due: d(0),
         status: "Pending",
-        createdAt: Date.now() - 1000
+        createdAt: t(2000)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "จดไอเดียสำหรับต่อ LINE Secretary",
+        title: "เขียน spec ฟีเจอร์ Notification ให้ครบก่อนส่งทีม Dev",
         priority: "Medium",
-        due: tomorrow.toISOString().slice(0, 10),
+        due: d(2),
         status: "Pending",
-        createdAt: Date.now() - 2000
+        createdAt: t(3000)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "ทดลองบันทึกรายจ่ายผ่านหน้า Expenses",
+        title: "ออกกำลังกาย 30 นาที",
+        priority: "Low",
+        due: d(0),
+        status: "Pending",
+        createdAt: t(4000)
+      },
+      {
+        id: crypto.randomUUID(), _isDemo: true,
+        title: "ทบทวน PR code ของทีม backend",
+        priority: "High",
+        due: d(-1),
+        status: "Completed",
+        createdAt: t(5000)
+      },
+      {
+        id: crypto.randomUUID(), _isDemo: true,
+        title: "อัปเดต dependencies ใน project",
         priority: "Low",
         due: "",
         status: "Completed",
-        createdAt: Date.now() - 3000
+        createdAt: t(6000)
       }
     ],
     notes: [
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "Johny OS คือพื้นที่รวม task, note, expense และเลขาส่วนตัว",
-        body: "เวอร์ชันแรกเก็บข้อมูลใน browser ก่อน เพื่อให้ใช้งานฟรีและ deploy ง่ายบน Cloudflare Pages",
-        tags: "vision, mvp",
-        createdAt: Date.now() - 1000
+        title: "ไอเดีย Q3: ฟีเจอร์ที่อยากทำ",
+        body: "• Reminder แจ้งเตือนก่อน deadline\n• Export รายจ่ายเป็น PDF\n• Dark mode เต็มรูปแบบ\n• Shortcut เพิ่มงานด้วยเสียง\n• Weekly summary ส่งเข้า LINE",
+        tags: "ไอเดีย, แผนงาน, Q3",
+        createdAt: t(1000)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "Phase 2: sync ข้ามเครื่องด้วย Supabase",
-        body: "เพิ่ม login, database, reminder และค่อยต่อ AI หลังจาก workflow หลักนิ่งแล้ว",
-        tags: "roadmap",
-        createdAt: Date.now() - 2000
+        title: "สรุป Meeting วันนี้",
+        body: "Sprint goal: ปิด 3 feature ภายใน 2 สัปดาห์\nBlock: รอ design จาก UX team\nAction item:\n- @Beam ส่ง mockup ภายใน พฤ.\n- @Me เขียน API spec ก่อน ศ.",
+        tags: "ประชุม, sprint, สรุป",
+        createdAt: t(2000)
+      },
+      {
+        id: crypto.randomUUID(), _isDemo: true,
+        title: "คำคมที่ชอบ",
+        body: "\"Done is better than perfect.\"\n— Mark Zuckerberg\n\n\"Start before you're ready. Don't prepare, begin.\"\n— Mel Robbins\n\n\"ความสำเร็จ คือผลรวมของความพยายามเล็กๆ ที่ทำทุกวัน\"",
+        tags: "แรงบันดาลใจ",
+        createdAt: t(3000)
       }
     ],
     expenses: [
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "กาแฟทำงาน",
-        amount: 75,
-        category: "เครื่องดื่ม",
-        date: today.toISOString().slice(0, 10),
-        createdAt: Date.now() - 1000
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "เดินทาง",
-        amount: 120,
-        category: "เดินทาง",
-        date: today.toISOString().slice(0, 10),
-        createdAt: Date.now() - 2000
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "มื้อกลางวัน",
+        title: "กาแฟ Oat Latte",
         amount: 95,
+        category: "เครื่องดื่ม",
+        date: d(0),
+        createdAt: t(1000)
+      },
+      {
+        id: crypto.randomUUID(), _isDemo: true,
+        title: "ข้าวกลางวัน + น้ำ",
+        amount: 130,
         category: "อาหาร",
-        date: yesterday.toISOString().slice(0, 10),
-        createdAt: Date.now() - 3000
+        date: d(0),
+        createdAt: t(2000)
+      },
+      {
+        id: crypto.randomUUID(), _isDemo: true,
+        title: "BTS Skytrain",
+        amount: 52,
+        category: "เดินทาง",
+        date: d(0),
+        createdAt: t(3000)
+      },
+      {
+        id: crypto.randomUUID(), _isDemo: true,
+        title: "ค่ายา + วิตามิน",
+        amount: 350,
+        category: "สุขภาพ",
+        date: d(-1),
+        createdAt: t(4000)
+      },
+      {
+        id: crypto.randomUUID(), _isDemo: true,
+        title: "Netflix รายเดือน",
+        amount: 419,
+        category: "อื่นๆ",
+        date: d(-3),
+        createdAt: t(5000)
       }
     ],
     logs: [
-      "ลองพิมพ์: เพิ่มงาน อ่านหนังสือคืนนี้",
-      "ลองพิมพ์: จ่าย กาแฟ 75 เครื่องดื่ม",
-      "Johny OS Lite พร้อมช่วยจัดระเบียบวันของคุณแล้ว"
+      "ลองพิมพ์: เพิ่มงาน ประชุมทีมพรุ่งนี้ 10 โมง",
+      "ลองพิมพ์: จ่าย กาแฟ 95 เครื่องดื่ม",
+      "ลองพิมพ์: โน้ต ไอเดียใหม่สำหรับ project",
+      "Johny Memo พร้อมช่วยจัดระเบียบวันของคุณแล้ว"
     ]
   };
 }
