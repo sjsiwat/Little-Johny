@@ -4467,6 +4467,16 @@ body::before {
   }
 }
 
+/* LINE Notes Section */
+.line-notes-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin: 1.5rem 0 0.5rem;
+}
+
 /* LINE Link Panel */
 .line-link-panel {
   margin-top: 1.5rem;
