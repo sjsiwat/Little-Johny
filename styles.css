@@ -4523,6 +4523,11 @@ body::before {
   border-color: transparent;
   background: transparent;
 }
+.line-connect-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: auto;
+}
 
 /* LINE Modal */
 .modal-backdrop {

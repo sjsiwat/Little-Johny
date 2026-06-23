@@ -2036,13 +2036,21 @@ function initLineConnect() {
   const codeInput = document.getElementById('lineModalCode')
   const errorEl = document.getElementById('lineModalError')
 
+  const isLoggedIn = () => !!Auth.getUser()
+
   const stored = localStorage.getItem('lineUserId')
-  if (stored) {
+  if (stored && isLoggedIn()) {
     setConnectedUI(true)
     loadLineNotes(stored)
   }
 
+  updateLineConnectAccess()
+
+  Auth.onChange(() => updateLineConnectAccess())
+
   connectBtn?.addEventListener('click', () => {
+    if (!isLoggedIn()) return
+
     const linked = !!localStorage.getItem('lineUserId')
     if (linked) {
       localStorage.removeItem('lineUserId')
@@ -2096,6 +2104,23 @@ function initLineConnect() {
       confirmBtn.textContent = 'ยืนยัน'
     }
   })
+}
+
+function updateLineConnectAccess() {
+  const btn = document.getElementById('lineConnectBtn')
+  const text = document.getElementById('lineStatusText')
+  if (!btn) return
+  const loggedIn = !!Auth.getUser()
+  btn.disabled = !loggedIn
+  btn.title = loggedIn ? '' : 'ต้อง Log in ก่อนถึงจะเชื่อม LINE ได้'
+  if (!loggedIn) {
+    btn.classList.remove('line-connect-btn--disconnect')
+    if (text) text.textContent = 'ต้อง Log in ก่อน'
+  } else {
+    const linked = !!localStorage.getItem('lineUserId')
+    setConnectedUI(linked)
+    if (linked) loadLineNotes(localStorage.getItem('lineUserId'))
+  }
 }
 
 function setConnectedUI(connected) {
