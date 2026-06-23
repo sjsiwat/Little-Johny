@@ -1,6 +1,7 @@
 /* STORAGE_KEY moved to storage.js */
 
 let toastTimer = null;
+let _editingTaskId = null;
 function showToast(message, type = "success") {
   const existing = document.getElementById("app-toast");
   if (existing) existing.remove();
@@ -204,6 +205,40 @@ function renderShell() {
   if (sbDone)    sbDone.textContent    = doneTasks.length;
   if (sbExpense) sbExpense.textContent = `฿${todayExpense.toLocaleString("th-TH")}`;
 
+  // Stat card trends — computed from real data, no hardcoded deltas
+  const todayAdded = state.tasks.filter(t =>
+    t.createdAt && new Date(t.createdAt).toISOString().slice(0, 10) === todayKey
+  ).length;
+  const urgentCount = openItems.filter(t => t.priority === "Critical" || t.priority === "High").length;
+  const monthKey2 = new Date().toISOString().slice(0, 7);
+  const monthExpense = state.expenses
+    .filter(e => e.date?.startsWith(monthKey2))
+    .reduce((s, e) => s + Number(e.amount), 0);
+
+  const sbTrendTotal   = document.getElementById("sbTrendTotal");
+  const sbTrendOpen    = document.getElementById("sbTrendOpen");
+  const sbTrendDone    = document.getElementById("sbTrendDone");
+  const sbTrendExpense = document.getElementById("sbTrendExpense");
+
+  if (sbTrendTotal) {
+    sbTrendTotal.textContent = todayAdded > 0 ? `+${todayAdded} วันนี้` : state.tasks.length === 0 ? "ยังไม่มีงาน" : "";
+  }
+  if (sbTrendOpen) {
+    sbTrendOpen.textContent = openItems.length === 0
+      ? "ไม่มีงานค้าง"
+      : urgentCount > 0 ? `${urgentCount} สำคัญ/ด่วน` : "";
+  }
+  if (sbTrendDone) {
+    sbTrendDone.textContent = doneTasks.length > 0 && state.tasks.length > 0
+      ? `${Math.round(doneTasks.length / state.tasks.length * 100)}% ของทั้งหมด`
+      : "";
+  }
+  if (sbTrendExpense) {
+    sbTrendExpense.textContent = monthExpense > todayExpense
+      ? `฿${monthExpense.toLocaleString("th-TH")} เดือนนี้`
+      : monthExpense === 0 ? "ยังไม่มีรายจ่าย" : "";
+  }
+
   // ── Today Command Center ─────────────────────────────────
   const hour = new Date().getHours();
   const greetingMap = [
@@ -353,10 +388,10 @@ function renderTasks() {
   document.getElementById("taskList").innerHTML = filtered.length
     ? filtered
         .sort((a, b) => (a.due || "9999").localeCompare(b.due || "9999"))
-        .map(
-          (task) => {
-            const done = task.status === "Completed";
-            return `
+        .map((task) => {
+          if (task.id === _editingTaskId) return renderTaskEditForm(task);
+          const done = task.status === "Completed";
+          return `
             <article class="list-item ${done ? "done" : ""}" aria-label="${escapeHtml(task.title)}${done ? " (เสร็จแล้ว)" : ""}">
               <div>
                 <span class="item-title">${escapeHtml(task.title)}</span>
@@ -367,14 +402,40 @@ function renderTasks() {
               <div class="item-actions">
                 <button class="icon-button" type="button" data-toggle-task="${task.id}"
                   aria-pressed="${done}" title="${done ? "เปิดงานอีกครั้ง" : "ทำเครื่องหมายเสร็จ"}">✓</button>
+                <button class="icon-button icon-button--edit" type="button" data-edit-task="${task.id}" title="แก้ไขงาน" aria-label="แก้ไขงาน">
+                  <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M7.5 1.5l2 2-6 6H1.5v-2l6-6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                </button>
                 <button class="icon-button" type="button" data-delete-task="${task.id}" title="ลบงาน">×</button>
               </div>
             </article>
           `;
-          }
-        )
+        })
         .join("")
     : emptyState("ยังไม่มีงานในมุมมองนี้", "tasks", "เพิ่มงาน");
+}
+
+function renderTaskEditForm(task) {
+  const priorities = ["Low", "Medium", "High", "Critical"];
+  const opts = priorities.map(p =>
+    `<option value="${p}"${p === task.priority ? " selected" : ""}>${p}</option>`
+  ).join("");
+  return `
+    <article class="list-item list-item--editing">
+      <form class="task-edit-form" data-edit-form-task="${task.id}">
+        <input class="task-edit-title" type="text" value="${escapeHtml(task.title)}"
+          placeholder="ชื่องาน" required maxlength="200"
+          autocorrect="off" autocapitalize="sentences" enterkeyhint="done" />
+        <div class="task-edit-row">
+          <select class="task-edit-select" aria-label="Priority">${opts}</select>
+          <input class="task-edit-date" type="date" value="${task.due || ""}" aria-label="วันครบกำหนด" />
+          <div class="task-edit-actions">
+            <button type="submit" class="task-edit-save">บันทึก</button>
+            <button type="button" class="task-edit-cancel" data-cancel-edit="${task.id}">ยกเลิก</button>
+          </div>
+        </div>
+      </form>
+    </article>
+  `;
 }
 
 function renderNotes() {
@@ -670,6 +731,23 @@ document.getElementById("commandForm").addEventListener("submit", (event) => {
   render();
 });
 
+document.getElementById("taskList").addEventListener("submit", (e) => {
+  const form = e.target.closest("[data-edit-form-task]");
+  if (!form) return;
+  e.preventDefault();
+  const id = form.dataset.editFormTask;
+  const newTitle = form.querySelector(".task-edit-title").value.trim();
+  const newPriority = form.querySelector(".task-edit-select").value;
+  const newDue = form.querySelector(".task-edit-date").value;
+  if (!newTitle) return;
+  state.tasks = state.tasks.map(t =>
+    t.id === id ? { ...t, title: newTitle, priority: newPriority, due: newDue } : t
+  );
+  _editingTaskId = null;
+  render();
+  showToast("อัปเดตงานแล้ว");
+});
+
 document.addEventListener("click", (event) => {
   const target = event.target;
   if (!(target instanceof HTMLElement)) return;
@@ -684,14 +762,40 @@ document.addEventListener("click", (event) => {
     return;
   }
 
-  const viewJump = target.dataset.viewJump;
+  const viewJumpEl = target.closest("[data-view-jump]");
+  const viewJump = viewJumpEl?.dataset.viewJump;
   const toggleId = target.dataset.toggleTask;
   const deleteTaskId = target.dataset.deleteTask;
   const deleteNoteId = target.dataset.deleteNote;
   const deleteExpenseId = target.dataset.deleteExpense;
+  const editTaskId = target.closest("[data-edit-task]")?.dataset.editTask;
+  const cancelEditId = target.closest("[data-cancel-edit]")?.dataset.cancelEdit;
 
   if (viewJump) {
     setView(viewJump);
+    const focusId = viewJumpEl.dataset.focusInput;
+    if (focusId) {
+      setTimeout(() => {
+        const inp = document.getElementById(focusId);
+        if (inp) { inp.focus(); inp.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+      }, 50);
+    }
+  }
+
+  if (editTaskId) {
+    _editingTaskId = editTaskId;
+    renderTasks();
+    setTimeout(() => {
+      const inp = document.querySelector(".task-edit-title");
+      if (inp) { inp.focus(); inp.select(); }
+    }, 30);
+    return;
+  }
+
+  if (cancelEditId !== undefined) {
+    _editingTaskId = null;
+    renderTasks();
+    return;
   }
 
   if (toggleId) {

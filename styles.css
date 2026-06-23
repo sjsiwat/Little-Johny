@@ -1034,6 +1034,29 @@ h1 {
   white-space: nowrap;
 }
 
+.cal-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem;
+  color: var(--ink-faint);
+  text-align: center;
+}
+.cal-empty-state p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+}
+.cal-coming-soon {
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  background: var(--surface-soft);
+  border-radius: 20px;
+  padding: 0.2rem 0.7rem;
+  border: 1px solid var(--border);
+}
+
 /* ── Activity feed panel ── */
 .activity-feed {
   display: flex;
@@ -1399,6 +1422,78 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   background: #fff;
   color: var(--ink);
 }
+
+.icon-button--edit { display: flex; align-items: center; justify-content: center; }
+.icon-button--edit:hover { color: var(--blue); border-color: var(--blue); }
+
+/* ── Inline task edit form ── */
+.list-item--editing {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue) 18%, transparent);
+  padding: 0.75rem;
+}
+
+.task-edit-form { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; }
+
+.task-edit-title {
+  width: 100%;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  outline: none;
+}
+.task-edit-title:focus { border-color: var(--blue); box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue) 15%, transparent); }
+
+.task-edit-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.task-edit-select,
+.task-edit-date {
+  font-size: 0.78rem;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  outline: none;
+}
+.task-edit-select:focus,
+.task-edit-date:focus { border-color: var(--blue); }
+
+.task-edit-actions { display: flex; gap: 0.35rem; margin-left: auto; }
+
+.task-edit-save {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-sm);
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: opacity var(--t-fast);
+}
+.task-edit-save:hover { opacity: 0.88; }
+
+.task-edit-cancel {
+  font-size: 0.78rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: background var(--t-fast);
+}
+.task-edit-cancel:hover { background: var(--surface-soft); }
 
 /* ============================================================
    PRIORITY

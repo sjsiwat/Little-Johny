@@ -327,7 +327,7 @@
               </div>
               <strong id="sbStatTotal">0</strong>
               <span>งานทั้งหมด</span>
-              <span class="sb-stat-trend" id="sbTrendTotal">↗ 20% จากเมื่อวาน</span>
+              <span class="sb-stat-trend" id="sbTrendTotal"></span>
             </div>
             <div class="sb-stat sb-stat--amber">
               <div class="sb-stat-icon" aria-hidden="true">
@@ -335,7 +335,7 @@
               </div>
               <strong id="sbStatOpen">0</strong>
               <span>ค้างอยู่</span>
-              <span class="sb-stat-trend" id="sbTrendOpen">↗ 1 งานจากเมื่อวาน</span>
+              <span class="sb-stat-trend" id="sbTrendOpen"></span>
             </div>
             <div class="sb-stat sb-stat--green">
               <div class="sb-stat-icon" aria-hidden="true">
@@ -343,7 +343,7 @@
               </div>
               <strong id="sbStatDone">0</strong>
               <span>เสร็จแล้ว</span>
-              <span class="sb-stat-trend" id="sbTrendDone">↗ เยี่ยม!</span>
+              <span class="sb-stat-trend" id="sbTrendDone"></span>
             </div>
             <div class="sb-stat sb-stat--red">
               <div class="sb-stat-icon" aria-hidden="true">
@@ -351,7 +351,7 @@
               </div>
               <strong id="sbStatExpense">฿0</strong>
               <span>วันนี้</span>
-              <span class="sb-stat-trend" id="sbTrendExpense">↗ 0% จากเมื่อวาน</span>
+              <span class="sb-stat-trend" id="sbTrendExpense"></span>
             </div>
           </div>
 
@@ -393,27 +393,11 @@
                 <button class="ghost-button" type="button">ดูปฏิทิน →</button>
               </div>
               <div class="today-cal-events" id="todayCalEvents">
-                <div class="cal-event-row">
-                  <span class="cal-event-time">09:00</span>
-                  <span class="cal-event-title"><span class="cal-event-dot" style="background:#FF453A"></span>ประชุมทีมประจำสัปดาห์</span>
-                  <span class="cal-event-dur">1 ชม.</span>
+                <div class="cal-empty-state">
+                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" style="opacity:0.35"><rect x="2.5" y="5" width="23" height="20.5" rx="4.5" stroke="currentColor" stroke-width="1.8"/><path d="M9 2.5v5M19 2.5v5M2.5 12h23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  <p>ยังไม่มีกำหนดการวันนี้</p>
+                  <span class="cal-coming-soon">ฟีเจอร์ปฏิทินกำลังพัฒนา</span>
                 </div>
-                <div class="cal-event-row">
-                  <span class="cal-event-time">11:00</span>
-                  <span class="cal-event-title"><span class="cal-event-dot" style="background:#30D158"></span>ตรวจสอบงานลูกค้า</span>
-                  <span class="cal-event-dur">30 นาที</span>
-                </div>
-                <div class="cal-event-row">
-                  <span class="cal-event-time">14:00</span>
-                  <span class="cal-event-title"><span class="cal-event-dot" style="background:#FF9F0A"></span>นำเสนอโปรเจกต์</span>
-                  <span class="cal-event-dur">1 ชม.</span>
-                </div>
-                <div class="cal-event-row">
-                  <span class="cal-event-time">16:00</span>
-                  <span class="cal-event-title"><span class="cal-event-dot" style="background:#0A84FF"></span>สรุปงานประจำวัน</span>
-                  <span class="cal-event-dur">30 นาที</span>
-                </div>
-                <button class="ghost-button" type="button" style="margin-top:0.6rem;width:100%;justify-content:center;display:flex">+ เพิ่มเหตุการณ์</button>
               </div>
             </section>
 
@@ -436,14 +420,14 @@
 
             <section class="panel dash-assistant-panel">
               <div class="panel-head">
-                <h2>✦ Ask Johny</h2>
-                <button class="ghost-button" type="button" data-view-jump="secretary">เปิด →</button>
+                <h2>คำสั่งด่วน</h2>
+                <button class="ghost-button" type="button" data-view-jump="secretary">ดูทั้งหมด →</button>
               </div>
               <div class="dash-assistant">
-                <p class="dash-assist-desc">ถามอะไรก็ได้เกี่ยวกับงาน รายจ่าย หรือไอเดียของคุณ</p>
+                <p class="dash-assist-desc">พิมพ์คำสั่งเพื่อเพิ่มข้อมูลเร็ว เช่น <code>เพิ่มงาน ส่งรายงาน</code> หรือ <code>จ่าย กาแฟ 75 เครื่องดื่ม</code></p>
                 <div class="dash-assist-input-row">
-                  <input class="dash-assist-input" id="dashAssistInput" type="text" placeholder="ถามอะไรก็ได้เกี่ยวกับงาน โน้ต หรือรายจ่ายของคุณ…" />
-                  <button class="dash-assist-send" type="button" id="dashAssistSend" aria-label="Send">
+                  <input class="dash-assist-input" id="dashAssistInput" type="text" placeholder="เพิ่มงาน / จ่าย / โน้ต: / สรุปรายจ่าย…" />
+                  <button class="dash-assist-send" type="button" id="dashAssistSend" aria-label="ส่งคำสั่ง">
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6h10M7 2l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                   </button>
                 </div>
@@ -605,7 +589,7 @@
           </span>
           <span>โน้ตใหม่</span>
         </button>
-        <button class="fab-item fab-item--task" type="button" data-view-jump="tasks">
+        <button class="fab-item fab-item--task" type="button" data-view-jump="tasks" data-focus-input="taskTitle">
           <span class="fab-item-icon">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 6l2 2 3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span>
