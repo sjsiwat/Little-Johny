@@ -137,12 +137,13 @@ const Storage = (() => {
     },
 
     save(state) {
+      // Guest mode is ephemeral — no persistence anywhere, no cloud sync.
+      // Data is saved only for authenticated users.
+      if (!Auth.isLoggedIn()) return;
       localSave(state);
-      if (Auth.isLoggedIn()) {
-        clearTimeout(_syncTimer);
-        if (_syncChangeListener) _syncChangeListener('pending');
-        _syncTimer = setTimeout(() => pushToCloud(state), 1500);
-      }
+      clearTimeout(_syncTimer);
+      if (_syncChangeListener) _syncChangeListener('pending');
+      _syncTimer = setTimeout(() => pushToCloud(state), 1500);
     },
 
     onSyncChange(fn) { _syncChangeListener = fn; },
