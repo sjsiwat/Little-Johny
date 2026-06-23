@@ -1,4 +1,4 @@
-const CACHE_NAME = "johny-os-lite-v4";
+const CACHE_NAME = "johny-os-lite-v5";
 const APP_ASSETS = [
   "/",
   "/index.html",
