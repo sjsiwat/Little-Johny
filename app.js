@@ -2024,27 +2024,56 @@ if ("serviceWorker" in navigator) {
 }
 
 
-// LINE Bot Linking
+// LINE Bot
 const LINE_WORKER_URL = 'https://johny-line-bot.sj-siwat.workers.dev'
 
-function initLineLink() {
-  const panel = document.getElementById('lineLinkPanel')
-  const btn = document.getElementById('lineLinkBtn')
-  const input = document.getElementById('lineLinkCode')
-  const status = document.getElementById('lineLinkStatus')
-  const form = document.getElementById('lineLinkForm')
+function initLineConnect() {
+  const backdrop = document.getElementById('lineModalBackdrop')
+  const connectBtn = document.getElementById('lineConnectBtn')
+  const closeBtn = document.getElementById('lineModalClose')
+  const cancelBtn = document.getElementById('lineModalCancel')
+  const confirmBtn = document.getElementById('lineModalConfirm')
+  const codeInput = document.getElementById('lineModalCode')
+  const errorEl = document.getElementById('lineModalError')
 
   const stored = localStorage.getItem('lineUserId')
   if (stored) {
-    showLinked(stored, status, form)
+    setConnectedUI(true)
+    loadLineNotes(stored)
   }
 
-  btn?.addEventListener('click', async () => {
-    const code = input.value.trim()
-    if (code.length !== 6) return showToast('กรอกรหัส 6 หลัก')
+  connectBtn?.addEventListener('click', () => {
+    const linked = !!localStorage.getItem('lineUserId')
+    if (linked) {
+      localStorage.removeItem('lineUserId')
+      setConnectedUI(false)
+      document.getElementById('lineNotesSection').style.display = 'none'
+      showToast('ยกเลิกการเชื่อม LINE แล้ว')
+      return
+    }
+    codeInput.value = ''
+    errorEl.hidden = true
+    backdrop.hidden = false
+    codeInput.focus()
+  })
 
-    btn.disabled = true
-    btn.textContent = 'กำลังตรวจสอบ...'
+  const closeModal = () => { backdrop.hidden = true }
+  closeBtn?.addEventListener('click', closeModal)
+  cancelBtn?.addEventListener('click', closeModal)
+  backdrop?.addEventListener('click', (e) => { if (e.target === backdrop) closeModal() })
+
+  codeInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') confirmBtn.click() })
+
+  confirmBtn?.addEventListener('click', async () => {
+    const code = codeInput.value.trim()
+    if (code.length !== 6) {
+      errorEl.textContent = 'กรอกรหัส 6 หลัก'
+      errorEl.hidden = false
+      return
+    }
+    confirmBtn.disabled = true
+    confirmBtn.textContent = 'กำลังตรวจสอบ...'
+    errorEl.hidden = true
     try {
       const res = await fetch(`${LINE_WORKER_URL}/link/verify`, {
         method: 'POST',
@@ -2055,25 +2084,36 @@ function initLineLink() {
       if (!res.ok) throw new Error(data.error)
 
       localStorage.setItem('lineUserId', data.lineUserId)
-      showLinked(data.lineUserId, status, form)
+      backdrop.hidden = true
+      setConnectedUI(true)
       showToast('เชื่อมบัญชี LINE สำเร็จ!')
       loadLineNotes(data.lineUserId)
     } catch (err) {
-      showToast(err.message || 'เกิดข้อผิดพลาด')
-      btn.disabled = false
-      btn.textContent = 'เชื่อม'
+      errorEl.textContent = err.message || 'รหัสไม่ถูกต้อง กรุณาลองใหม่'
+      errorEl.hidden = false
+    } finally {
+      confirmBtn.disabled = false
+      confirmBtn.textContent = 'ยืนยัน'
     }
   })
 }
 
-function showLinked(userId, status, form) {
-  status.textContent = '✓ เชื่อมแล้ว'
-  form.innerHTML = `<p class="line-link-hint">LINE เชื่อมกับ JohnyMemo แล้ว <button type="button" id="lineUnlinkBtn" style="color:var(--danger);background:none;border:none;cursor:pointer;padding:0">ยกเลิกการเชื่อม</button></p>`
-  document.getElementById('lineUnlinkBtn')?.addEventListener('click', () => {
-    localStorage.removeItem('lineUserId')
-    location.reload()
-  })
-  loadLineNotes(userId)
+function setConnectedUI(connected) {
+  const dot = document.getElementById('lineStatusDot')
+  const text = document.getElementById('lineStatusText')
+  const btn = document.getElementById('lineConnectBtn')
+  if (!dot || !text || !btn) return
+  if (connected) {
+    dot.classList.add('line-status-dot--connected')
+    text.textContent = 'เชื่อมต่อแล้ว'
+    btn.textContent = 'ยกเลิกการเชื่อม'
+    btn.classList.add('line-connect-btn--disconnect')
+  } else {
+    dot.classList.remove('line-status-dot--connected')
+    text.textContent = 'ยังไม่ได้เชื่อม'
+    btn.textContent = 'เชื่อมบัญชี LINE'
+    btn.classList.remove('line-connect-btn--disconnect')
+  }
 }
 
 async function loadLineNotes(userId) {
@@ -2100,4 +2140,4 @@ async function loadLineNotes(userId) {
   `).join('')
 }
 
-initLineLink()
+initLineConnect()
