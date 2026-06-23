@@ -4,6 +4,7 @@ let toastTimer = null;
 let _editingTaskId    = null;
 let _editingNoteId    = null;
 let _editingExpenseId = null;
+let _focusTaskId      = null;
 function showToast(message, type = "success") {
   const existing = document.getElementById("app-toast");
   if (existing) existing.remove();
@@ -168,7 +169,41 @@ function render() {
   renderNotes();
   renderExpenses();
   renderSecretary();
+  renderFocusTaskPicker();
   saveState();
+}
+
+function renderFocusTaskPicker() {
+  const picker = document.getElementById("focusTaskPicker");
+  if (!picker) return;
+  // If the currently focused task was completed or deleted, clear it
+  const focusTask = _focusTaskId
+    ? state.tasks.find(t => t.id === _focusTaskId && t.status !== "Completed")
+    : null;
+  if (_focusTaskId && !focusTask) _focusTaskId = null;
+
+  if (focusTask) {
+    picker.innerHTML = `
+      <div class="focus-task-selected">
+        <span class="focus-task-name">${escapeHtml(focusTask.title)}</span>
+        <button class="focus-task-clear" data-clear-focus-task type="button" aria-label="ยกเลิก focus task">✕</button>
+      </div>`;
+  } else {
+    const openTasks = state.tasks
+      .filter(t => t.status !== "Completed")
+      .sort((a, b) => { const r = {Critical:0,High:1,Medium:2,Low:3}; return r[a.priority]-r[b.priority]; })
+      .slice(0, 10);
+    if (!openTasks.length) { picker.innerHTML = ""; return; }
+    picker.innerHTML = `
+      <select class="focus-task-select" id="focusTaskSelect" aria-label="เลือก task ที่จะ focus">
+        <option value="">เลือก task ที่จะ focus…</option>
+        ${openTasks.map(t => `<option value="${t.id}">${escapeHtml(t.title)}</option>`).join("")}
+      </select>`;
+    document.getElementById("focusTaskSelect")?.addEventListener("change", e => {
+      _focusTaskId = e.target.value || null;
+      renderFocusTaskPicker();
+    });
+  }
 }
 
 function updateClock() {
@@ -402,6 +437,9 @@ function renderTasks() {
                 </span>
               </div>
               <div class="item-actions">
+                ${!done ? `<button class="icon-button icon-button--focus${_focusTaskId === task.id ? " is-focusing" : ""}" type="button" data-focus-task="${task.id}" title="Focus session กับงานนี้" aria-label="Focus">
+                  <svg width="10" height="11" viewBox="0 0 10 11" fill="none" aria-hidden="true"><path d="M2 1l7 4.5-7 4.5V1z" fill="currentColor"/></svg>
+                </button>` : ""}
                 <button class="icon-button" type="button" data-toggle-task="${task.id}"
                   aria-pressed="${done}" title="${done ? "เปิดงานอีกครั้ง" : "ทำเครื่องหมายเสร็จ"}">✓</button>
                 <button class="icon-button icon-button--edit" type="button" data-edit-task="${task.id}" title="แก้ไขงาน" aria-label="แก้ไขงาน">
@@ -890,6 +928,22 @@ document.addEventListener("click", (event) => {
   const deleteExpenseId = target.dataset.deleteExpense;
   const editTaskId      = target.closest("[data-edit-task]")?.dataset.editTask;
   const cancelEditId    = target.closest("[data-cancel-edit]")?.dataset.cancelEdit;
+  // Focus task
+  if (target.closest("[data-focus-task]")) {
+    const id = target.closest("[data-focus-task]").dataset.focusTask;
+    _focusTaskId = (_focusTaskId === id) ? null : id;  // toggle
+    renderFocusTaskPicker();
+    renderTasks();
+    if (_focusTaskId) showToast("Focus: " + (state.tasks.find(t => t.id === id)?.title || ""));
+    return;
+  }
+  if (target.closest("[data-clear-focus-task]")) {
+    _focusTaskId = null;
+    renderFocusTaskPicker();
+    renderTasks();
+    return;
+  }
+
   const editNoteId      = target.closest("[data-edit-note]")?.dataset.editNote;
   const cancelNoteId    = target.closest("[data-cancel-edit-note]")?.dataset.cancelEditNote;
   const editExpenseId   = target.closest("[data-edit-expense]")?.dataset.editExpense;
@@ -1058,7 +1112,19 @@ document.addEventListener("keydown", (e) => {
         updateDisplay();
         if (remaining <= 0) {
           stop();
-          showToast("⏰ Focus session เสร็จแล้ว! พักสักครู่");
+          const ft = _focusTaskId ? state.tasks.find(t => t.id === _focusTaskId) : null;
+          if (ft) {
+            const prompt = document.getElementById("focusDonePrompt");
+            const textEl = document.getElementById("focusDoneText");
+            const yesBtn = document.getElementById("focusDoneYes");
+            if (prompt && textEl && yesBtn) {
+              textEl.textContent = ft.title;
+              yesBtn.dataset.completeTask = _focusTaskId;
+              prompt.hidden = false;
+            }
+          } else {
+            showToast("⏰ Focus session เสร็จแล้ว! พักสักครู่");
+          }
         }
       }, 1000);
     }
@@ -1090,6 +1156,26 @@ document.getElementById("dashAssistInput")?.addEventListener("keydown", e => {
     e.preventDefault();
     document.getElementById("dashAssistSend")?.click();
   }
+});
+
+/* ── Focus done prompt ── */
+document.getElementById("focusDoneYes")?.addEventListener("click", e => {
+  const taskId = e.currentTarget.dataset.completeTask;
+  if (taskId) {
+    state.tasks = state.tasks.map(t => t.id === taskId ? { ...t, status: "Completed" } : t);
+    Storage.save(state);
+    _focusTaskId = null;
+    render();
+    showToast("งานเสร็จแล้ว 🎉 เยี่ยมมาก!");
+  }
+  document.getElementById("focusDonePrompt").hidden = true;
+});
+document.getElementById("focusDoneNo")?.addEventListener("click", () => {
+  _focusTaskId = null;
+  document.getElementById("focusDonePrompt").hidden = true;
+  renderFocusTaskPicker();
+  renderTasks();
+  showToast("⏰ Focus session เสร็จแล้ว! พักสักครู่");
 });
 
 setView(location.hash.replace("#", "") && views[location.hash.replace("#", "")]
