@@ -5,6 +5,53 @@ let _editingTaskId    = null;
 let _editingNoteId    = null;
 let _editingExpenseId = null;
 let _focusTaskId      = null;
+
+/* ── Thai public holidays & Buddhist holy days ── */
+const THAI_HOLIDAYS = {
+  // 2025
+  "2025-01-01": { name: "วันขึ้นปีใหม่", type: "national" },
+  "2025-02-12": { name: "วันมาฆบูชา", type: "buddhist" },
+  "2025-04-06": { name: "วันจักรี", type: "national" },
+  "2025-04-13": { name: "วันสงกรานต์", type: "national" },
+  "2025-04-14": { name: "วันสงกรานต์", type: "national" },
+  "2025-04-15": { name: "วันสงกรานต์", type: "national" },
+  "2025-05-01": { name: "วันแรงงานแห่งชาติ", type: "national" },
+  "2025-05-04": { name: "วันฉัตรมงคล", type: "national" },
+  "2025-05-12": { name: "วันวิสาขบูชา", type: "buddhist" },
+  "2025-06-03": { name: "วันเฉลิมพระชนมพรรษา สมเด็จพระราชินี", type: "royal" },
+  "2025-07-10": { name: "วันอาสาฬหบูชา", type: "buddhist" },
+  "2025-07-11": { name: "วันเข้าพรรษา", type: "buddhist" },
+  "2025-07-28": { name: "วันเฉลิมพระชนมพรรษา ร.10", type: "royal" },
+  "2025-08-12": { name: "วันแม่แห่งชาติ", type: "national" },
+  "2025-10-13": { name: "วันนวมินทรมหาราช", type: "royal" },
+  "2025-10-23": { name: "วันปิยมหาราช", type: "national" },
+  "2025-12-05": { name: "วันพ่อแห่งชาติ", type: "national" },
+  "2025-12-10": { name: "วันรัฐธรรมนูญ", type: "national" },
+  "2025-12-31": { name: "วันสิ้นปี", type: "national" },
+  // 2026
+  "2026-01-01": { name: "วันขึ้นปีใหม่", type: "national" },
+  "2026-02-01": { name: "วันมาฆบูชา", type: "buddhist" },
+  "2026-04-06": { name: "วันจักรี", type: "national" },
+  "2026-04-13": { name: "วันสงกรานต์", type: "national" },
+  "2026-04-14": { name: "วันสงกรานต์", type: "national" },
+  "2026-04-15": { name: "วันสงกรานต์", type: "national" },
+  "2026-05-01": { name: "วันแรงงานแห่งชาติ", type: "national" },
+  "2026-05-04": { name: "วันฉัตรมงคล", type: "national" },
+  "2026-05-31": { name: "วันวิสาขบูชา", type: "buddhist" },
+  "2026-06-03": { name: "วันเฉลิมพระชนมพรรษา สมเด็จพระราชินี", type: "royal" },
+  "2026-07-27": { name: "วันอาสาฬหบูชา", type: "buddhist" },
+  "2026-07-28": { name: "วันเข้าพรรษา + วันเฉลิมพระชนมพรรษา ร.10", type: "buddhist" },
+  "2026-08-12": { name: "วันแม่แห่งชาติ", type: "national" },
+  "2026-10-13": { name: "วันนวมินทรมหาราช", type: "royal" },
+  "2026-10-23": { name: "วันปิยมหาราช", type: "national" },
+  "2026-12-05": { name: "วันพ่อแห่งชาติ", type: "national" },
+  "2026-12-10": { name: "วันรัฐธรรมนูญ", type: "national" },
+  "2026-12-31": { name: "วันสิ้นปี", type: "national" },
+};
+
+let _calYear  = new Date().getFullYear();
+let _calMonth = new Date().getMonth();
+let _calSelectedDate = null;
 function showToast(message, type = "success") {
   const existing = document.getElementById("app-toast");
   if (existing) existing.remove();
@@ -177,6 +224,7 @@ const views = {
   tasks: document.getElementById("tasks"),
   notes: document.getElementById("notes"),
   expenses: document.getElementById("expenses"),
+  calendar: document.getElementById("calendar"),
   secretary: document.getElementById("secretary")
 };
 
@@ -185,6 +233,7 @@ const viewTitles = {
   tasks: "Tasks",
   notes: "Notes",
   expenses: "Expenses",
+  calendar: "ปฏิทิน",
   secretary: "Assistant"
 };
 
@@ -229,6 +278,7 @@ function render() {
   renderTasks();
   renderNotes();
   renderExpenses();
+  renderCalendar();
   renderSecretary();
   renderFocusTaskPicker();
   saveState();
@@ -665,6 +715,141 @@ function renderExpenseEditForm(expense) {
   `;
 }
 
+const THAI_MONTHS = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+const THAI_DOW   = ["อา","จ","อ","พ","พฤ","ศ","ส"];
+
+function renderCalendar() {
+  const el = document.getElementById("calendar");
+  if (!el) return;
+
+  const today    = new Date();
+  const todayKey = today.toISOString().slice(0, 10);
+  const thaiYear = _calYear + 543;
+
+  // Build tasks-by-date lookup
+  const tasksByDate = {};
+  state.tasks.forEach(t => {
+    if (t.due) {
+      if (!tasksByDate[t.due]) tasksByDate[t.due] = [];
+      tasksByDate[t.due].push(t);
+    }
+  });
+
+  const firstDay    = new Date(_calYear, _calMonth, 1);
+  const daysInMonth = new Date(_calYear, _calMonth + 1, 0).getDate();
+  const startDow    = firstDay.getDay(); // 0 = Sunday
+
+  // Build day cells
+  let cells = "";
+  for (let i = 0; i < startDow; i++) {
+    cells += `<div class="cal-cell cal-cell--empty"></div>`;
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const mm      = String(_calMonth + 1).padStart(2, "0");
+    const dd      = String(d).padStart(2, "0");
+    const dateKey = `${_calYear}-${mm}-${dd}`;
+    const isToday    = dateKey === todayKey;
+    const isSelected = dateKey === _calSelectedDate;
+    const holiday    = THAI_HOLIDAYS[dateKey];
+    const tasks      = tasksByDate[dateKey] || [];
+    const dow        = new Date(_calYear, _calMonth, d).getDay();
+    const isWeekend  = dow === 0 || dow === 6;
+
+    const priorityRank = { Critical: 0, High: 1, Medium: 2, Low: 3 };
+    const dotColors = [...tasks]
+      .sort((a, b) => (priorityRank[a.priority] ?? 9) - (priorityRank[b.priority] ?? 9))
+      .slice(0, 3)
+      .map(t => `<span class="cal-dot cal-dot--${t.priority.toLowerCase()}${t.status === 'Completed' ? ' cal-dot--done' : ''}"></span>`)
+      .join("");
+
+    cells += `
+      <button class="cal-cell${isToday ? " is-today" : ""}${isSelected ? " is-selected" : ""}${isWeekend ? " is-weekend" : ""}${holiday ? " has-holiday" : ""}"
+              data-cal-date="${dateKey}" type="button" aria-label="${dateKey}${holiday ? ' ' + holiday.name : ''}">
+        <span class="cal-num">${d}</span>
+        ${holiday ? `<span class="cal-hday-pip cal-hday-pip--${holiday.type}" title="${holiday.name}"></span>` : ""}
+        ${tasks.length ? `<span class="cal-dots">${dotColors}${tasks.length > 3 ? `<span class="cal-dot-more">+${tasks.length - 3}</span>` : ""}</span>` : ""}
+      </button>`;
+  }
+
+  // Day panel
+  const dayPanelHtml = _calSelectedDate
+    ? renderCalDayPanel(_calSelectedDate, tasksByDate[_calSelectedDate] || [])
+    : `<div class="cal-empty-hint"><svg width="32" height="32" viewBox="0 0 32 32" fill="none" opacity=".25"><rect x="3" y="5" width="26" height="24" rx="4" stroke="currentColor" stroke-width="2"/><path d="M3 13h26" stroke="currentColor" stroke-width="2"/><path d="M10 3v4M22 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><p>กดที่วันที่เพื่อดูงานและเพิ่ม task</p></div>`;
+
+  el.innerHTML = `
+    <div class="cal-layout">
+
+      <div class="cal-main">
+        <div class="cal-header">
+          <button class="cal-nav-btn" data-cal-prev type="button" aria-label="เดือนก่อน">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M11 14L7 9l4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="cal-title-wrap">
+            <span class="cal-month-name">${THAI_MONTHS[_calMonth]}</span>
+            <span class="cal-year">${thaiYear}</span>
+          </div>
+          <button class="cal-nav-btn" data-cal-next type="button" aria-label="เดือนถัดไป">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 4l4 5-4 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+
+        <div class="cal-dow-row">
+          ${THAI_DOW.map((d, i) => `<span class="cal-dow${i === 0 || i === 6 ? " is-weekend" : ""}">${d}</span>`).join("")}
+        </div>
+
+        <div class="cal-grid">${cells}</div>
+
+        <div class="cal-legend">
+          <span class="cal-legend-item"><span class="cal-hday-pip cal-hday-pip--national"></span>วันหยุดราชการ</span>
+          <span class="cal-legend-item"><span class="cal-hday-pip cal-hday-pip--buddhist"></span>วันสำคัญทางพุทธ</span>
+          <span class="cal-legend-item"><span class="cal-hday-pip cal-hday-pip--royal"></span>วันราชพิธี</span>
+        </div>
+      </div>
+
+      <aside class="cal-side" id="calSidePanel">${dayPanelHtml}</aside>
+
+    </div>`;
+}
+
+function renderCalDayPanel(dateKey, tasks) {
+  const holiday  = THAI_HOLIDAYS[dateKey];
+  const [y, m, d] = dateKey.split("-");
+  const thaiYear  = Number(y) + 543;
+  const dateLabel = `${Number(d)} ${THAI_MONTHS[Number(m) - 1]} ${thaiYear}`;
+
+  const openTasks = tasks.filter(t => t.status !== "Completed");
+  const doneTasks = tasks.filter(t => t.status === "Completed");
+  const allRows   = [...openTasks, ...doneTasks];
+
+  const taskRows = allRows.length
+    ? allRows.map(t => `
+        <div class="cal-task-row${t.status === "Completed" ? " is-done" : ""}">
+          <span class="cal-task-pip cal-task-pip--${t.priority.toLowerCase()}"></span>
+          <span class="cal-task-name">${escapeHtml(t.title)}</span>
+          <span class="priority-${t.priority} cal-task-badge">${t.priority}</span>
+        </div>`).join("")
+    : `<p class="cal-no-tasks">ไม่มีงานในวันนี้</p>`;
+
+  return `
+    <div class="cal-day-hdr">
+      <span class="cal-day-label">${dateLabel}</span>
+      ${holiday ? `<span class="cal-day-holiday cal-day-holiday--${holiday.type}">${holiday.name}</span>` : ""}
+    </div>
+    <div class="cal-task-rows">${taskRows}</div>
+    <form class="cal-add-form" id="calAddForm" data-add-date="${dateKey}">
+      <input class="cal-add-input" type="text" id="calAddInput" placeholder="เพิ่มงานสำหรับวันนี้…" autocomplete="off" />
+      <div class="cal-add-row">
+        <select class="cal-add-select" id="calAddPriority">
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+          <option value="Critical">Critical</option>
+          <option value="Low">Low</option>
+        </select>
+        <button class="cal-add-btn" type="submit">+ เพิ่ม</button>
+      </div>
+    </form>`;
+}
+
 function renderSecretary() {
   document.getElementById("assistantLog").innerHTML = state.logs.length
     ? state.logs
@@ -974,9 +1159,45 @@ document.getElementById("taskList").addEventListener("submit", (e) => {
   showToast("อัปเดตงานแล้ว");
 });
 
+document.addEventListener("submit", e => {
+  const form = e.target.closest("#calAddForm");
+  if (!form) return;
+  e.preventDefault();
+  const title    = document.getElementById("calAddInput")?.value.trim();
+  const priority = document.getElementById("calAddPriority")?.value || "Medium";
+  const due      = form.dataset.addDate;
+  if (!title) return;
+  addTask(title, priority, due);
+  document.getElementById("calAddInput").value = "";
+  renderCalendar();
+  showToast(`เพิ่มงาน "${title}" วันที่ ${due}`);
+});
+
 document.addEventListener("click", (event) => {
   const target = event.target;
   if (!(target instanceof HTMLElement)) return;
+
+  // Calendar navigation
+  if (target.closest("[data-cal-prev]")) {
+    _calMonth--;
+    if (_calMonth < 0) { _calMonth = 11; _calYear--; }
+    renderCalendar();
+    return;
+  }
+  if (target.closest("[data-cal-next]")) {
+    _calMonth++;
+    if (_calMonth > 11) { _calMonth = 0; _calYear++; }
+    renderCalendar();
+    return;
+  }
+  // Calendar date click
+  const calDate = target.closest("[data-cal-date]");
+  if (calDate) {
+    _calSelectedDate = calDate.dataset.calDate;
+    renderCalendar();
+    document.getElementById("calAddInput")?.focus();
+    return;
+  }
 
   // Sidebar toggle
   if (target.closest("#sidebarToggle")) {
@@ -1109,7 +1330,7 @@ document.addEventListener("keydown", (e) => {
   if (e.target.matches("input, textarea, select")) return;
   if (e.metaKey || e.ctrlKey || e.altKey) return;
 
-  const viewKeys = { "1": "dashboard", "2": "tasks", "3": "notes", "4": "expenses", "5": "secretary" };
+  const viewKeys = { "1": "dashboard", "2": "tasks", "3": "notes", "4": "expenses", "5": "calendar", "6": "secretary" };
   if (viewKeys[e.key]) {
     e.preventDefault();
     setView(viewKeys[e.key]);
