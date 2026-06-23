@@ -1,7 +1,9 @@
 /* STORAGE_KEY moved to storage.js */
 
 let toastTimer = null;
-let _editingTaskId = null;
+let _editingTaskId    = null;
+let _editingNoteId    = null;
+let _editingExpenseId = null;
 function showToast(message, type = "success") {
   const existing = document.getElementById("app-toast");
   if (existing) existing.remove();
@@ -442,43 +444,126 @@ function renderNotes() {
   document.getElementById("noteList").innerHTML = state.notes.length
     ? [...state.notes]
         .sort((a, b) => b.createdAt - a.createdAt)
-        .map(
-          (note) => `
+        .map((note) => {
+          if (note.id === _editingNoteId) return renderNoteEditForm(note);
+          return `
             <article class="list-item">
               <div>
                 <span class="item-title">${escapeHtml(note.title)}</span>
-                <span class="item-meta">${escapeHtml(note.tags || "no tags")}</span>
-                <p class="muted">${escapeHtml(note.body || "")}</p>
+                <span class="item-meta">${escapeHtml(note.tags || "ไม่มี tag")} · ${relativeTime(note.createdAt)}</span>
+                ${note.body ? `<p class="muted">${escapeHtml(note.body)}</p>` : ""}
               </div>
               <div class="item-actions">
-                <button class="icon-button" type="button" data-delete-note="${note.id}" title="Delete">×</button>
+                <button class="icon-button icon-button--edit" type="button" data-edit-note="${note.id}" title="แก้ไขโน้ต" aria-label="แก้ไขโน้ต">
+                  <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M7.5 1.5l2 2-6 6H1.5v-2l6-6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="icon-button" type="button" data-delete-note="${note.id}" title="ลบโน้ต">×</button>
               </div>
             </article>
-          `
-        )
+          `;
+        })
         .join("")
-    : emptyState("ยังไม่มีโน้ต", "notes", "เขียนโน้ต");
+    : emptyState("ยังไม่มีโน้ต เริ่มจดสิ่งที่คิดได้เลย", "notes", "เขียนโน้ต");
+}
+
+function renderNoteEditForm(note) {
+  return `
+    <article class="list-item list-item--editing">
+      <form class="task-edit-form" data-edit-form-note="${note.id}">
+        <input class="task-edit-title" type="text" value="${escapeHtml(note.title)}"
+          placeholder="หัวข้อโน้ต" required maxlength="160"
+          autocorrect="off" autocapitalize="sentences" />
+        <textarea class="note-edit-body" rows="4"
+          placeholder="เนื้อหา">${escapeHtml(note.body || "")}</textarea>
+        <div class="task-edit-row">
+          <input class="note-edit-tags" type="text" value="${escapeHtml(note.tags || "")}"
+            placeholder="tags เช่น work, idea" />
+          <div class="task-edit-actions">
+            <button type="submit" class="task-edit-save">บันทึก</button>
+            <button type="button" class="task-edit-cancel" data-cancel-edit-note="${note.id}">ยกเลิก</button>
+          </div>
+        </div>
+      </form>
+    </article>
+  `;
 }
 
 function renderExpenses() {
+  const todayKey  = new Date().toISOString().slice(0, 10);
+  const monthKey  = new Date().toISOString().slice(0, 7);
+  const todayExps = state.expenses.filter(e => e.date === todayKey);
+  const monthExps = state.expenses.filter(e => e.date?.startsWith(monthKey));
+  const todayTotal = todayExps.reduce((s, e) => s + Number(e.amount), 0);
+  const monthTotal = monthExps.reduce((s, e) => s + Number(e.amount), 0);
+
+  const statsEl = document.getElementById("expenseStats");
+  if (statsEl) {
+    statsEl.innerHTML = state.expenses.length ? `
+      <div class="expense-stats-row">
+        <div class="expense-stat-item">
+          <span class="expense-stat-label">วันนี้</span>
+          <strong class="expense-stat-value">${formatMoney(todayTotal)}</strong>
+          <span class="expense-stat-sub">${todayExps.length} รายการ</span>
+        </div>
+        <div class="expense-stat-divider"></div>
+        <div class="expense-stat-item">
+          <span class="expense-stat-label">เดือนนี้</span>
+          <strong class="expense-stat-value">${formatMoney(monthTotal)}</strong>
+          <span class="expense-stat-sub">${monthExps.length} รายการ</span>
+        </div>
+      </div>
+    ` : "";
+  }
+
   document.getElementById("expenseList").innerHTML = state.expenses.length
     ? [...state.expenses]
         .sort((a, b) => b.createdAt - a.createdAt)
-        .map(
-          (expense) => `
+        .map((expense) => {
+          if (expense.id === _editingExpenseId) return renderExpenseEditForm(expense);
+          return `
             <article class="list-item">
               <div>
                 <span class="item-title">${escapeHtml(expense.title)} · ${formatMoney(expense.amount)}</span>
                 <span class="item-meta">${escapeHtml(expense.category)} · ${formatDate(expense.date)}</span>
               </div>
               <div class="item-actions">
-                <button class="icon-button" type="button" data-delete-expense="${expense.id}" title="Delete">×</button>
+                <button class="icon-button icon-button--edit" type="button" data-edit-expense="${expense.id}" title="แก้ไขรายจ่าย" aria-label="แก้ไขรายจ่าย">
+                  <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M7.5 1.5l2 2-6 6H1.5v-2l6-6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="icon-button" type="button" data-delete-expense="${expense.id}" title="ลบรายจ่าย">×</button>
               </div>
             </article>
-          `
-        )
+          `;
+        })
         .join("")
-    : emptyState("ยังไม่มีรายจ่าย", "expenses", "บันทึกรายจ่าย");
+    : emptyState("ยังไม่มีรายจ่าย เริ่มบันทึกได้เลย", "expenses", "บันทึกรายจ่าย");
+}
+
+function renderExpenseEditForm(expense) {
+  const categories = ["อาหาร","เครื่องดื่ม","เดินทาง","น้ำมัน","ค่าไฟ","ค่าน้ำ","อินเทอร์เน็ต","สุขภาพ","ช้อปปิ้ง","การศึกษา","ลงทุน","อื่นๆ"];
+  const catOpts = categories.map(c =>
+    `<option value="${c}"${c === expense.category ? " selected" : ""}>${c}</option>`
+  ).join("");
+  return `
+    <article class="list-item list-item--editing">
+      <form class="task-edit-form" data-edit-form-expense="${expense.id}">
+        <div class="task-edit-row">
+          <input class="task-edit-title expense-edit-title" type="text" value="${escapeHtml(expense.title)}"
+            placeholder="รายการ" required maxlength="80" autocorrect="off" />
+          <input class="expense-edit-amount" type="number" value="${expense.amount}"
+            min="0" step="0.01" required placeholder="฿" />
+        </div>
+        <div class="task-edit-row">
+          <select class="task-edit-select" aria-label="หมวดหมู่">${catOpts}</select>
+          <input class="task-edit-date" type="date" value="${expense.date || ""}" aria-label="วันที่" />
+          <div class="task-edit-actions">
+            <button type="submit" class="task-edit-save">บันทึก</button>
+            <button type="button" class="task-edit-cancel" data-cancel-edit-expense="${expense.id}">ยกเลิก</button>
+          </div>
+        </div>
+      </form>
+    </article>
+  `;
 }
 
 function renderSecretary() {
@@ -731,6 +816,41 @@ document.getElementById("commandForm").addEventListener("submit", (event) => {
   render();
 });
 
+document.getElementById("noteList").addEventListener("submit", (e) => {
+  const form = e.target.closest("[data-edit-form-note]");
+  if (!form) return;
+  e.preventDefault();
+  const id = form.dataset.editFormNote;
+  const newTitle = form.querySelector(".task-edit-title").value.trim();
+  const newBody  = form.querySelector(".note-edit-body").value.trim();
+  const newTags  = form.querySelector(".note-edit-tags").value.trim();
+  if (!newTitle) return;
+  state.notes = state.notes.map(n =>
+    n.id === id ? { ...n, title: newTitle, body: newBody, tags: newTags } : n
+  );
+  _editingNoteId = null;
+  render();
+  showToast("อัปเดตโน้ตแล้ว");
+});
+
+document.getElementById("expenseList").addEventListener("submit", (e) => {
+  const form = e.target.closest("[data-edit-form-expense]");
+  if (!form) return;
+  e.preventDefault();
+  const id         = form.dataset.editFormExpense;
+  const newTitle   = form.querySelector(".expense-edit-title").value.trim();
+  const newAmount  = Number(form.querySelector(".expense-edit-amount").value);
+  const newCat     = form.querySelector(".task-edit-select").value;
+  const newDate    = form.querySelector(".task-edit-date").value;
+  if (!newTitle || isNaN(newAmount)) return;
+  state.expenses = state.expenses.map(ex =>
+    ex.id === id ? { ...ex, title: newTitle, amount: newAmount, category: newCat, date: newDate } : ex
+  );
+  _editingExpenseId = null;
+  render();
+  showToast("อัปเดตรายจ่ายแล้ว");
+});
+
 document.getElementById("taskList").addEventListener("submit", (e) => {
   const form = e.target.closest("[data-edit-form-task]");
   if (!form) return;
@@ -768,8 +888,12 @@ document.addEventListener("click", (event) => {
   const deleteTaskId = target.dataset.deleteTask;
   const deleteNoteId = target.dataset.deleteNote;
   const deleteExpenseId = target.dataset.deleteExpense;
-  const editTaskId = target.closest("[data-edit-task]")?.dataset.editTask;
-  const cancelEditId = target.closest("[data-cancel-edit]")?.dataset.cancelEdit;
+  const editTaskId      = target.closest("[data-edit-task]")?.dataset.editTask;
+  const cancelEditId    = target.closest("[data-cancel-edit]")?.dataset.cancelEdit;
+  const editNoteId      = target.closest("[data-edit-note]")?.dataset.editNote;
+  const cancelNoteId    = target.closest("[data-cancel-edit-note]")?.dataset.cancelEditNote;
+  const editExpenseId   = target.closest("[data-edit-expense]")?.dataset.editExpense;
+  const cancelExpenseId = target.closest("[data-cancel-edit-expense]")?.dataset.cancelEditExpense;
 
   if (viewJump) {
     setView(viewJump);
@@ -795,6 +919,30 @@ document.addEventListener("click", (event) => {
   if (cancelEditId !== undefined) {
     _editingTaskId = null;
     renderTasks();
+    return;
+  }
+
+  if (editNoteId) {
+    _editingNoteId = editNoteId;
+    renderNotes();
+    setTimeout(() => { const inp = document.querySelector(".task-edit-title"); if (inp) { inp.focus(); inp.select(); } }, 30);
+    return;
+  }
+  if (cancelNoteId !== undefined) {
+    _editingNoteId = null;
+    renderNotes();
+    return;
+  }
+
+  if (editExpenseId) {
+    _editingExpenseId = editExpenseId;
+    renderExpenses();
+    setTimeout(() => { const inp = document.querySelector(".expense-edit-title"); if (inp) { inp.focus(); inp.select(); } }, 30);
+    return;
+  }
+  if (cancelExpenseId !== undefined) {
+    _editingExpenseId = null;
+    renderExpenses();
     return;
   }
 
