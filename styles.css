@@ -1170,6 +1170,26 @@ h1 {
   gap: 0.5rem;
 }
 
+.dash-cal-task {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  background: var(--surface-soft);
+  font-size: 0.8rem;
+}
+.dash-cal-task.is-done { opacity: 0.45; }
+.dash-cal-pip {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+.dash-cal-task--critical .dash-cal-pip { background: #FF453A; }
+.dash-cal-task--high    .dash-cal-pip { background: #FF9F0A; }
+.dash-cal-task--medium  .dash-cal-pip { background: #0A84FF; }
+.dash-cal-task--low     .dash-cal-pip { background: #30D158; }
+.dash-cal-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-cal-badge { font-size: 0.65rem; flex-shrink: 0; }
+
 .cal-event-row {
   display: grid;
   grid-template-columns: 3.5rem 1fr auto;
