@@ -1,17 +1,31 @@
 {
-  "name": "Johny OS Lite",
-  "short_name": "Johny OS",
+  "name": "Johny Memo",
+  "short_name": "Johny",
   "description": "Personal digital workspace for tasks, notes, expenses, and daily planning.",
-  "start_url": "/#dashboard",
+  "start_url": "/?source=pwa",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#f7f5ef",
   "theme_color": "#1f7a6d",
   "icons": [
     {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
       "src": "/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
-  ]
+  ],
+  "categories": ["productivity", "utilities"]
 }
