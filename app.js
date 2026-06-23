@@ -2068,7 +2068,7 @@ function initLineLink() {
 
 function showLinked(userId, status, form) {
   status.textContent = '✓ เชื่อมแล้ว'
-  form.innerHTML = `<p class="line-link-hint">LINE เชื่อมกับ JohnyMemo แล้ว <button type="button" id="lineUnlinkBtn" style="color:var(--danger);background:none;border:none;cursor:pointer;padding:0">ยกเลิก</button></p><div id="lineNoteList"></div>`
+  form.innerHTML = `<p class="line-link-hint">LINE เชื่อมกับ JohnyMemo แล้ว <button type="button" id="lineUnlinkBtn" style="color:var(--danger);background:none;border:none;cursor:pointer;padding:0">ยกเลิกการเชื่อม</button></p>`
   document.getElementById('lineUnlinkBtn')?.addEventListener('click', () => {
     localStorage.removeItem('lineUserId')
     location.reload()
@@ -2077,17 +2077,27 @@ function showLinked(userId, status, form) {
 }
 
 async function loadLineNotes(userId) {
+  const section = document.getElementById('lineNotesSection')
   const container = document.getElementById('lineNoteList')
-  if (!container) return
+  if (!section || !container) return
+
   const res = await fetch(`${LINE_WORKER_URL}/notes/${userId}`)
   const { notes } = await res.json()
+
   if (notes.length === 0) {
-    container.innerHTML = '<p class="line-link-hint">ยังไม่มีโน้ตจาก LINE</p>'
+    section.style.display = 'none'
     return
   }
-  container.innerHTML = notes.map(n =>
-    `<div class="item-row"><span>${n.text}</span><small style="color:var(--text-muted)">${new Date(n.createdAt).toLocaleDateString('th-TH')}</small></div>`
-  ).join('')
+
+  section.style.display = 'block'
+  container.innerHTML = [...notes].reverse().map(n => `
+    <article class="list-item">
+      <div>
+        <span class="item-title">${escapeHtml(n.text)}</span>
+        <span class="item-meta">LINE · ${new Date(n.createdAt).toLocaleDateString('th-TH')}</span>
+      </div>
+    </article>
+  `).join('')
 }
 
 initLineLink()
