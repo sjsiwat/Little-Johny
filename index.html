@@ -14,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css?v=3" />
@@ -39,7 +39,7 @@
             <img src="./johny-cat.svg" class="hp-logo-cat" alt="" aria-hidden="true" />
             <span class="hp-logo-name">Johny Memo</span>
           </a>
-          <button class="hp-nav-btn" id="hpNavLoginBtn" type="button">Log in</button>
+          <button class="hp-nav-btn" id="hpNavLoginBtn" type="button" onclick="document.getElementById('authLoginBtn')?.click()">Log in</button>
         </div>
       </nav>
 
@@ -53,8 +53,8 @@
           <h1 class="hp-hero-title">Your Personal<br>Digital Workspace</h1>
           <p class="hp-hero-desc">Capture ideas, manage tasks, track expenses<br class="hp-desk-br">and plan your day — all in one place.</p>
           <div class="hp-hero-cta">
-            <button class="hp-cta-primary" id="hpGuestBtn" type="button">Enter Guest Mode</button>
-            <button class="hp-cta-ghost" id="hpLoginBtn" type="button">Log in</button>
+            <button class="hp-cta-primary" id="hpGuestBtn" type="button" onclick="enterGuestMode()">Enter Guest Mode</button>
+            <button class="hp-cta-ghost" id="hpLoginBtn" type="button" onclick="document.getElementById('authLoginBtn')?.click()">Log in</button>
           </div>
         </div>
       </section>
@@ -134,6 +134,31 @@
               </div>
             </div>
 
+            <!-- AI assistant chat preview -->
+            <div class="hp-card hp-card--chat" aria-hidden="true">
+              <div class="hp-chat-head">
+                <span class="hp-card-icon hp-icon-blue">
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 5.5v.5M7.5 4.5v.5M10.5 5.5v.5M4.5 8c.5 1.5 6 1.5 6 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                </span>
+                <span class="hp-chat-title">JohnyMemo AI</span>
+                <span class="hp-chat-soon">Coming Soon</span>
+              </div>
+              <div class="hp-chat-body">
+                <div class="hp-cm hp-cm--in hp-cm-anim" style="animation-delay:0.3s">
+                  <div class="hp-cm-bubble">วันนี้มีงานอะไรที่ต้องทำบ้าง?</div>
+                </div>
+                <div class="hp-cm hp-cm--out hp-cm-anim" style="animation-delay:1s">
+                  <div class="hp-cm-bubble">คุณมี 3 งานค้าง — Finish AWS Project (High), Workout (Med), Update Resume (Low) ✓</div>
+                </div>
+                <div class="hp-cm hp-cm--in hp-cm-anim" style="animation-delay:1.9s">
+                  <div class="hp-cm-bubble">เพิ่มงาน "Design Review" ด่วนด้วย</div>
+                </div>
+                <div class="hp-cm-typing hp-cm-anim" style="animation-delay:2.6s">
+                  <span></span><span></span><span></span>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
@@ -183,7 +208,7 @@
             <span>Johny Memo</span>
           </div>
           <p class="hp-footer-copy">Your personal digital workspace</p>
-          <button class="hp-cta-primary hp-cta-sm" id="hpFooterGuestBtn" type="button">Enter Guest Mode</button>
+          <button class="hp-cta-primary hp-cta-sm" id="hpFooterGuestBtn" type="button" onclick="enterGuestMode()">Enter Guest Mode</button>
         </div>
       </footer>
 
@@ -192,30 +217,66 @@
     <div class="app-shell" style="display:none">
       <!-- ── Sidebar ── -->
       <aside class="sidebar" aria-label="Main navigation">
-        <!-- Sidebar header: cat + brand -->
+        <!-- Sidebar header: cat + brand + toggle -->
         <div class="sidebar-header">
           <div class="brand">
-            <div class="brand-cat" aria-hidden="true">
-              <img src="./johny-cat.svg" alt="" class="brand-cat-img" />
-            </div>
             <div class="brand-text">
               <strong>Johny Memo</strong>
               <span id="brandSubtitle">Personal workspace</span>
             </div>
           </div>
+          <button class="sidebar-toggle-btn" id="sidebarToggle" type="button" aria-label="Toggle sidebar" title="Toggle sidebar">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <rect x="1" y="2" width="12" height="1.5" rx="0.75" fill="currentColor"/>
+              <rect x="1" y="6.25" width="8" height="1.5" rx="0.75" fill="currentColor"/>
+              <rect x="1" y="10.5" width="12" height="1.5" rx="0.75" fill="currentColor"/>
+            </svg>
+          </button>
         </div>
 
         <nav class="nav-list">
-          <a href="#dashboard" class="nav-link active" data-view="dashboard"
-            >Dashboard</a
-          >
-          <a href="#tasks" class="nav-link" data-view="tasks">Tasks</a>
-          <a href="#notes" class="nav-link" data-view="notes">Notes</a>
-          <a href="#expenses" class="nav-link" data-view="expenses">Expenses</a>
-          <a href="#secretary" class="nav-link" data-view="secretary"
-            >Assistant</a
-          >
+          <a href="#dashboard" class="nav-link active" data-view="dashboard">
+            <span class="nav-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="5.5" height="5.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg></span>
+            <span>Dashboard</span>
+          </a>
+          <a href="#tasks" class="nav-link" data-view="tasks">
+            <span class="nav-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 8l2 2 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span>Tasks</span>
+          </a>
+          <a href="#notes" class="nav-link" data-view="notes">
+            <span class="nav-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 2h5.5L12 4.5V13H4V2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9.5 2v2.5H12" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6 8h4M6 10.5h2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+            <span>Notes</span>
+          </a>
+          <a href="#expenses" class="nav-link" data-view="expenses">
+            <span class="nav-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="5" width="13" height="8.5" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 5V4a3 3 0 0 1 6 0v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10.5" cy="9.25" r="1" fill="currentColor"/></svg></span>
+            <span>Expenses</span>
+          </a>
+          <a href="#secretary" class="nav-link" data-view="secretary">
+            <span class="nav-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2.5" width="13" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 8l2 1.5L4.5 11M8.5 11h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span>Assistant</span>
+          </a>
         </nav>
+
+        <!-- Focus Timer (Pomodoro) -->
+        <div class="sidebar-section" aria-label="Focus timer">
+          <p class="sidebar-section-title">Focus Timer</p>
+          <div class="focus-timer-wrap">
+            <div class="focus-ring-wrap" role="timer" aria-label="Focus timer">
+              <svg class="focus-ring-svg" viewBox="0 0 64 64">
+                <circle class="focus-ring-bg" cx="32" cy="32" r="28"/>
+                <circle class="focus-ring-arc" id="focusArc" cx="32" cy="32" r="28"/>
+              </svg>
+              <span class="focus-time-label" id="focusTimerLabel" aria-live="off">25:00</span>
+            </div>
+            <button class="focus-timer-btn" id="focusTimerBtn" type="button">▶ Start</button>
+          </div>
+        </div>
+
+        <!-- Motivational quote -->
+        <div class="sidebar-quote" aria-label="Daily quote">
+          <blockquote id="dailyQuote">"ความสำเร็จ คือ ผลรวมของความพยายามเล็ก ๆ ที่ทำทุกวัน"</blockquote>
+          <cite id="dailyQuoteAuthor">— Johny</cite>
+        </div>
 
       </aside>
 
@@ -259,117 +320,134 @@
 
         <!-- DASHBOARD -->
         <section class="view active" id="dashboard" aria-labelledby="viewTitle">
-          <section class="dashboard-hero" aria-label="Johny Memo introduction">
-            <div class="hero-copy">
-              <span class="hero-kicker">Best Friend in your browser</span>
-              <h2>จัดงาน โน้ต และรายจ่าย<br />ให้อยู่ในที่เดียว</h2>
-              <div class="hero-chips">
-                <span class="hero-chip hero-chip--blue" id="heroChipTasks">0 งานค้าง</span>
-                <span class="hero-chip hero-chip--amber" id="heroChipExpense">฿0 วันนี้</span>
-                <span class="hero-chip hero-chip--sage" id="heroChipFocus">กำหนดเป้าหมาย</span>
+          <div class="quick-tiles" aria-label="Today overview">
+            <div class="sb-stat sb-stat--blue">
+              <div class="sb-stat-icon" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="8" y="1" width="5" height="5" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="1" y="8" width="5" height="5" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="8" y="8" width="5" height="5" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
               </div>
-              <div class="hero-today">
-                <span class="section-label">Today focus</span>
-                <span id="heroFocusTitle">Plan your next move</span>
-              </div>
-              <div class="hero-actions">
-                <button
-                  class="primary-action"
-                  type="button"
-                  data-view-jump="tasks"
-                >
-                  เพิ่มงานแรก
-                </button>
-              </div>
+              <strong id="sbStatTotal">0</strong>
+              <span>งานทั้งหมด</span>
+              <span class="sb-stat-trend" id="sbTrendTotal">↗ 20% จากเมื่อวาน</span>
             </div>
-
-            <div class="hero-visual" aria-hidden="true">
-              <div class="line-chat">
-                <div class="line-topbar">
-                  <span class="line-back">‹</span>
-                  <span class="line-ava">
-                    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><polygon points="8,9 6,2 14,7" fill="#2f2823"/><polygon points="24,9 26,2 18,7" fill="#2f2823"/><circle cx="16" cy="17" r="11" fill="#2f2823"/><circle cx="12" cy="16" r="2.1" fill="#d8aa50"/><circle cx="20" cy="16" r="2.1" fill="#d8aa50"/><circle cx="12.3" cy="16.2" r="0.9" fill="#1c1714"/><circle cx="20.3" cy="16.2" r="0.9" fill="#1c1714"/><path d="M14.5 20.5 q1.5 1.4 3 0" stroke="#d99a92" stroke-width="1" fill="none" stroke-linecap="round"/></svg>
-                  </span>
-                  <div class="line-title"><strong>Johny Memo</strong><span>online</span></div>
-                  <span class="line-menu">⊞ video</span>
-                </div>
-                <div class="line-body" id="lineChatBody"></div>
-                <div class="line-inputbar">
-                  <span class="line-plus">＋</span>
-                  <span class="line-inputfield">Aa</span>
-                  <span class="line-send">➤</span>
-                </div>
+            <div class="sb-stat sb-stat--amber">
+              <div class="sb-stat-icon" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 4v3.5l2 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
+              <strong id="sbStatOpen">0</strong>
+              <span>ค้างอยู่</span>
+              <span class="sb-stat-trend" id="sbTrendOpen">↗ 1 งานจากเมื่อวาน</span>
             </div>
-          </section>
+            <div class="sb-stat sb-stat--green">
+              <div class="sb-stat-icon" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 7l2 2 3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <strong id="sbStatDone">0</strong>
+              <span>เสร็จแล้ว</span>
+              <span class="sb-stat-trend" id="sbTrendDone">↗ เยี่ยม!</span>
+            </div>
+            <div class="sb-stat sb-stat--red">
+              <div class="sb-stat-icon" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 4V3.5a2.5 2.5 0 0 1 5 0V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9.5" cy="8" r="1" fill="currentColor"/></svg>
+              </div>
+              <strong id="sbStatExpense">฿0</strong>
+              <span>วันนี้</span>
+              <span class="sb-stat-trend" id="sbTrendExpense">↗ 0% จากเมื่อวาน</span>
+            </div>
+          </div>
 
-          <div class="stats-grid">
-            <article class="stat-card">
-              <div class="stat-icon stat-icon--tasks">☰</div>
-              <span>งานทั้งหมด</span><strong id="statTotalTasks">0</strong>
-            </article>
-            <article class="stat-card">
-              <div class="stat-icon stat-icon--open">⧗</div>
-              <span>งานค้าง</span><strong id="statOpenTasks">0</strong>
-            </article>
-            <article class="stat-card">
-              <div class="stat-icon stat-icon--done">✓</div>
-              <span>เสร็จแล้ว</span><strong id="statDoneTasks">0</strong>
-            </article>
-            <article class="stat-card">
-              <div class="stat-icon stat-icon--expense">฿</div>
-              <span>รายจ่ายเดือนนี้</span><strong id="statMonthExpense">฿0</strong>
-            </article>
+          <div class="today-command">
+            <div class="tc-left">
+              <h2 class="greeting-heading"><span id="greetingHeading">สวัสดีตอนเช้า</span>, Johny 👋</h2>
+              <div class="tc-signals">
+                <span class="signal signal--tasks" id="signalTasks">0 งานค้าง</span>
+                <span class="signal signal--expense" id="signalExpense">฿0 วันนี้</span>
+                <span class="signal signal--notes" id="signalNotes" hidden></span>
+              </div>
+              <p class="greeting-date" id="greetingDate">วันนี้</p>
+              <p class="greeting-kicker" id="greetingKicker" style="display:none"></p>
+              <button class="hero-focus-btn" id="heroFocusBtn" type="button" data-view-jump="tasks">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+                  <path d="M2 1.5L9.5 5.5L2 9.5V1.5Z" fill="currentColor"/>
+                </svg>
+                เริ่มโฟกัสงาน
+              </button>
+            </div>
+            <div class="tc-mascot" aria-hidden="true">
+              <img src="./johny-cat.svg" class="tc-mascot-img" alt="" />
+            </div>
           </div>
 
           <div class="dashboard-grid">
-            <section class="panel">
+            <!-- Row 1: Priority Queue | Today Calendar | Money Snapshot -->
+            <section class="panel focus-panel">
               <div class="panel-head">
-                <div>
-                  <span class="section-label">Priority queue</span>
-                  <h2>วันนี้ควรโฟกัส</h2>
-                </div>
-                <button
-                  class="ghost-button"
-                  type="button"
-                  data-view-jump="tasks"
-                >
-                  ดูงานทั้งหมด →
-                </button>
+                <h2>โฟกัสวันนี้</h2>
+                <button class="ghost-button" type="button" data-view-jump="tasks">ดูทั้งหมด →</button>
               </div>
               <div class="item-list" id="focusList"></div>
             </section>
+
             <section class="panel">
               <div class="panel-head">
-                <div>
-                  <span class="section-label">Money snapshot</span>
-                  <h2>สรุปรายจ่าย</h2>
+                <h2 id="calTodayHeading">ปฏิทินวันนี้</h2>
+                <button class="ghost-button" type="button">ดูปฏิทิน →</button>
+              </div>
+              <div class="today-cal-events" id="todayCalEvents">
+                <div class="cal-event-row">
+                  <span class="cal-event-time">09:00</span>
+                  <span class="cal-event-title"><span class="cal-event-dot" style="background:#FF453A"></span>ประชุมทีมประจำสัปดาห์</span>
+                  <span class="cal-event-dur">1 ชม.</span>
                 </div>
-                <button
-                  class="ghost-button"
-                  type="button"
-                  data-view-jump="expenses"
-                >
-                  ดูทั้งหมด →
-                </button>
+                <div class="cal-event-row">
+                  <span class="cal-event-time">11:00</span>
+                  <span class="cal-event-title"><span class="cal-event-dot" style="background:#30D158"></span>ตรวจสอบงานลูกค้า</span>
+                  <span class="cal-event-dur">30 นาที</span>
+                </div>
+                <div class="cal-event-row">
+                  <span class="cal-event-time">14:00</span>
+                  <span class="cal-event-title"><span class="cal-event-dot" style="background:#FF9F0A"></span>นำเสนอโปรเจกต์</span>
+                  <span class="cal-event-dur">1 ชม.</span>
+                </div>
+                <div class="cal-event-row">
+                  <span class="cal-event-time">16:00</span>
+                  <span class="cal-event-title"><span class="cal-event-dot" style="background:#0A84FF"></span>สรุปงานประจำวัน</span>
+                  <span class="cal-event-dur">30 นาที</span>
+                </div>
+                <button class="ghost-button" type="button" style="margin-top:0.6rem;width:100%;justify-content:center;display:flex">+ เพิ่มเหตุการณ์</button>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <h2>สรุปรายจ่าย</h2>
+                <button class="ghost-button" type="button" data-view-jump="expenses">ดูทั้งหมด →</button>
               </div>
               <div class="expense-bars" id="expenseBars"></div>
             </section>
-            <section class="panel wide">
+
+            <!-- Row 2: Recent Notes | Assistant -->
+            <section class="panel dash-notes-panel">
               <div class="panel-head">
-                <div>
-                  <span class="section-label">Knowledge base</span>
-                  <h2>บันทึกล่าสุด</h2>
-                </div>
-                <button
-                  class="ghost-button"
-                  type="button"
-                  data-view-jump="notes"
-                >
-                  ดูทั้งหมด →
-                </button>
+                <h2>โน้ตล่าสุด</h2>
+                <button class="ghost-button" type="button" data-view-jump="notes">ดูทั้งหมด →</button>
               </div>
               <div class="item-list compact" id="recentNotes"></div>
+            </section>
+
+            <section class="panel dash-assistant-panel">
+              <div class="panel-head">
+                <h2>✦ Ask Johny</h2>
+                <button class="ghost-button" type="button" data-view-jump="secretary">เปิด →</button>
+              </div>
+              <div class="dash-assistant">
+                <p class="dash-assist-desc">ถามอะไรก็ได้เกี่ยวกับงาน รายจ่าย หรือไอเดียของคุณ</p>
+                <div class="dash-assist-input-row">
+                  <input class="dash-assist-input" id="dashAssistInput" type="text" placeholder="ถามอะไรก็ได้เกี่ยวกับงาน โน้ต หรือรายจ่ายของคุณ…" />
+                  <button class="dash-assist-send" type="button" id="dashAssistSend" aria-label="Send">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6h10M7 2l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </div>
+              </div>
             </section>
           </div>
         </section>
@@ -507,8 +585,34 @@
       </main>
     </div>
 
-    <!-- Floating Johny cat — sine-wave drift behind content -->
-    <img src="./johny-cat.svg" class="cat-roam-float" aria-hidden="true" alt="" />
+    <!-- Floating Action Button -->
+    <div class="fab-wrap" id="fabWrap">
+      <button class="fab-main" id="fabMain" type="button" aria-label="Quick actions" aria-expanded="false">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="fab-menu" id="fabMenu" hidden>
+        <button class="fab-item fab-item--expense" type="button" data-view-jump="expenses">
+          <span class="fab-item-icon">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M6 3.5v5M5 5h2.5a.75.75 0 0 1 0 1.5H5.25a.75.75 0 0 0 0 1.5H7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </span>
+          <span>รายจ่ายใหม่</span>
+        </button>
+        <button class="fab-item fab-item--note" type="button" data-view-jump="notes">
+          <span class="fab-item-icon">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="1" width="9" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 4.5h5M3.5 7h5M3.5 9.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </span>
+          <span>โน้ตใหม่</span>
+        </button>
+        <button class="fab-item fab-item--task" type="button" data-view-jump="tasks">
+          <span class="fab-item-icon">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 6l2 2 3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span>งานใหม่</span>
+        </button>
+      </div>
+    </div>
 
     <!-- ═══════════════════════════════════════
          ANIMATED BACKGROUND — soft watercolour drift
@@ -824,399 +928,6 @@
     </dialog>
 
     <!-- CATS script removed — replaced by CSS-animated johny-float.png -->
-    <script>
-      (function () { return; /* legacy cat canvas code removed */
-      (function () {
-        /* ───────── shared painterly helpers ───────── */
-        function fillSoft(ctx, color, blur) {
-          ctx.save();
-          ctx.shadowColor = color;
-          ctx.shadowBlur = blur || 0;
-          ctx.fillStyle = color;
-          ctx.fill();
-          ctx.shadowBlur = 0;
-          ctx.fill();
-          ctx.restore();
-        }
-        function setupDPR(canvas, cssW, cssH) {
-          const dpr = Math.min(window.devicePixelRatio || 1, 2);
-          canvas.width = Math.round(cssW * dpr);
-          canvas.height = Math.round(cssH * dpr);
-          const ctx = canvas.getContext("2d");
-          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-          return ctx;
-        }
-        function isDark() { return document.documentElement.dataset.theme === "dark"; }
-
-        /* track pointer globally for the mascot */
-        const pointer = { x: innerWidth * 0.5, y: innerHeight * 0.4 };
-        window.addEventListener("mousemove", (e) => { pointer.x = e.clientX; pointer.y = e.clientY; });
-
-        /* ───────── side-view walking cat (parade + roamer) ───────── */
-        function drawWalkingCat(ctx, cat, t) {
-          const { x, y, scale, cfg, phase } = cat;
-          const lT = t + phase;
-          const legSwing = Math.sin(lT * 5) * 7;
-          const bob = Math.sin(lT * 10) * 1.4;
-          const tailWag = Math.sin(lT * 3) * 13;
-          const blink = Math.sin(lT * 0.7) > 0.93 ? 0.12 : 1;
-
-          ctx.save();
-          ctx.translate(x, y);
-          ctx.scale(scale, scale);
-
-          /* tail */
-          ctx.strokeStyle = cfg.body;
-          ctx.lineWidth = 3.4; ctx.lineCap = "round";
-          ctx.save(); ctx.shadowColor = cfg.body; ctx.shadowBlur = 3;
-          ctx.beginPath();
-          ctx.moveTo(16, 2 + bob);
-          ctx.bezierCurveTo(28, -7 + tailWag, 30, -21 + tailWag * 0.5, 19, -28 + tailWag * 0.3);
-          ctx.stroke();
-          ctx.restore();
-
-          /* back legs */
-          ctx.strokeStyle = cfg.shade; ctx.lineWidth = 4.2;
-          ctx.beginPath(); ctx.moveTo(8, 10 + bob); ctx.lineTo(13 + legSwing * 0.5, 24); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(2, 10 + bob); ctx.lineTo(4 - legSwing * 0.5, 24); ctx.stroke();
-
-          /* body */
-          ctx.beginPath();
-          ctx.ellipse(0, bob, 20, 13, 0, 0, Math.PI * 2);
-          fillSoft(ctx, cfg.body, 5);
-          /* belly highlight */
-          ctx.beginPath(); ctx.ellipse(-2, 3 + bob, 14, 8, 0, 0, Math.PI * 2);
-          ctx.fillStyle = cfg.hi; ctx.fill();
-
-          /* head */
-          ctx.beginPath(); ctx.arc(-18, -4 + bob, 12, 0, Math.PI * 2);
-          fillSoft(ctx, cfg.body, 4);
-
-          /* ears */
-          ctx.fillStyle = cfg.body;
-          ctx.beginPath(); ctx.moveTo(-23, -13 + bob); ctx.lineTo(-30, -25 + bob); ctx.lineTo(-15, -14 + bob); ctx.closePath(); ctx.fill();
-          ctx.beginPath(); ctx.moveTo(-12, -12 + bob); ctx.lineTo(-10, -24 + bob); ctx.lineTo(-4, -14 + bob); ctx.closePath(); ctx.fill();
-          ctx.fillStyle = cfg.inner; ctx.globalAlpha = 0.7;
-          ctx.beginPath(); ctx.moveTo(-23, -14 + bob); ctx.lineTo(-28, -22 + bob); ctx.lineTo(-16, -15 + bob); ctx.closePath(); ctx.fill();
-          ctx.beginPath(); ctx.moveTo(-12, -13 + bob); ctx.lineTo(-11, -21 + bob); ctx.lineTo(-6, -15 + bob); ctx.closePath(); ctx.fill();
-          ctx.globalAlpha = 1;
-
-          /* big manga eye */
-          ctx.save();
-          ctx.translate(-22, -4.5 + bob);
-          ctx.scale(1, blink);
-          ctx.beginPath(); ctx.ellipse(0, 0, 3.4, 4.2, 0, 0, Math.PI * 2);
-          ctx.fillStyle = cfg.iris; ctx.fill();
-          ctx.beginPath(); ctx.ellipse(0.3, 0.4, 1.5, 2.6, 0, 0, Math.PI * 2);
-          ctx.fillStyle = "#1c1814"; ctx.fill();
-          if (blink > 0.5) {
-            ctx.fillStyle = "rgba(255,255,255,0.95)";
-            ctx.beginPath(); ctx.arc(-1, -1.4, 1, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.arc(1, 1.1, 0.5, 0, Math.PI * 2); ctx.fill();
-          }
-          ctx.restore();
-
-          /* nose + blush */
-          ctx.fillStyle = cfg.inner;
-          ctx.beginPath(); ctx.moveTo(-27, -1 + bob); ctx.lineTo(-28.4, 0.8 + bob); ctx.lineTo(-25.6, 0.8 + bob); ctx.closePath(); ctx.fill();
-          ctx.fillStyle = cfg.blush; ctx.globalAlpha = 0.4;
-          ctx.beginPath(); ctx.ellipse(-25.5, 1.5 + bob, 3, 1.8, 0, 0, Math.PI * 2); ctx.fill();
-          ctx.globalAlpha = 1;
-
-          /* whiskers */
-          ctx.strokeStyle = cfg.whisker; ctx.lineWidth = 0.7;
-          for (const o of [-1.5, 0.8, 3]) { ctx.beginPath(); ctx.moveTo(-28, o + bob); ctx.lineTo(-17, o * 0.8 + bob); ctx.stroke(); }
-
-          /* front legs */
-          ctx.strokeStyle = cfg.body; ctx.lineWidth = 4.2;
-          ctx.beginPath(); ctx.moveTo(-8, 10 + bob); ctx.lineTo(-5 - legSwing, 24); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(-14, 10 + bob); ctx.lineTo(-17 + legSwing, 24); ctx.stroke();
-
-          /* shadow */
-          ctx.fillStyle = "rgba(60,50,40,0.08)";
-          ctx.beginPath(); ctx.ellipse(0, 26, 18, 3.5, 0, 0, Math.PI * 2); ctx.fill();
-          ctx.restore();
-        }
-
-        function drawThread(ctx, cat, t) {
-          const { x, y, scale, cfg, phase } = cat;
-          const lT = t + phase;
-          const bob = Math.sin(lT * 10) * 1.4;
-          const sx = x + 20 * scale, sy = y + bob * scale;
-          ctx.save();
-          ctx.strokeStyle = cfg.thread; ctx.lineWidth = 1.8; ctx.globalAlpha = 0.78;
-          ctx.lineCap = "round"; ctx.lineJoin = "round";
-          ctx.beginPath(); ctx.moveTo(sx, sy);
-          ctx.bezierCurveTo(sx + 35, sy + Math.sin(lT * 2.2) * 9, sx + 70, sy + Math.sin(lT * 2.2 + 1.6) * 9, sx + 105, sy + Math.sin(lT * 2.2 + 3) * 7);
-          ctx.stroke();
-          const bx = sx + 105, by = sy + Math.sin(lT * 2.2 + 3) * 7;
-          ctx.fillStyle = cfg.thread; ctx.globalAlpha = 0.7;
-          ctx.beginPath(); ctx.arc(bx, by, 4, 0, Math.PI * 2); ctx.fill();
-          ctx.restore();
-        }
-
-        function catConfigs() {
-          const base = [
-            { body: "#2f2823", shade: "#221c18", hi: "rgba(190,180,170,0.16)", inner: "#d99a92", iris: "#d2a44e", blush: "#e0867e", whisker: "#cfc6ba", thread: "#c47e5e" },
-            { body: "#6f93a6", shade: "#5a7d90", hi: "rgba(255,255,255,0.22)", inner: "#dde8ed", iris: "#3f6b53", blush: "#d99a92", whisker: "rgba(255,255,255,0.7)", thread: "#9cbac9" },
-            { body: "#c47e5e", shade: "#a9684a", hi: "rgba(255,255,255,0.2)", inner: "#f2d4c2", iris: "#5a6f3f", blush: "#b85c45", whisker: "rgba(255,255,255,0.65)", thread: "#e6c060" },
-            { body: "#94ab8a", shade: "#7c9472", hi: "rgba(255,255,255,0.2)", inner: "#e0ecd6", iris: "#a8743a", blush: "#cf9f86", whisker: "rgba(255,255,255,0.65)", thread: "#d99a92" },
-            { body: "#d9c3a3", shade: "#bfa886", hi: "rgba(255,255,255,0.24)", inner: "#f3ead7", iris: "#7a5a36", blush: "#d99a92", whisker: "rgba(120,100,70,0.5)", thread: "#6f93a6" },
-          ];
-          return base;
-        }
-
-        /* ───────── ROAMER (walks across page bottom) ───────── */
-        (function roam() {
-          const canvas = document.getElementById("catRoamCanvas");
-          if (!canvas) return;
-          let ctx, W = 0, H = 0, t = 0, raf = null, cat = null, firstSpawn = true;
-          const CFG = catConfigs();
-          function spawn() {
-            const dir = firstSpawn ? 1 : (Math.random() > 0.5 ? -1 : 1);
-            const cfg = CFG[Math.floor(Math.random() * CFG.length)];
-            const startX = firstSpawn ? W * 0.4 : (dir === 1 ? -60 : W + 60);
-            firstSpawn = false;
-            cat = { dir, cfg, scale: 1.15, speed: 0.7 + Math.random() * 0.5, phase: Math.random() * 6, y: H - 30, x: startX, wait: 0 };
-          }
-          function resize() {
-            const r = canvas.getBoundingClientRect();
-            W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
-            ctx = setupDPR(canvas, W, H);
-            if (!cat) spawn();
-          }
-          function frame() {
-            t += 0.016; ctx.clearRect(0, 0, W, H);
-            if (cat) {
-              if (cat.wait > 0) { cat.wait -= 0.016; }
-              else {
-                ctx.save();
-                ctx.translate(cat.x, cat.y);
-                if (cat.dir === 1) ctx.scale(-1, 1); /* flip to face travel dir */
-                drawWalkingCat(ctx, { x: 0, y: 0, scale: cat.scale, cfg: cat.cfg, phase: cat.phase }, t);
-                ctx.restore();
-                cat.x += cat.dir * cat.speed;
-                if ((cat.dir === 1 && cat.x > W + 80) || (cat.dir === -1 && cat.x < -80)) { cat = null; spawnTimer = setTimeout(spawn, 4000 + Math.random() * 6000); }
-              }
-            }
-            raf = requestAnimationFrame(frame);
-          }
-          let spawnTimer = null;
-          function pause() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
-          function resume() { if (!raf) frame(); }
-          document.addEventListener("visibilitychange", () => document.hidden ? pause() : resume());
-          window.addEventListener("resize", resize);
-          resize(); frame();
-        })();
-
-        /* ───────── MASCOT (sitting, follows pointer) ───────── */
-        (function mascot() {
-          const canvas = document.getElementById("catMascotCanvas");
-          if (!canvas) return;
-          const CW = 138, CH = 124;
-          const ctx = setupDPR(canvas, CW, CH);
-          let t = 0, raf = null, hop = 0, happy = 0;
-          canvas.style.cursor = "pointer";
-          canvas.addEventListener("pointerdown", () => { hop = 1; happy = 1; });
-
-          function cfg() {
-            return isDark()
-              ? { body: "#6b6760", shade: "#565249", hi: "rgba(255,255,255,0.14)", inner: "#e0a59c", iris: "#e2c071", blush: "#e0a59c", nose: "#e0a59c" }
-              : { body: "#332b25", shade: "#241e19", hi: "rgba(200,190,180,0.16)", inner: "#d99a92", iris: "#d8aa50", blush: "#e0867e", nose: "#d99a92" };
-          }
-
-          function frame() {
-            t += 0.016; ctx.clearRect(0, 0, CW, CH);
-            const c = cfg();
-            const breathe = 1 + Math.sin(t * 1.6) * 0.018;
-            hop *= 0.88; happy *= 0.97;
-            const lift = hop > 0.02 ? -Math.sin((1 - hop) * Math.PI) * 7 : 0;
-
-            /* pointer direction (screen) */
-            const rect = canvas.getBoundingClientRect();
-            const cxs = rect.left + rect.width / 2, cys = rect.top + rect.height * 0.42;
-            let dx = pointer.x - cxs, dy = pointer.y - cys;
-            const dlen = Math.hypot(dx, dy) || 1;
-            const nx = dx / dlen, ny = dy / dlen;
-            const headTilt = Math.max(-0.18, Math.min(0.18, dx / 600));
-            const blink = (Math.sin(t * 0.9) > 0.92 || happy > 0.4) ? 0.12 : 1;
-            const tailSway = Math.sin(t * 2.2) * 10 + happy * Math.sin(t * 14) * 8;
-            const earTw = Math.sin(t * 0.8) > 0.9 ? -0.12 : 0;
-
-            ctx.save();
-            ctx.translate(0, lift - 3);
-
-            /* look direction for the eyes */
-            const lookX = nx * 2.2, lookY = ny * 1.6;
-
-            /* ground shadow */
-            ctx.beginPath(); ctx.ellipse(69, 120, 40, 5.5, 0, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(60,50,40,0.10)"; ctx.fill();
-
-            /* ── tail (thick, curling up on the right) ── */
-            ctx.save();
-            ctx.lineCap = "round";
-            ctx.strokeStyle = c.body; ctx.lineWidth = 12;
-            ctx.shadowColor = c.body; ctx.shadowBlur = 4;
-            ctx.beginPath();
-            ctx.moveTo(95, 104);
-            ctx.bezierCurveTo(120 + tailSway, 102, 122 + tailSway, 74, 103 + tailSway * 0.6, 66);
-            ctx.stroke();
-            ctx.shadowBlur = 0;
-            /* tail stripes */
-            ctx.strokeStyle = c.shade; ctx.lineWidth = 4; ctx.globalAlpha = 0.5;
-            for (const tp of [0.42, 0.64, 0.85]) {
-              const bx = 95 + (103 + tailSway * 0.6 - 95) * tp;
-              const by = 104 + (66 - 104) * tp;
-              ctx.beginPath(); ctx.moveTo(bx - 5, by - 2.5); ctx.lineTo(bx + 5, by + 2.5); ctx.stroke();
-            }
-            ctx.globalAlpha = 1;
-            ctx.restore();
-
-            /* ── body (chunky stocky pear) ── */
-            ctx.save();
-            ctx.translate(69, 92); ctx.scale(1, breathe); ctx.translate(-69, -92);
-            ctx.beginPath();
-            ctx.moveTo(40, 112);
-            ctx.bezierCurveTo(29, 80, 43, 58, 69, 58);
-            ctx.bezierCurveTo(95, 58, 109, 80, 98, 112);
-            ctx.bezierCurveTo(95, 121, 43, 121, 40, 112);
-            ctx.closePath();
-            fillSoft(ctx, c.body, 7);
-            /* chest/belly highlight */
-            ctx.beginPath(); ctx.ellipse(69, 96, 20, 22, 0, 0, Math.PI * 2);
-            ctx.fillStyle = c.hi; ctx.fill();
-            /* body stripes (tabby) */
-            ctx.strokeStyle = c.shade; ctx.lineWidth = 4.5; ctx.globalAlpha = 0.38; ctx.lineCap = "round";
-            for (const sy of [78, 90, 102]) {
-              ctx.beginPath(); ctx.moveTo(47, sy); ctx.quadraticCurveTo(41, sy + 5, 37, sy + 9); ctx.stroke();
-              ctx.beginPath(); ctx.moveTo(91, sy); ctx.quadraticCurveTo(97, sy + 5, 101, sy + 9); ctx.stroke();
-            }
-            ctx.globalAlpha = 1;
-            ctx.restore();
-
-            /* ── front paws ── */
-            ctx.fillStyle = c.body;
-            ctx.beginPath(); ctx.ellipse(55, 116, 12, 7.5, 0, 0, Math.PI * 2); fillSoft(ctx, c.body, 3);
-            ctx.beginPath(); ctx.ellipse(83, 116, 12, 7.5, 0, 0, Math.PI * 2); fillSoft(ctx, c.body, 3);
-            ctx.strokeStyle = c.shade; ctx.lineWidth = 0.9; ctx.globalAlpha = 0.55;
-            for (const pxx of [51, 55, 59]) { ctx.beginPath(); ctx.moveTo(pxx, 112); ctx.lineTo(pxx, 119); ctx.stroke(); }
-            for (const pxx of [79, 83, 87]) { ctx.beginPath(); ctx.moveTo(pxx, 112); ctx.lineTo(pxx, 119); ctx.stroke(); }
-            ctx.globalAlpha = 1;
-
-            /* ── HEAD group (chunky, tilts toward pointer) ── */
-            ctx.save();
-            ctx.translate(69, 42);
-            ctx.rotate(headTilt);
-
-            /* ears (rounded) */
-            ctx.fillStyle = c.body;
-            ctx.save(); ctx.translate(-20, -20); ctx.rotate(earTw);
-            ctx.beginPath(); ctx.moveTo(-12, 8); ctx.quadraticCurveTo(-13, -16, 2, -15); ctx.quadraticCurveTo(12, -7, 14, 7); ctx.closePath(); fillSoft(ctx, c.body, 3); ctx.restore();
-            ctx.save(); ctx.translate(20, -20); ctx.rotate(-earTw);
-            ctx.beginPath(); ctx.moveTo(12, 8); ctx.quadraticCurveTo(13, -16, -2, -15); ctx.quadraticCurveTo(-12, -7, -14, 7); ctx.closePath(); fillSoft(ctx, c.body, 3); ctx.restore();
-            /* inner ears */
-            ctx.fillStyle = c.inner; ctx.globalAlpha = 0.6;
-            ctx.beginPath(); ctx.moveTo(-22, -16); ctx.quadraticCurveTo(-20, -28, -10, -23); ctx.quadraticCurveTo(-12, -16, -16, -12); ctx.closePath(); ctx.fill();
-            ctx.beginPath(); ctx.moveTo(22, -16); ctx.quadraticCurveTo(20, -28, 10, -23); ctx.quadraticCurveTo(12, -16, 16, -12); ctx.closePath(); ctx.fill();
-            ctx.globalAlpha = 1;
-
-            /* head mass: main dome + two chubby cheeks */
-            ctx.beginPath(); ctx.ellipse(0, -2, 30, 27, 0, 0, Math.PI * 2); fillSoft(ctx, c.body, 6);
-            ctx.beginPath(); ctx.ellipse(-16, 11, 15, 14, 0, 0, Math.PI * 2); fillSoft(ctx, c.body, 4);
-            ctx.beginPath(); ctx.ellipse(16, 11, 15, 14, 0, 0, Math.PI * 2); fillSoft(ctx, c.body, 4);
-
-            /* forehead highlight */
-            ctx.beginPath(); ctx.ellipse(-7, -8, 13, 11, 0, 0, Math.PI * 2);
-            ctx.fillStyle = c.hi; ctx.fill();
-
-            /* forehead tabby stripes */
-            ctx.strokeStyle = c.shade; ctx.lineWidth = 2.4; ctx.globalAlpha = 0.45; ctx.lineCap = "round";
-            ctx.beginPath(); ctx.moveTo(-1, -26); ctx.lineTo(-1, -14); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(-8, -25); ctx.lineTo(-6, -14); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(6, -25); ctx.lineTo(4, -14); ctx.stroke();
-            ctx.globalAlpha = 1;
-
-            /* ── eyes (big, heavy-lidded / sleepy) ── */
-            const lidCover = 0.4 + (1 - blink) * 0.5;   /* sleepy → closed */
-            for (const ex of [-10.5, 10.5]) {
-              const eyeCx = ex, eyeCy = -4, eyeRx = 11, eyeRy = 13;
-              const eyeTop = eyeCy - eyeRy, eyeBot = eyeCy + eyeRy;
-              const lidY = eyeTop + (eyeBot - eyeTop) * lidCover;
-              ctx.save();
-              /* white */
-              ctx.beginPath(); ctx.ellipse(eyeCx, eyeCy, eyeRx, eyeRy, 0, 0, Math.PI * 2);
-              ctx.fillStyle = "#fbf7ef"; ctx.fill();
-              /* clip for pupil + lid */
-              ctx.beginPath(); ctx.ellipse(eyeCx, eyeCy, eyeRx, eyeRy, 0, 0, Math.PI * 2); ctx.clip();
-              /* pupil */
-              ctx.fillStyle = "#1c1714";
-              ctx.beginPath(); ctx.ellipse(eyeCx + lookX, eyeCy + 3 + lookY, 4.2, 7, 0, 0, Math.PI * 2); ctx.fill();
-              /* catchlight */
-              ctx.fillStyle = "rgba(255,255,255,0.9)";
-              ctx.beginPath(); ctx.arc(eyeCx + lookX - 2, eyeCy + 0.5 + lookY, 1.7, 0, Math.PI * 2); ctx.fill();
-              /* heavy upper eyelid */
-              ctx.fillStyle = c.body;
-              ctx.beginPath();
-              ctx.moveTo(eyeCx - eyeRx - 2, eyeTop - 2);
-              ctx.lineTo(eyeCx + eyeRx + 2, eyeTop - 2);
-              ctx.lineTo(eyeCx + eyeRx + 2, lidY);
-              ctx.quadraticCurveTo(eyeCx, lidY + 4.5, eyeCx - eyeRx - 2, lidY);
-              ctx.closePath();
-              ctx.fill();
-              ctx.restore();
-              /* lash line along the lid crease */
-              ctx.strokeStyle = "rgba(40,30,22,0.45)"; ctx.lineWidth = 1.4; ctx.lineCap = "round";
-              ctx.beginPath();
-              ctx.moveTo(eyeCx - 9, lidY - 1);
-              ctx.quadraticCurveTo(eyeCx, lidY + 3.5, eyeCx + 9, lidY - 1);
-              ctx.stroke();
-            }
-            /* a few outer eyelashes */
-            ctx.strokeStyle = "rgba(40,30,22,0.5)"; ctx.lineWidth = 1.2; ctx.lineCap = "round";
-            ctx.beginPath(); ctx.moveTo(-20, -11); ctx.lineTo(-24, -14); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(-18, -14); ctx.lineTo(-21, -18); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(20, -11); ctx.lineTo(24, -14); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(18, -14); ctx.lineTo(21, -18); ctx.stroke();
-
-            /* ── muzzle: whisker pads + nose + mouth ── */
-            ctx.fillStyle = c.hi; ctx.globalAlpha = 0.75;
-            ctx.beginPath(); ctx.ellipse(-7, 13, 9, 7, 0, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.ellipse(7, 13, 9, 7, 0, 0, Math.PI * 2); ctx.fill();
-            ctx.globalAlpha = 1;
-            /* nose */
-            ctx.fillStyle = c.nose;
-            ctx.beginPath(); ctx.moveTo(0, 6); ctx.lineTo(-4, 9); ctx.quadraticCurveTo(0, 12.5, 4, 9); ctx.closePath(); ctx.fill();
-            /* mouth */
-            ctx.strokeStyle = "rgba(50,38,28,0.5)"; ctx.lineWidth = 1.3; ctx.lineCap = "round";
-            ctx.beginPath();
-            ctx.moveTo(0, 10); ctx.lineTo(0, 14);
-            ctx.moveTo(0, 14); ctx.quadraticCurveTo(-5, 19, -10, 15);
-            ctx.moveTo(0, 14); ctx.quadraticCurveTo(5, 19, 10, 15);
-            ctx.stroke();
-            /* whiskers */
-            ctx.strokeStyle = isDark() ? "rgba(255,255,255,0.5)" : "rgba(70,55,42,0.4)"; ctx.lineWidth = 0.9;
-            for (const o of [-3, 1, 5]) {
-              ctx.beginPath(); ctx.moveTo(-13, 12 + o); ctx.lineTo(-34, 9 + o * 1.5); ctx.stroke();
-              ctx.beginPath(); ctx.moveTo(13, 12 + o); ctx.lineTo(34, 9 + o * 1.5); ctx.stroke();
-            }
-            /* blush */
-            ctx.fillStyle = c.blush; ctx.globalAlpha = 0.32;
-            ctx.beginPath(); ctx.ellipse(-20, 9, 5, 3, 0, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.ellipse(20, 9, 5, 3, 0, 0, Math.PI * 2); ctx.fill();
-            ctx.globalAlpha = 1;
-
-            ctx.restore(); /* head */
-            ctx.restore(); /* lift */
-            raf = requestAnimationFrame(frame);
-          }
-          function pause() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
-          function resume() { if (!raf) frame(); }
-          document.addEventListener("visibilitychange", () => document.hidden ? pause() : resume());
-          frame();
-        })();
-      })();
-    </script>
 
 <!-- LINE chat animation (bot: johnymemo) -->
     <script>
@@ -1281,8 +992,35 @@
       })();
     </script>
 
-    <script src="./auth.js?v=8"></script>
-    <script src="./storage.js?v=8"></script>
-    <script src="./app.js?v=8"></script>
+    <script src="./auth.js?v=9"></script>
+    <script src="./storage.js?v=9"></script>
+    <script src="./app.js?v=9"></script>
+    <script>
+      (function () {
+        const fabMain = document.getElementById('fabMain');
+        const fabMenu = document.getElementById('fabMenu');
+        if (!fabMain || !fabMenu) return;
+        function closeFab() {
+          fabMenu.hidden = true;
+          fabMain.setAttribute('aria-expanded', 'false');
+          fabMain.classList.remove('open');
+        }
+        fabMain.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = !fabMenu.hidden;
+          isOpen ? closeFab() : (fabMenu.hidden = false, fabMain.setAttribute('aria-expanded', 'true'), fabMain.classList.add('open'));
+        });
+        document.addEventListener('click', function (e) {
+          if (!fabMenu.hidden && !fabMenu.contains(e.target)) closeFab();
+        });
+        fabMenu.addEventListener('click', function (e) {
+          const item = e.target.closest('.fab-item[data-view-jump]');
+          if (item) setTimeout(closeFab, 120);
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') closeFab();
+        });
+      })();
+    </script>
   </body>
 </html>

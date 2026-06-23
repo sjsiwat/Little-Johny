@@ -1,275 +1,401 @@
-# Johny OS
+Johny OS
 
-## Product
+Product
 
 Personal Digital Workspace / Personal Operating System
 
----
+⸻
 
-## Users
+Product Identity
+
+Johny OS is a premium personal operating system that lives inside the browser.
+
+It is a private command center designed for one person.
+
+The product helps organize:
+
+* tasks
+* notes
+* expenses
+* ideas
+* personal knowledge
+* daily planning
+* life information
+
+Johny OS is not a collection of tools.
+
+It is a single place where daily decisions begin.
+
+⸻
+
+Users
 
 Single user — the builder and owner of this system.
 
-Johny OS is not a public SaaS product. It is a personal command centre used daily in Thai on desktop.
+This is not designed as a public SaaS platform.
 
-The workspace is designed around one person’s real life:
+It is optimized for:
 
-- managing tasks
-- capturing thoughts
-- tracking expenses
-- planning the day
-- storing personal knowledge
-- reviewing progress
+* daily personal usage
+* desktop-first workflow
+* Thai-first content
+* fast capture
+* low friction interaction
 
-Every feature exists to reduce friction in daily decisions.
+The system should feel like a personal Mac application.
 
----
+⸻
 
-## Product Vision
+Product Vision
 
-Johny OS is a personal second brain that lives inside the browser.
+Johny OS is a personal second brain.
 
-The goal is not to replace every tool.
+Inspired by:
 
-The goal is to create one calm place where everything starts.
+* macOS simplicity
+* iOS clarity
+* Raycast speed
+* Notion flexibility
+* Linear precision
 
-A user should be able to:
+The goal is:
 
-- capture an idea instantly
-- add a task without breaking focus
-- record spending in seconds
-- see today's priorities clearly
-- return later and understand their own context
+Create a calm digital environment where everything important is easy to capture, organize, and retrieve.
 
-The system grows from a local-first foundation:
+The system should reduce mental load.
 
-Browser storage first.
-Cloud sync later.
-AI and LINE integrations as extensions.
+⸻
 
-The core experience must already feel complete without external services.
+Core Experience
 
----
+Instant Capture
 
-## Core Experience
+Every action should be fast.
 
-### One action capture
+The user should be able to:
 
-Every important action should feel immediate.
+* create a task
+* write a note
+* record an expense
+* capture an idea
+
+with minimal steps.
+
+Avoid unnecessary flows.
+
+⸻
+
+Personal Command Center
+
+The dashboard is not an analytics dashboard.
+
+It is a daily operating surface.
+
+When opening Johny OS, the user should immediately understand:
+
+* What needs attention
+* What matters today
+* What has changed
+* What should happen next
+
+⸻
+
+Design Philosophy
+
+Clear Structure, Human Personality
+
+Johny OS combines:
+
+Precision
+
+Inspired by:
+
+* Linear
+* Raycast
+* Apple software
+
+Characteristics:
+
+* clean hierarchy
+* fast interaction
+* focused UI
+* predictable behavior
+
+Warmth
+
+The product should still feel personal.
+
+Not:
+
+* enterprise software
+* corporate dashboard
+* generic productivity template
+
+The personality comes from:
+
+* subtle details
+* thoughtful motion
+* mascot presence
+* carefully crafted interactions
+
+⸻
+
+Brand Personality
+
+Johny OS should feel:
+
+* intelligent
+* calm
+* premium
+* personal
+* modern
+* trustworthy
+
+The product should feel:
+
+“A personal operating system designed with Apple-level simplicity.”
+
+⸻
+
+Visual Direction
+
+Primary inspiration:
+
+* macOS
+* iOS
+* Raycast
+* Notion
+* Apple Notes
+* Arc Browser
+
+⸻
+
+Visual Principles
+
+Minimal but not Empty
+
+The interface should remove unnecessary elements.
+
+Every component must have a purpose.
+
+Avoid:
+
+* excessive decoration
+* visual noise
+* dashboard clutter
+
+⸻
+
+Content First
+
+Information is the priority.
+
+The UI should support the user.
+
+The interface should disappear when work begins.
+
+⸻
+
+Premium Software Feeling
+
+Avoid:
+
+* template dashboards
+* generic SaaS layouts
+* colorful productivity apps
+* artificial AI aesthetics
+
+The experience should feel like a native application.
+
+⸻
+
+Dashboard Philosophy
+
+The dashboard is the main workspace.
+
+It should not feel like:
+
+* a report page
+* admin panel
+* metric dashboard
+
+It should feel like:
+
+* macOS desktop workspace
+* personal command center
+* daily overview
+
+⸻
+
+Information Hierarchy
+
+Priority order:
+
+1. Today
+2. Tasks
+3. Active work
+4. Recent notes
+5. Personal information
+6. Secondary data
+
+Not every widget has equal importance.
+
+⸻
+
+Mascot
+
+The cat mascot represents the human side of Johny OS.
+
+It is a companion, not a feature.
+
+Purpose:
+
+* add personality
+* create emotional connection
+* make the product feel personal
+
+Rules:
+
+The mascot should:
+
+* be subtle
+* never block productivity
+* support the experience
+
+The mascot should not:
+
+* dominate the interface
+* make the product feel childish
+* turn the app into a cartoon experience
+
+⸻
+
+Interaction Principles
+
+Fast
+
+Actions should feel instant.
 
 Examples:
 
-- Create task
-- Write note
-- Add expense
-- Record idea
+* keyboard shortcuts
+* quick actions
+* command-style input
 
-Avoid multi-step flows when a single action is possible.
+Calm
 
----
+Animations should support usability.
 
-## Brand Personality
+Use:
 
-Sharp · Warm · Human
-
-Johny OS should feel like a tool crafted by a person.
-
-Not a corporate dashboard.
-Not a productivity template.
-Not an AI wrapper.
-
-The product combines:
-
-- Linear-level clarity
-- Superhuman-level speed
-- personal workspace warmth
-
-The cat mascot represents the human side of the system:
-
-- friendly presence
-- quiet companion
-- small moments of personality
-
-It should feel alive, but never distract from the work.
-
----
-
-## Visual Direction
-
-### Personality
-
-Hand-crafted digital workspace.
-
-Key elements:
-
-- Caveat handwriting style
-- cat mascot
-- soft organic shapes
-- earthy natural palette
-- subtle sketch-like details
-- gentle motion
-
-The design should feel:
-
-"built by someone, not generated from a template"
-
----
-
-## Hero / Landing Experience
-
-The hero area should communicate:
-
-"This is my personal operating system."
-
-The cat mascot can exist as a companion element:
-
-- sitting near the hero card
-- floating slowly
-- subtle blinking
-- small tail movement
-- soft atmospheric background elements
-
-Animation should be calm and optional.
-
-Motion supports personality, not decoration.
-
----
-
-## Anti References
+* smooth transitions
+* subtle feedback
+* gentle motion
 
 Avoid:
 
-### Generic SaaS dashboards
+* excessive animations
+* playful effects
+
+Consistent
+
+Every feature should follow the same system.
+
+Users should not relearn interactions.
+
+⸻
+
+Local First
+
+Johny OS starts with a local-first foundation.
+
+Core experience must work without external services.
+
+Foundation:
+
+* browser storage
+* offline capability
+* local data ownership
+
+Cloud features are extensions.
+
+Not requirements.
+
+⸻
+
+Future Extensions
+
+Future capabilities:
+
+* AI assistant
+* LINE integration
+* cloud synchronization
+* automation
+* external APIs
+
+Future features should extend the workspace.
+
+They should not change the core feeling.
+
+⸻
+
+Accessibility
+
+Support:
+
+* readable contrast
+* dark and light themes
+* reduced motion preference
+* Thai readability
+* keyboard-friendly workflows
+
+⸻
+
+Anti References
+
+Avoid:
+
+Generic SaaS
 
 No:
 
-- Notion clones
-- template card grids
-- empty metric dashboards
-- "big number + small label" layouts
-- blue corporate productivity themes
+* dashboard templates
+* KPI panels
+* corporate cards
+* fake metrics
 
----
+Enterprise Software
 
-### Corporate software feeling
+No:
 
-Avoid:
+* cold business UI
+* complicated navigation
+* heavy configuration
 
-- cold enterprise UI
-- fintech style
-- dark navy + gold palettes
-- overly formal typography
+AI Product Trends
 
----
+No:
 
-### AI generated aesthetic
+* gradient AI backgrounds
+* excessive glow
+* futuristic effects
 
-Avoid:
+⸻
 
-- beige AI landing pages
-- excessive gradient backgrounds
-- uppercase eyebrow labels everywhere
-- decorative 01 / 02 / 03 sections
-- fake complexity
+Product Statement
 
----
-
-## Design Principles
-
-### 1. Sharp capture, soft presence
-
-The interface should disappear while working.
-
-Actions are fast.
-Personality stays in the background.
-
----
-
-### 2. Crafted, not templated
-
-Hand-drawn elements are part of the identity.
-
-Do not remove them to make the UI look more "professional".
-
-The goal is intentional imperfection.
-
----
-
-### 3. Thai first, bilingual always
-
-Thai is the primary language for personal content.
-
-English is used for system concepts.
-
-Both languages must remain readable:
-
-- desktop
-- mobile
-- small screens
-
----
-
-### 4. State over decoration
-
-Every visual element must communicate something:
-
-- priority
-- completion
-- urgency
-- category
-- progress
-
-If decoration has no meaning, remove it.
-
----
-
-### 5. Local-first confidence
-
-Offline and local storage are first-class experiences.
-
-Do not make the app feel like a temporary offline version.
-
-The local experience is the product.
-
----
-
-## Future Extensions
-
-Johny OS may expand with:
-
-- AI assistant
-- LINE integration
-- cloud synchronization
-- automation
-- external APIs
-
-Future features should orbit the core workspace.
-
-They should not change the feeling of the product.
-
----
-
-## Accessibility
-
-Best effort accessibility.
-
-Requirements:
-
-- respect prefers-reduced-motion
-- maintain readable contrast
-- support light and dark themes
-- Thai text remains readable at small sizes
-- avoid relying only on colour for meaning
-
----
-
-## Product Statement
-
-Johny OS is a small personal operating system.
+Johny OS is a personal operating system.
 
 A place to think.
+
 A place to plan.
-A place to keep life organised.
+
+A place to organize life.
+
+Inspired by the simplicity of Apple software,
+the speed of Raycast,
+and the flexibility of Notion.
 
 Built for one person first.
+
 Designed to grow naturally.

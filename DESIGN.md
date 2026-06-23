@@ -1,421 +1,523 @@
-# Johny OS Design System v2
+Johny OS Design System v3
 
-## Design Vision
+Design Vision
 
 Johny OS is not a typical productivity dashboard.
 
+It is a premium personal operating system designed for daily life.
+
 The feeling should be:
 
-- Notion simplicity
-- Studio Ghibli watercolor illustration
-- Personal notebook
-- Calm workspace
-- Cozy digital desk
-- Soft paper texture
-- Handmade feeling
-- Warm and human
+* macOS simplicity
+* iOS elegance
+* Raycast efficiency
+* Notion flexibility
+* Apple Notes calmness
+* Linear precision
 
 The UI should feel like:
 
-> "A small personal workspace inside a Ghibli sketchbook."
+“A personal command center inside a beautifully designed Apple ecosystem.”
 
-Avoid:
+⸻
 
-- SaaS startup style
-- Corporate dashboard
-- Neon colors
-- Sharp edges
-- Heavy shadows
-- Glassmorphism
-- Cyberpunk aesthetics
+Product Personality
 
----
+Johny OS should feel:
 
-# Visual Style
+* Premium
+* Calm
+* Intelligent
+* Minimal
+* Focused
+* Professional
+* Modern
 
-## Theme
+The experience should feel like a native macOS application.
 
-Watercolor + Sketchbook + Nature
+Not a website.
 
-Imagine:
+Not a SaaS dashboard.
 
-- old notebook paper
-- watercolor paint
-- hand-drawn illustrations
-- soft green garden
-- calm morning sunlight
+Not an admin panel.
 
-Color palette must feel:
+⸻
 
-- soft
-- natural
-- organic
-- low contrast
+Avoid
 
----
+Do not use:
 
-# Color Palette
+* Cartoon style
+* Cute productivity aesthetics
+* Ghibli / watercolor style
+* Handwritten fonts
+* Gaming UI
+* Neon colors
+* Cyberpunk effects
+* Heavy gradients
+* Excessive glassmorphism
+* Dashboard template patterns
 
-Background:
+⸻
 
-```css
-#f7f5f0
-#f3f0e8
-#ede8de
-```
+Design Inspiration
 
-Primary Green:
+Primary references:
 
-```css
-#6f8f6d
-#7ea37d
-#94b394
-```
+* macOS
+* iOS
+* Raycast
+* Notion
+* Linear
+* Arc Browser
+* Apple Notes
 
-Accent Brown:
+⸻
 
-```css
-#8f7761
-#a3876a
-```
+Visual Style
 
-Soft Orange:
+Theme
 
-```css
-#d8a36a
-```
+Dark-first premium workspace.
 
-Text:
+The interface should use:
 
-```css
-#2d2a26
-#5e5a54
-```
+* deep neutral backgrounds
+* subtle layers
+* soft depth
+* clean typography
+* minimal decoration
 
-Borders:
+Think:
 
-```css
-#e5dfd4
-```
+macOS dark mode
 
----
+not
 
-# Typography
+gaming dark mode.
 
-Heading:
+⸻
 
-- Caveat
-- Kalam
-- Patrick Hand
+Color System
 
-Body:
+Background
 
-- Inter
-- Noto Sans Thai
+#0F1115
+#121418
+#181A20
+
+⸻
+
+Surface
+
+#181B22
+#1C1F27
+#222631
+
+⸻
+
+Elevated Surface
+
+#252A35
+
+⸻
+
+Borders
+
+Very subtle.
+
+rgba(255,255,255,0.06)
+rgba(255,255,255,0.08)
+
+Avoid visible heavy borders.
+
+⸻
+
+Text
+
+Primary:
+
+#F5F5F7
+
+Secondary:
+
+#A1A5B0
+
+Muted:
+
+#6F7480
+
+⸻
+
+Accent
+
+Apple-style blue:
+
+#0A84FF
+
+Secondary accents:
+
+#30D158
+#FF9F0A
+#FF453A
+
+Use sparingly.
+
+⸻
+
+Typography
+
+Primary font:
+
+* Inter
+* SF Pro style
+
+Thai:
+
+* Noto Sans Thai
 
 Rules:
 
-- Handwritten font only for headings
-- All content uses Inter
-- Large spacing
-- Comfortable reading
+* No handwritten fonts
+* No decorative fonts
 
----
+Typography should create hierarchy.
 
-# Layout
+⸻
+
+Heading
+
+Large:
+
+Bold / Semibold
+
+Clear.
+
+Confident.
+
+⸻
+
+Body
+
+Regular.
+
+Readable.
+
+Comfortable spacing.
+
+⸻
+
+Layout
 
 Desktop:
 
-```text
-┌─────────────┬──────────────────────┐
-│             │                      │
-│ Sidebar     │   Dashboard          │
-│             │                      │
-│             │                      │
-└─────────────┴──────────────────────┘
-```
+┌──────────────┬────────────────────────┐
+│              │                        │
+│ Sidebar      │ Dashboard              │
+│              │                        │
+│              │                        │
+└──────────────┴────────────────────────┘
 
-Sidebar width:
+⸻
 
-```css
-220px
-```
+Sidebar:
 
-Content max width:
+width: 240px
 
-```css
-1400px
-```
+Content:
 
-Spacing system:
+max-width: 1400px
 
-```css
+⸻
+
+Spacing:
+
 8px
+12px
 16px
 24px
 32px
 48px
-```
+64px
 
----
+Prioritize whitespace.
 
-# Sidebar
+⸻
 
-The sidebar should feel like a notebook margin.
+Sidebar
+
+The sidebar should feel like:
+
+macOS Finder sidebar + Raycast navigation.
 
 Contains:
 
-- Logo
-- Theme toggle
-- Cat illustration
-- Navigation
-- User profile
-- Decorative plant illustration
-
-Visual style:
-
-- very light background
-- subtle border
-- watercolor decorations
-
----
-
-# Mascot
-
-A black Ghibli-style cat.
-
-Position:
-
-- Left sidebar
-- Near top section
-
-Behavior:
-
-- Slow floating animation
-- Blink every 4–6 seconds
-- Tail moves gently
-- Ear twitch occasionally
-
-Never use:
-
-- Cartoon mascot
-- Emoji style
-- Gaming mascot
-
-The cat should feel alive but subtle.
-
----
-
-# Hero Section
-
-Large welcome card.
-
-Layout:
-
-```text
-┌─────────────────────────────┐
-│                             │
-│ Headline                    │
-│ Description                 │
-│ Buttons                      🐱
-│                             │
-│ Today Focus                 │
-└─────────────────────────────┘
-```
-
-Background:
-
-- watercolor paper
-- soft nature illustration
-- light trees
-- grass
-- clouds
-
-Top-right corner:
-
-- watercolor tree branch
-- soft leaves
-
-Bottom section:
-
-- small walking cats illustration
-
-The hero should feel like:
-
-> opening a page inside a Ghibli journal.
-
----
-
-# Cards
-
-All cards should look like paper notes.
+* Logo
+* Navigation
+* Quick actions
+* Workspace switcher
+* User profile
+* Settings
 
 Style:
 
-```css
-border-radius: 18px;
-border: 1px solid #e5dfd4;
-background: #ffffff;
-```
+* dark translucent background
+* subtle divider
+* minimal icons
+
+Avoid decorative elements.
+
+⸻
+
+Navigation
+
+Style:
+
+Active state:
+
+soft blue highlight
+subtle background
+rounded rectangle
+
+Not:
+
+bright button style.
+
+⸻
+
+Dashboard Structure
+
+The dashboard should prioritize information.
+
+Structure:
+
+Top Navigation
+↓
+Welcome / Today Overview
+↓
+Focus Area
+↓
+Tasks + Calendar
+↓
+Notes + Recent Activity
+↓
+Finance Summary
+
+⸻
+
+Hero Section
+
+Replace decorative hero.
+
+Create:
+
+“Today Command Center”
+
+Example:
+
+Good evening, Johny
+Here is your day overview.
+3 tasks remaining
+2 notes captured
+1 expense pending
+
+Style:
+
+* large typography
+* clean surface
+* subtle background
+* minimal decoration
+
+⸻
+
+Cards
+
+Cards should feel like Apple system panels.
+
+Style:
+
+border-radius: 16px;
+background:
+#181B22;
+border:
+1px solid rgba(255,255,255,0.06);
 
 Shadow:
 
-```css
-0 2px 8px rgba(0,0,0,0.04)
-```
+Very subtle.
 
-No strong shadows.
+No floating cards everywhere.
 
----
+⸻
 
-# Stats Cards
-
-Display:
-
-- Tasks
-- Pending
-- Completed
-- Expenses
-
-Style:
-
-- soft icon background
-- rounded corners
-- minimal information
-
-Icons:
-
-- outlined
-- hand-drawn feeling
-- muted colors
-
----
-
-# Task Section
-
-Feels like a handwritten to-do list.
-
-Features:
-
-- checkbox
-- due date
-- priority tag
-
-Priority colors:
-
-Critical:
-#d96b5f
-
-High:
-#d8a36a
-
-Medium:
-#7ea37d
-
-Low:
-#a8b0a0
-
----
-
-# Notes Section
-
-Looks like small notebook pages.
-
-Cards should feel:
-
-- personal
-- scrapbook-like
-- warm
-
-Each note card:
-
-- title
-- preview text
-- category tag
-- timestamp
-
----
-
-# Expense Section
-
-Minimal financial tracking.
+Card Principles
 
 Avoid:
 
-- financial software look
-- trading dashboard look
+card inside card inside card.
 
 Use:
 
-- soft progress bars
-- muted colors
-- friendly icons
+* sections
+* spacing
+* grouping
 
-Should feel:
+Cards are containers.
 
-> household notebook
+Not decoration.
 
-not
+⸻
 
-> accounting software
+Components
 
----
+Buttons
 
-# Animations
+Apple style.
 
-Very subtle.
+Primary:
 
-Allowed:
+background: #0A84FF;
+color: white;
+border-radius: 10px;
 
-- cat floating
-- blinking
-- tail wag
-- leaf sway
-- cloud drifting
-- fade in
+Secondary:
 
-Animation duration:
+transparent surface.
 
-```css
-3s - 12s
-```
+⸻
+
+Inputs
+
+Inspired by:
+
+macOS Spotlight
+
+Raycast search.
+
+Style:
+
+* dark surface
+* subtle border
+* smooth focus state
+
+⸻
+
+Tasks
+
+Should feel like:
+
+Apple Reminders + Notion database.
+
+Features:
+
+* checkbox
+* title
+* priority
+* date
+* status
+
+Keep minimal.
+
+⸻
+
+Notes
+
+Should feel like:
+
+Apple Notes.
+
+Features:
+
+* title
+* preview
+* tags
+* timestamp
+
+Avoid scrapbook style.
+
+⸻
+
+Expenses
+
+Should feel like:
+
+Apple Wallet summary.
 
 Avoid:
 
-- bouncing
-- spinning
-- flashy transitions
+financial dashboard style.
 
----
+Use:
 
-# Decorative Elements
+* simple charts
+* clean numbers
+* subtle progress indicators
 
-Add watercolor illustrations:
+⸻
 
-- leaves
-- grass
-- flowers
-- clouds
-- paper textures
+Mascot
 
-Opacity:
+Mascot remains part of Johny OS identity.
 
-```css
-0.08 - 0.25
-```
+However:
 
-Never distract from content.
+The mascot is not the main interface.
 
----
+Role:
 
-# Overall Feeling
+Digital companion.
 
-If Notion is:
+Rules:
 
-"Professional productivity"
+* small presence
+* subtle animation
+* appears mainly in onboarding/home
+* minimal dashboard presence
 
-Johny OS should be:
+Avoid:
 
-"Personal productivity inside a Ghibli sketchbook"
+large cartoon elements.
 
-The application should feel warm, calm, handmade, and comforting.
+⸻
+
+Animation
+
+Professional motion only.
+
+Allowed:
+
+* fade
+* slide
+* subtle scale
+* blur transition
+
+Duration:
+
+150ms - 300ms
+
+Avoid:
+
+* bouncing
+* playful movement
+* excessive animations
+
+⸻
+
+Overall Feeling
+
+If:
+
+Notion =
+flexible workspace
+
+Raycast =
+fast command center
+
+macOS =
+premium operating system
+
+Johny OS should become:
+
+“A personal operating system with the simplicity of Apple software.”
+
+The final product should feel mature, calm, premium and timeless.
