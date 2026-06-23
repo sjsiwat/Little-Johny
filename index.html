@@ -261,9 +261,13 @@
             <span class="nav-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2.5" width="13" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M1.5 6.5h13" stroke="currentColor" stroke-width="1.5"/><path d="M5 1.5v2M11 1.5v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="4" y="9" width="2" height="2" rx="0.5" fill="currentColor"/><rect x="7" y="9" width="2" height="2" rx="0.5" fill="currentColor"/><rect x="10" y="9" width="2" height="2" rx="0.5" fill="currentColor"/></svg></span>
             <span>Calendar</span>
           </a>
-          <a href="#secretary" class="nav-link" data-view="secretary">
-            <span class="nav-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2.5" width="13" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 8l2 1.5L4.5 11M8.5 11h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span>Assistant</span>
+          <a href="#goals" class="nav-link" data-view="goals">
+            <span class="nav-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/></svg></span>
+            <span>Goals</span>
+          </a>
+          <a href="#review" class="nav-link" data-view="review">
+            <span class="nav-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="9" width="3" height="5.5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="6.5" y="5.5" width="3" height="9" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="11.5" y="2.5" width="3" height="12" rx="1" stroke="currentColor" stroke-width="1.5"/></svg></span>
+            <span>Review</span>
           </a>
         </nav>
 
@@ -429,21 +433,23 @@
               <div class="item-list compact" id="recentNotes"></div>
             </section>
 
-            <section class="panel dash-assistant-panel">
+
+            <section class="panel dash-goals-panel">
               <div class="panel-head">
-                <h2>คำสั่งด่วน</h2>
-                <button class="ghost-button" type="button" data-view-jump="secretary">ดูทั้งหมด →</button>
+                <h2>🎯 Active Goals</h2>
+                <button class="ghost-button" type="button" data-view-jump="goals">ดูทั้งหมด →</button>
               </div>
-              <div class="dash-assistant">
-                <p class="dash-assist-desc">พิมพ์คำสั่งเพื่อเพิ่มข้อมูลเร็ว เช่น <code>เพิ่มงาน ส่งรายงาน</code> หรือ <code>จ่าย กาแฟ 75 เครื่องดื่ม</code></p>
-                <div class="dash-assist-input-row">
-                  <input class="dash-assist-input" id="dashAssistInput" type="text" placeholder="เพิ่มงาน / จ่าย / โน้ต: / สรุปรายจ่าย…" />
-                  <button class="dash-assist-send" type="button" id="dashAssistSend" aria-label="ส่งคำสั่ง">
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6h10M7 2l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </button>
-                </div>
-              </div>
+              <div id="dashGoalBars"></div>
             </section>
+
+            <section class="panel dash-review-panel">
+              <div class="panel-head">
+                <h2>📊 เดือนนี้</h2>
+                <button class="ghost-button" type="button" data-view-jump="review">ดูรายงาน →</button>
+              </div>
+              <div id="dashReviewStats"></div>
+            </section>
+
           </div>
         </section>
 
@@ -590,37 +596,34 @@
           <!-- rendered by renderCalendar() -->
         </section>
 
-        <!-- SECRETARY -->
-        <section
-          class="view"
-          id="secretary"
-          aria-label="LINE secretary preview"
-        >
-          <div class="secretary-layout">
-            <section class="panel">
-              <h2>Personal Secretary</h2>
-              <form
-                id="commandForm"
-                class="command-box"
-                style="margin-top: 1rem"
-              >
-                <textarea
-                  id="commandText"
-                  rows="5"
-                  placeholder="ตัวอย่าง: เพิ่มงาน เรียน JavaScript พรุ่งนี้ 19:00&#10;โน้ต: ซื้อจอคอม&#10;จ่าย กาแฟ 75 เครื่องดื่ม"
-                ></textarea>
-                <button type="submit">ส่งคำสั่ง</button>
-              </form>
-            </section>
-            <section class="panel">
-              <h2>ผลลัพธ์</h2>
-              <div
-                class="assistant-log"
-                id="assistantLog"
-                style="margin-top: 1rem"
-              ></div>
-            </section>
+        <!-- GOALS -->
+        <section class="view" id="goals" aria-label="Goals">
+          <form class="composer" id="goalForm">
+            <input
+              id="goalTitle"
+              type="text"
+              placeholder="Goal เช่น Build Johny Memo"
+              maxlength="120"
+              required
+            />
+            <div class="goal-form-meta">
+              <label class="goal-form-label">เริ่มต้นที่
+                <input id="goalInitProgress" type="number" min="0" max="100" value="0" class="goal-progress-input" /> %
+              </label>
+              <button type="submit">เพิ่ม Goal</button>
+            </div>
+          </form>
+          <div class="item-list" id="goalList"></div>
+        </section>
+
+        <!-- REVIEW -->
+        <section class="view" id="review" aria-label="Review">
+          <div class="review-tab-bar task-view-filters">
+            <button class="chip active" type="button" data-review-tab="daily">วันนี้</button>
+            <button class="chip" type="button" data-review-tab="weekly">สัปดาห์นี้</button>
+            <button class="chip" type="button" data-review-tab="monthly">เดือนนี้</button>
           </div>
+          <div id="reviewContent" class="review-content"></div>
         </section>
       </main>
     </div>
