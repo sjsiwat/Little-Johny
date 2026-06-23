@@ -267,40 +267,15 @@
           </a>
         </nav>
 
-        <!-- Focus Timer (Pomodoro) -->
-        <div class="sidebar-section" aria-label="Focus timer">
-          <p class="sidebar-section-title">Focus Timer</p>
-          <div class="focus-timer-wrap">
-            <div class="focus-ring-wrap" role="timer" aria-label="Focus timer">
-              <svg class="focus-ring-svg" viewBox="0 0 64 64">
-                <circle class="focus-ring-bg" cx="32" cy="32" r="28"/>
-                <circle class="focus-ring-arc" id="focusArc" cx="32" cy="32" r="28"/>
-              </svg>
-              <span class="focus-time-label" id="focusTimerLabel" aria-live="off" tabindex="0" title="แตะเพื่อตั้งเวลา">25:00</span>
-              <input class="focus-time-input" id="focusTimeInput" type="number" min="1" max="99" value="25" hidden aria-label="ตั้งเวลา (นาที)" />
+        <!-- LINE Connect -->
+        <div class="sidebar-section" aria-label="LINE connection">
+          <p class="sidebar-section-title">LINE Bot</p>
+          <div class="line-connect-block">
+            <div class="line-connect-status" id="lineConnectStatus">
+              <span class="line-status-dot" id="lineStatusDot"></span>
+              <span class="line-status-text" id="lineStatusText">ยังไม่ได้เชื่อม</span>
             </div>
-            <div class="focus-presets">
-              <button class="focus-preset" data-minutes="5" type="button">5</button>
-              <button class="focus-preset" data-minutes="15" type="button">15</button>
-              <button class="focus-preset focus-preset--active" data-minutes="25" type="button">25</button>
-              <button class="focus-preset" data-minutes="50" type="button">50</button>
-            </div>
-            <div class="focus-timer-actions">
-              <button class="focus-timer-btn" id="focusTimerBtn" type="button">▶ Start</button>
-              <button class="focus-timer-reset" id="focusTimerReset" type="button" aria-label="รีเซ็ต" title="รีเซ็ต">
-                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M12.5 2A6 6 0 1 0 13.5 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><polyline points="10.5,0 13.5,2 10.5,4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-            </div>
-            <button class="focus-finish-btn" id="focusFinishBtn" type="button" hidden>✓ เสร็จสิ้นก่อนกำหนด</button>
-          </div>
-          <div id="focusTaskPicker"></div>
-          <div class="focus-done-prompt" id="focusDonePrompt" hidden>
-            <p class="focus-done-question">task เสร็จหรือยัง?</p>
-            <p class="focus-done-title" id="focusDoneText"></p>
-            <div class="focus-done-actions">
-              <button class="focus-done-yes" id="focusDoneYes" type="button">✓ เสร็จแล้ว</button>
-              <button class="focus-done-no" id="focusDoneNo" type="button">ยังไม่เสร็จ</button>
-            </div>
+            <button class="line-connect-btn" id="lineConnectBtn" type="button">เชื่อมบัญชี LINE</button>
           </div>
         </div>
 
@@ -311,6 +286,25 @@
         </div>
 
       </aside>
+
+      <!-- LINE Connect Modal -->
+      <div class="modal-backdrop" id="lineModalBackdrop" hidden>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lineModalTitle">
+          <div class="modal-header">
+            <h3 class="modal-title" id="lineModalTitle">เชื่อมบัญชี LINE</h3>
+            <button class="modal-close" id="lineModalClose" type="button" aria-label="ปิด">×</button>
+          </div>
+          <div class="modal-body">
+            <p class="modal-hint">พิม <strong>เชื่อมบัญชี</strong> ใน LINE Bot แล้วนำรหัส 6 หลักมากรอกด้านล่าง</p>
+            <input class="modal-code-input" id="lineModalCode" type="text" inputmode="numeric" maxlength="6" placeholder="_ _ _ _ _ _" autocomplete="off" />
+            <p class="modal-error" id="lineModalError" hidden></p>
+          </div>
+          <div class="modal-footer">
+            <button class="modal-cancel" id="lineModalCancel" type="button">ยกเลิก</button>
+            <button class="modal-confirm" id="lineModalConfirm" type="button">ยืนยัน</button>
+          </div>
+        </div>
+      </div>
 
       <!-- ── Workspace ── -->
       <main class="workspace">
@@ -550,19 +544,6 @@
             <div class="item-list" id="lineNoteList"></div>
           </div>
 
-          <div class="line-link-panel" id="lineLinkPanel">
-            <div class="line-link-panel__header">
-              <span>เชื่อมกับ LINE Bot</span>
-              <span id="lineLinkStatus" class="line-link-status"></span>
-            </div>
-            <div id="lineLinkForm">
-              <p class="line-link-hint">พิม <strong>เชื่อมบัญชี</strong> ใน LINE แล้วนำรหัส 6 หลักมากรอกที่นี่</p>
-              <div class="line-link-input-row">
-                <input id="lineLinkCode" type="text" maxlength="6" placeholder="รหัส 6 หลัก" />
-                <button type="button" id="lineLinkBtn">เชื่อม</button>
-              </div>
-            </div>
-          </div>
         </section>
 
         <!-- EXPENSES -->
