@@ -112,11 +112,15 @@ const Storage = (() => {
     if (!Auth.isLoggedIn()) return;
     if (_syncChangeListener) _syncChangeListener('syncing');
     const uid = Auth.getUser().id;
+    // Strip demo items — they are display-only and must never reach the cloud
+    const tasks    = state.tasks.filter(t => !t._isDemo);
+    const notes    = state.notes.filter(n => !n._isDemo);
+    const expenses = state.expenses.filter(e => !e._isDemo);
     try {
       await Promise.all([
-        syncTable('tasks', state.tasks, taskToRow, uid),
-        syncTable('notes', state.notes, noteToRow, uid),
-        syncTable('expenses', state.expenses, expenseToRow, uid)
+        syncTable('tasks', tasks, taskToRow, uid),
+        syncTable('notes', notes, noteToRow, uid),
+        syncTable('expenses', expenses, expenseToRow, uid)
       ]);
       if (_syncChangeListener) _syncChangeListener('synced');
     } catch (err) {

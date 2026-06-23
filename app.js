@@ -29,7 +29,7 @@ function createDemoState() {
   return {
     tasks: [
       {
-        id: crypto.randomUUID(),
+        id: crypto.randomUUID(), _isDemo: true,
         title: "ออกแบบ Dashboard ให้เห็นภาพรวมชีวิตใน 5 นาที",
         priority: "High",
         due: today.toISOString().slice(0, 10),
@@ -37,7 +37,7 @@ function createDemoState() {
         createdAt: Date.now() - 1000
       },
       {
-        id: crypto.randomUUID(),
+        id: crypto.randomUUID(), _isDemo: true,
         title: "จดไอเดียสำหรับต่อ LINE Secretary",
         priority: "Medium",
         due: tomorrow.toISOString().slice(0, 10),
@@ -45,7 +45,7 @@ function createDemoState() {
         createdAt: Date.now() - 2000
       },
       {
-        id: crypto.randomUUID(),
+        id: crypto.randomUUID(), _isDemo: true,
         title: "ทดลองบันทึกรายจ่ายผ่านหน้า Expenses",
         priority: "Low",
         due: "",
@@ -55,14 +55,14 @@ function createDemoState() {
     ],
     notes: [
       {
-        id: crypto.randomUUID(),
+        id: crypto.randomUUID(), _isDemo: true,
         title: "Johny OS คือพื้นที่รวม task, note, expense และเลขาส่วนตัว",
         body: "เวอร์ชันแรกเก็บข้อมูลใน browser ก่อน เพื่อให้ใช้งานฟรีและ deploy ง่ายบน Cloudflare Pages",
         tags: "vision, mvp",
         createdAt: Date.now() - 1000
       },
       {
-        id: crypto.randomUUID(),
+        id: crypto.randomUUID(), _isDemo: true,
         title: "Phase 2: sync ข้ามเครื่องด้วย Supabase",
         body: "เพิ่ม login, database, reminder และค่อยต่อ AI หลังจาก workflow หลักนิ่งแล้ว",
         tags: "roadmap",
@@ -71,7 +71,7 @@ function createDemoState() {
     ],
     expenses: [
       {
-        id: crypto.randomUUID(),
+        id: crypto.randomUUID(), _isDemo: true,
         title: "กาแฟทำงาน",
         amount: 75,
         category: "เครื่องดื่ม",
@@ -79,7 +79,7 @@ function createDemoState() {
         createdAt: Date.now() - 1000
       },
       {
-        id: crypto.randomUUID(),
+        id: crypto.randomUUID(), _isDemo: true,
         title: "เดินทาง",
         amount: 120,
         category: "เดินทาง",
@@ -87,7 +87,7 @@ function createDemoState() {
         createdAt: Date.now() - 2000
       },
       {
-        id: crypto.randomUUID(),
+        id: crypto.randomUUID(), _isDemo: true,
         title: "มื้อกลางวัน",
         amount: 95,
         category: "อาหาร",
@@ -1315,9 +1315,10 @@ async function onSignedIn(user) {
   // Only carry local items forward when user explicitly entered guest mode first.
   // Returning authenticated users (page reload / token refresh) should use cloud as
   // the source of truth — their localStorage is just a stale cache, not guest work.
-  const guestTasks    = _trueGuestSession ? [...state.tasks]    : [];
-  const guestNotes    = _trueGuestSession ? [...state.notes]    : [];
-  const guestExpenses = _trueGuestSession ? [...state.expenses] : [];
+  // Demo items (_isDemo: true) are display-only and must never reach the cloud.
+  const guestTasks    = _trueGuestSession ? state.tasks.filter(t => !t._isDemo)    : [];
+  const guestNotes    = _trueGuestSession ? state.notes.filter(n => !n._isDemo)    : [];
+  const guestExpenses = _trueGuestSession ? state.expenses.filter(e => !e._isDemo) : [];
   _trueGuestSession = false; // consumed — reset for next time
 
   const hasGuest = guestTasks.length + guestNotes.length + guestExpenses.length > 0;
