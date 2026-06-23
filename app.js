@@ -233,7 +233,7 @@ const viewTitles = {
   tasks: "Tasks",
   notes: "Notes",
   expenses: "Expenses",
-  calendar: "ปฏิทิน",
+  calendar: "Calendar",
   secretary: "Assistant"
 };
 
