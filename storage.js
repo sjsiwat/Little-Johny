@@ -9,6 +9,7 @@
 const Storage = (() => {
   const LOCAL_KEY = 'johny-os-lite-state';
   let _syncTimer = null;
+  let _syncChangeListener = null;
 
   /* ── Local helpers ── */
   function localLoad() {
@@ -109,6 +110,7 @@ const Storage = (() => {
 
   async function pushToCloud(state) {
     if (!Auth.isLoggedIn()) return;
+    if (_syncChangeListener) _syncChangeListener('syncing');
     const uid = Auth.getUser().id;
     try {
       await Promise.all([
@@ -116,8 +118,10 @@ const Storage = (() => {
         syncTable('notes', state.notes, noteToRow, uid),
         syncTable('expenses', state.expenses, expenseToRow, uid)
       ]);
+      if (_syncChangeListener) _syncChangeListener('synced');
     } catch (err) {
       console.error('[storage] cloud sync failed:', err);
+      if (_syncChangeListener) _syncChangeListener('error');
     }
   }
 
@@ -132,9 +136,12 @@ const Storage = (() => {
       localSave(state);
       if (Auth.isLoggedIn()) {
         clearTimeout(_syncTimer);
+        if (_syncChangeListener) _syncChangeListener('pending');
         _syncTimer = setTimeout(() => pushToCloud(state), 1500);
       }
     },
+
+    onSyncChange(fn) { _syncChangeListener = fn; },
 
     async loadCloud() {
       if (!Auth.isLoggedIn()) return null;

@@ -950,6 +950,32 @@ setView(location.hash.replace("#", "") && views[location.hash.replace("#", "")]
 render();
 
 /* ── Auth UI ── */
+function updateSyncStatus(status) {
+  const dot   = document.getElementById('syncDot');
+  const label = document.getElementById('syncLabel');
+  if (!dot || !label) return;
+  const states = {
+    idle:    { cls: 'status-dot--online',  text: 'อยู่ในระบบ' },
+    pending: { cls: 'status-dot--syncing', text: 'รอซิงค์…' },
+    syncing: { cls: 'status-dot--syncing', text: 'กำลังซิงค์…' },
+    synced:  { cls: 'status-dot--online',  text: 'ซิงค์แล้ว ✓' },
+    offline: { cls: 'status-dot--offline', text: 'ออฟไลน์' },
+    error:   { cls: 'status-dot--error',   text: 'ซิงค์ไม่สำเร็จ' }
+  };
+  const s = states[status] || states.idle;
+  dot.className = `status-dot ${s.cls}`;
+  label.textContent = s.text;
+  if (status === 'synced') {
+    setTimeout(() => { if (label.textContent === 'ซิงค์แล้ว ✓') updateSyncStatus('idle'); }, 3000);
+  }
+}
+
+function mergeById(local, cloud) {
+  const map = new Map();
+  [...local, ...cloud].forEach(item => map.set(item.id, item));
+  return [...map.values()].sort((a, b) => b.createdAt - a.createdAt);
+}
+
 function updateAuthBar(user) {
   const loggedInRow = document.getElementById("authLoggedInRow");
   const guestRow    = document.getElementById("authGuestRow");
@@ -965,12 +991,37 @@ function updateAuthBar(user) {
 async function onSignedIn(user) {
   showApp();
   updateAuthBar(user);
-  showToast("กำลังโหลดข้อมูลจาก cloud…");
+
+  const guestTasks    = [...state.tasks];
+  const guestNotes    = [...state.notes];
+  const guestExpenses = [...state.expenses];
+  const hasGuest = guestTasks.length + guestNotes.length + guestExpenses.length > 0;
+
+  updateSyncStatus('syncing');
+  showToast("กำลังซิงค์ข้อมูล…");
   const cloud = await Storage.loadCloud();
+
   if (cloud) {
-    state = { ...state, tasks: cloud.tasks, notes: cloud.notes, expenses: cloud.expenses };
+    const hasCloud = cloud.tasks.length + cloud.notes.length + cloud.expenses.length > 0;
+    if (hasGuest && hasCloud) {
+      state = {
+        ...state,
+        tasks:    mergeById(guestTasks,    cloud.tasks),
+        notes:    mergeById(guestNotes,    cloud.notes),
+        expenses: mergeById(guestExpenses, cloud.expenses)
+      };
+      showToast(`รวมข้อมูลเรียบร้อย — ${state.tasks.length} งาน, ${state.notes.length} โน้ต`);
+    } else if (hasCloud) {
+      state = { ...state, tasks: cloud.tasks, notes: cloud.notes, expenses: cloud.expenses };
+      showToast(`โหลดข้อมูลจาก cloud (${cloud.tasks.length} งาน)`);
+    } else if (hasGuest) {
+      showToast(`อัปโหลด ${guestTasks.length} งานจาก Guest ขึ้น cloud`);
+    }
     render();
-    showToast(`ซิงค์ข้อมูลจาก cloud สำเร็จ (${cloud.tasks.length} งาน)`);
+    updateSyncStatus('synced');
+  } else {
+    updateSyncStatus('error');
+    showToast("ซิงค์ไม่สำเร็จ — ข้อมูล local ยังอยู่ครบ");
   }
 }
 
@@ -1135,6 +1186,10 @@ document.getElementById("hpLoginBtn")?.addEventListener("click", () => {
 });
 document.getElementById("hpGuestBtn")?.addEventListener("click", enterGuestMode);
 document.getElementById("hpFooterGuestBtn")?.addEventListener("click", enterGuestMode);
+
+Storage.onSyncChange(updateSyncStatus);
+window.addEventListener('online',  () => updateSyncStatus('idle'));
+window.addEventListener('offline', () => updateSyncStatus('offline'));
 
 initAuth();
 
