@@ -670,6 +670,8 @@ function escapeHtml(value) {
 
 /* ── Homepage ↔ App routing ── */
 let _inApp = false; // true once user enters the app (guest or signed in)
+let _trueGuestSession = false; // set only via enterGuestMode(); NOT for returning authenticated users
+let _syncedUserId = null;      // guard against double onSignedIn (Auth.init + onChange race)
 
 function showApp() {
   _inApp = true;
@@ -690,6 +692,7 @@ function showHomepage() {
 }
 
 function enterGuestMode() {
+  _trueGuestSession = true;
   showApp();
   setView("dashboard");
 }
@@ -1302,12 +1305,21 @@ function updateAuthBar(user) {
 }
 
 async function onSignedIn(user) {
+  // Guard: prevent double-execution for the same user (Auth.init + onChange can both fire)
+  if (_syncedUserId === user.id) return;
+  _syncedUserId = user.id;
+
   showApp();
   updateAuthBar(user);
 
-  const guestTasks    = [...state.tasks];
-  const guestNotes    = [...state.notes];
-  const guestExpenses = [...state.expenses];
+  // Only carry local items forward when user explicitly entered guest mode first.
+  // Returning authenticated users (page reload / token refresh) should use cloud as
+  // the source of truth — their localStorage is just a stale cache, not guest work.
+  const guestTasks    = _trueGuestSession ? [...state.tasks]    : [];
+  const guestNotes    = _trueGuestSession ? [...state.notes]    : [];
+  const guestExpenses = _trueGuestSession ? [...state.expenses] : [];
+  _trueGuestSession = false; // consumed — reset for next time
+
   const hasGuest = guestTasks.length + guestNotes.length + guestExpenses.length > 0;
 
   updateSyncStatus('syncing');
@@ -1316,19 +1328,31 @@ async function onSignedIn(user) {
 
   if (cloud) {
     const hasCloud = cloud.tasks.length + cloud.notes.length + cloud.expenses.length > 0;
-    if (hasGuest && hasCloud) {
+    if (hasCloud) {
+      // Cloud is authoritative. Merge only truly-new guest items (IDs absent from cloud).
+      const cloudTaskIds    = new Set(cloud.tasks.map(t => t.id));
+      const cloudNoteIds    = new Set(cloud.notes.map(n => n.id));
+      const cloudExpIds     = new Set(cloud.expenses.map(e => e.id));
+      const freshTasks    = guestTasks.filter(t => !cloudTaskIds.has(t.id));
+      const freshNotes    = guestNotes.filter(n => !cloudNoteIds.has(n.id));
+      const freshExpenses = guestExpenses.filter(e => !cloudExpIds.has(e.id));
       state = {
         ...state,
-        tasks:    mergeById(guestTasks,    cloud.tasks),
-        notes:    mergeById(guestNotes,    cloud.notes),
-        expenses: mergeById(guestExpenses, cloud.expenses)
+        tasks:    [...cloud.tasks,    ...freshTasks],
+        notes:    [...cloud.notes,    ...freshNotes],
+        expenses: [...cloud.expenses, ...freshExpenses]
       };
-      showToast(`รวมข้อมูลเรียบร้อย — ${state.tasks.length} งาน, ${state.notes.length} โน้ต`);
-    } else if (hasCloud) {
-      state = { ...state, tasks: cloud.tasks, notes: cloud.notes, expenses: cloud.expenses };
-      showToast(`โหลดข้อมูลจาก cloud (${cloud.tasks.length} งาน)`);
+      const merged = freshTasks.length + freshNotes.length + freshExpenses.length;
+      if (merged > 0) {
+        showToast(`รวมข้อมูลเรียบร้อย — เพิ่ม ${merged} รายการจาก Guest`);
+      } else {
+        showToast(`โหลดข้อมูลจาก cloud (${cloud.tasks.length} งาน)`);
+      }
     } else if (hasGuest) {
+      // Cloud is empty and user had real guest work — upload it
       showToast(`อัปโหลด ${guestTasks.length} งานจาก Guest ขึ้น cloud`);
+    } else {
+      showToast("เชื่อมต่อแล้ว ✓");
     }
     render();
     updateSyncStatus('synced');
@@ -1351,6 +1375,7 @@ async function initAuth() {
     updateAuthBar(u);
     if (event === "SIGNED_IN")  onSignedIn(u);
     if (event === "SIGNED_OUT") {
+      _syncedUserId = null; // allow next sign-in to sync fresh
       showToast("ออกจากระบบแล้ว — ข้อมูล local ยังอยู่");
       showHomepage();
     }
