@@ -45,6 +45,9 @@ const EXPENSE_BAR_COLORS = {
 /* ── Icons ── */
 const ICON_EDIT = '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M7.5 1.5l2 2-6 6H1.5v-2l6-6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>';
 
+/* ── Goals ── */
+const GOAL_COLORS = ["#0A84FF", "#30D158", "#FF9F0A", "#BF5AF2", "#FF453A", "#64D2FF"];
+
 /* ── Thai locale ── */
 const THAI_MONTHS = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
 const THAI_DOW    = ["อา","จ","อ","พ","พฤ","ศ","ส"];
@@ -298,6 +301,12 @@ function createDemoState() {
       }
     ],
 
+    goals: [
+      { id: crypto.randomUUID(), _isDemo: true, title: "Build Johny Memo", progress: 60, color: "#0A84FF", createdAt: ts(10) },
+      { id: crypto.randomUUID(), _isDemo: true, title: "Save 100,000 THB", progress: 12, color: "#FF9F0A", createdAt: ts(20) },
+      { id: crypto.randomUUID(), _isDemo: true, title: "Improve Health", progress: 40, color: "#30D158", createdAt: ts(30) },
+    ],
+
     logs: [
       "ลองพิมพ์: เพิ่มงาน ประชุมทีมพรุ่งนี้ 10 โมง",
       "ลองพิมพ์: จ่าย กาแฟ 95 เครื่องดื่ม",
@@ -322,6 +331,7 @@ let state = (() => {
     ...t,
     status: normalizeStatus(t.status),
   }));
+  if (!s.goals) s.goals = [];
   return s;
 })();
 
@@ -331,7 +341,8 @@ const views = {
   notes: document.getElementById("notes"),
   expenses: document.getElementById("expenses"),
   calendar: document.getElementById("calendar"),
-  secretary: document.getElementById("secretary")
+  goals: document.getElementById("goals"),
+  review: document.getElementById("review"),
 };
 
 const viewTitles = {
@@ -340,7 +351,8 @@ const viewTitles = {
   notes: "Notes",
   expenses: "Expenses",
   calendar: "Calendar",
-  secretary: "Assistant"
+  goals: "Goals",
+  review: "Review",
 };
 
 function saveState() {
@@ -388,7 +400,8 @@ function render() {
   renderNotes();
   renderExpenses();
   renderCalendar();
-  renderSecretary();
+  renderGoals();
+  renderReview();
   renderFocusTaskPicker();
   saveState();
 }
@@ -592,6 +605,8 @@ function renderDashboard() {
   }
 
   renderExpenseBars();
+  renderGoalProgressDash();
+  renderWeeklyReviewDash();
 }
 
 function renderExpenseBars() {
@@ -619,6 +634,224 @@ function renderExpenseBars() {
         })
         .join("")
     : emptyState("ยังไม่มีรายจ่ายให้สรุป ลองบันทึกกาแฟ มื้อกลางวัน หรือค่าเดินทางรายการแรก", "expenses", "บันทึกรายจ่าย");
+}
+
+/* ── Goals ── */
+function addGoal(title, progress, color) {
+  state.goals.unshift({
+    id: crypto.randomUUID(),
+    title,
+    progress: Math.min(100, Math.max(0, progress || 0)),
+    color: color || GOAL_COLORS[state.goals.length % GOAL_COLORS.length],
+    createdAt: Date.now()
+  });
+}
+
+function renderGoals() {
+  const list = document.getElementById("goalList");
+  if (!list) return;
+  if (!state.goals.length) {
+    list.innerHTML = emptyState("ยังไม่มี Goal ลองเพิ่ม Goal แรกของคุณ", "goals", "เพิ่ม Goal");
+    return;
+  }
+  list.innerHTML = state.goals.map(goal => {
+    const pct = Math.min(100, Math.max(0, goal.progress || 0));
+    const color = goal.color || "#0A84FF";
+    return `
+      <article class="list-item goal-item" data-goal-id="${goal.id}">
+        <div class="goal-item-body">
+          <div class="goal-item-top">
+            <span class="goal-item-title">${escapeHtml(goal.title)}</span>
+            <span class="goal-pct">${pct}%</span>
+          </div>
+          <div class="goal-bar-track">
+            <div class="goal-bar-fill" style="width:${pct}%; background:${color}"></div>
+          </div>
+          <div class="goal-slider-row">
+            <input type="range" min="0" max="100" value="${pct}"
+              class="goal-slider" data-goal-slider="${goal.id}" aria-label="ความคืบหน้า" />
+          </div>
+        </div>
+        <div class="item-actions">
+          <button class="icon-button" type="button" data-delete-goal="${goal.id}" title="ลบ Goal">×</button>
+        </div>
+      </article>`;
+  }).join("");
+
+  list.querySelectorAll("[data-goal-slider]").forEach(slider => {
+    slider.addEventListener("input", e => {
+      const id = slider.dataset.goalSlider;
+      const pct = Number(e.target.value);
+      state.goals = state.goals.map(g => g.id === id ? { ...g, progress: pct } : g);
+      const item = slider.closest("[data-goal-id]");
+      if (item) {
+        const pctEl = item.querySelector(".goal-pct");
+        const barEl = item.querySelector(".goal-bar-fill");
+        if (pctEl) pctEl.textContent = `${pct}%`;
+        if (barEl) barEl.style.width = `${pct}%`;
+      }
+      saveState();
+      renderGoalProgressDash();
+    });
+  });
+}
+
+function renderGoalProgressDash() {
+  const el = document.getElementById("dashGoalBars");
+  if (!el) return;
+  if (!state.goals.length) {
+    el.innerHTML = emptyState("ยังไม่มี Goal", "goals", "เพิ่ม Goal");
+    return;
+  }
+  el.innerHTML = state.goals.slice(0, 4).map(goal => {
+    const pct = Math.min(100, Math.max(0, goal.progress || 0));
+    const color = goal.color || "#0A84FF";
+    return `
+      <div class="goal-dash-row">
+        <div class="goal-dash-label">
+          <span>${escapeHtml(goal.title)}</span>
+          <strong>${pct}%</strong>
+        </div>
+        <div class="goal-bar-track">
+          <div class="goal-bar-fill" style="width:${pct}%; background:${color}"></div>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+/* ── Review ── */
+let _reviewTab = "daily";
+
+function renderWeeklyReviewDash() {
+  const el = document.getElementById("dashReviewStats");
+  if (!el) return;
+  const monthKey = getMonthKey();
+  const now = new Date();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay());
+  const weekStartKey = weekStart.toISOString().slice(0, 10);
+  const weekDone = state.tasks.filter(t => isTaskDone(t) && t.due >= weekStartKey).length;
+  const monthExpense = state.expenses
+    .filter(e => e.date?.startsWith(monthKey))
+    .reduce((s, e) => s + Number(e.amount), 0);
+  const monthNotes = state.notes.filter(n =>
+    n.createdAt && new Date(n.createdAt).toISOString().slice(0, 7) === monthKey
+  ).length;
+  const avgGoalProgress = state.goals.length
+    ? Math.round(state.goals.reduce((s, g) => s + (g.progress || 0), 0) / state.goals.length)
+    : 0;
+  el.innerHTML = `
+    <div class="review-dash-grid">
+      <div class="review-dash-stat">
+        <strong>${weekDone}</strong>
+        <span>งานเสร็จสัปดาห์นี้</span>
+      </div>
+      <div class="review-dash-stat">
+        <strong>${formatMoney(monthExpense)}</strong>
+        <span>รายจ่ายเดือนนี้</span>
+      </div>
+      <div class="review-dash-stat">
+        <strong>${monthNotes}</strong>
+        <span>โน้ตเดือนนี้</span>
+      </div>
+      <div class="review-dash-stat">
+        <strong>${avgGoalProgress}%</strong>
+        <span>Goal Progress</span>
+      </div>
+    </div>`;
+}
+
+function renderReview() {
+  const el = document.getElementById("reviewContent");
+  if (!el) return;
+  const todayKey = getTodayKey();
+  const monthKey = getMonthKey();
+  const now = new Date();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay());
+  const weekStartKey = weekStart.toISOString().slice(0, 10);
+
+  if (_reviewTab === "daily") {
+    const todayDone = state.tasks.filter(t => isTaskDone(t) && t.due === todayKey);
+    const todayOverdue = state.tasks.filter(t => !isTaskDone(t) && t.due && t.due < todayKey);
+    const todayNotes = state.notes.filter(n =>
+      n.createdAt && new Date(n.createdAt).toISOString().slice(0, 10) === todayKey
+    );
+    const todayExpense = state.expenses
+      .filter(e => e.date === todayKey)
+      .reduce((s, e) => s + Number(e.amount), 0);
+    el.innerHTML = `
+      <div class="review-section">
+        <div class="review-stat-grid">
+          <div class="review-stat-card review-stat-card--green"><strong>${todayDone.length}</strong><span>งานเสร็จวันนี้</span></div>
+          <div class="review-stat-card review-stat-card--red"><strong>${todayOverdue.length}</strong><span>งานเกินกำหนด</span></div>
+          <div class="review-stat-card review-stat-card--amber"><strong>${todayNotes.length}</strong><span>โน้ตวันนี้</span></div>
+          <div class="review-stat-card review-stat-card--blue"><strong>${formatMoney(todayExpense)}</strong><span>รายจ่ายวันนี้</span></div>
+        </div>
+        ${todayDone.length ? `<div class="review-subsection"><h3>งานที่เสร็จวันนี้</h3>${todayDone.map(t => `<div class="review-task-row">✓ ${escapeHtml(t.title)}</div>`).join("")}</div>` : ""}
+        ${todayOverdue.length ? `<div class="review-subsection"><h3>งานที่เกินกำหนด</h3>${todayOverdue.map(t => `<div class="review-task-row review-task-row--overdue">! ${escapeHtml(t.title)} · ${formatDate(t.due)}</div>`).join("")}</div>` : ""}
+      </div>`;
+  } else if (_reviewTab === "weekly") {
+    const weekDone = state.tasks.filter(t => isTaskDone(t));
+    const weekExpense = state.expenses
+      .filter(e => e.date >= weekStartKey)
+      .reduce((s, e) => s + Number(e.amount), 0);
+    const weekNotes = state.notes.filter(n =>
+      n.createdAt && new Date(n.createdAt).toISOString().slice(0, 10) >= weekStartKey
+    ).length;
+    const catTotals = state.expenses
+      .filter(e => e.date >= weekStartKey)
+      .reduce((acc, e) => { acc[e.category] = (acc[e.category] || 0) + Number(e.amount); return acc; }, {});
+    const topCat = Object.entries(catTotals).sort((a, b) => b[1] - a[1])[0];
+    const completionRate = state.tasks.length
+      ? Math.round(state.tasks.filter(t => isTaskDone(t)).length / state.tasks.length * 100) : 0;
+    el.innerHTML = `
+      <div class="review-section">
+        <div class="review-stat-grid">
+          <div class="review-stat-card review-stat-card--green"><strong>${weekDone.length}</strong><span>งานเสร็จสัปดาห์นี้</span></div>
+          <div class="review-stat-card review-stat-card--amber"><strong>${formatMoney(weekExpense)}</strong><span>รายจ่ายสัปดาห์นี้</span></div>
+          <div class="review-stat-card review-stat-card--blue"><strong>${weekNotes}</strong><span>โน้ตสัปดาห์นี้</span></div>
+          <div class="review-stat-card review-stat-card--primary"><strong>${completionRate}%</strong><span>Completion Rate</span></div>
+        </div>
+        ${topCat ? `<div class="review-subsection"><h3>หมวดที่ใช้มากสุดสัปดาห์นี้</h3><div class="review-top-cat">${escapeHtml(topCat[0])} · ${formatMoney(topCat[1])}</div></div>` : ""}
+      </div>`;
+  } else {
+    const monthDone = state.tasks.filter(t => isTaskDone(t)).length;
+    const monthExpense = state.expenses
+      .filter(e => e.date?.startsWith(monthKey))
+      .reduce((s, e) => s + Number(e.amount), 0);
+    const monthNotes = state.notes.filter(n =>
+      n.createdAt && new Date(n.createdAt).toISOString().slice(0, 7) === monthKey
+    ).length;
+    const completionRate = state.tasks.length
+      ? Math.round(state.tasks.filter(t => isTaskDone(t)).length / state.tasks.length * 100) : 0;
+    const avgGoalProgress = state.goals.length
+      ? Math.round(state.goals.reduce((s, g) => s + (g.progress || 0), 0) / state.goals.length) : 0;
+    el.innerHTML = `
+      <div class="review-section">
+        <div class="review-stat-grid">
+          <div class="review-stat-card review-stat-card--green"><strong>${monthDone}</strong><span>งานเสร็จเดือนนี้</span></div>
+          <div class="review-stat-card review-stat-card--amber"><strong>${formatMoney(monthExpense)}</strong><span>รายจ่ายเดือนนี้</span></div>
+          <div class="review-stat-card review-stat-card--blue"><strong>${monthNotes}</strong><span>โน้ตเดือนนี้</span></div>
+          <div class="review-stat-card review-stat-card--primary"><strong>${completionRate}%</strong><span>Completion Rate</span></div>
+        </div>
+        ${state.goals.length ? `
+          <div class="review-subsection">
+            <h3>ความคืบหน้า Goals</h3>
+            ${state.goals.map(g => {
+              const pct = g.progress || 0;
+              return `<div class="review-goal-row">
+                <span>${escapeHtml(g.title)}</span>
+                <div class="goal-bar-track"><div class="goal-bar-fill" style="width:${pct}%;background:${g.color||'#0A84FF'}"></div></div>
+                <strong>${pct}%</strong>
+              </div>`;
+            }).join("")}
+          </div>` : ""}
+        <div class="review-subsection">
+          <div class="review-summary-item"><span>Average Goal Progress</span><strong>${avgGoalProgress}%</strong></div>
+        </div>
+      </div>`;
+  }
 }
 
 function renderTasks() {
@@ -1046,15 +1279,6 @@ function renderCalDayPanel(dateKey, tasks) {
     </form>`;
 }
 
-function renderSecretary() {
-  document.getElementById("assistantLog").innerHTML = state.logs.length
-    ? state.logs
-        .slice(-8)
-        .reverse()
-        .map((line) => `<div class="log-line">${escapeHtml(line)}</div>`)
-        .join("")
-    : emptyState("ยังไม่มีประวัติคำสั่ง ลองพิมพ์ เพิ่มงาน หรือ จ่าย ตามด้วยรายการ", "secretary", "ลองส่งคำสั่ง");
-}
 
 function renderSimpleTask(task) {
   return `
@@ -1136,7 +1360,7 @@ function showHomepage() {
 }
 
 function freshDemoState() {
-  return { theme: state.theme || "dark", taskFilter: "all", ...createDemoState() };
+  return { theme: state.theme || "dark", taskFilter: "all", goals: [], ...createDemoState() };
 }
 
 function enterGuestMode() {
@@ -1368,13 +1592,30 @@ document.getElementById("expenseForm").addEventListener("submit", (event) => {
   showToast(`บันทึก ${title} ${formatMoney(Number(amount))} แล้ว`);
 });
 
-document.getElementById("commandForm").addEventListener("submit", (event) => {
-  event.preventDefault();
-  const commandInput = document.getElementById("commandText");
-  const result = parseCommand(commandInput.value);
-  state.logs.push(result);
-  commandInput.value = "";
-  render();
+/* ── Goals form ── */
+document.getElementById("goalForm")?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const title = document.getElementById("goalTitle").value.trim();
+  if (!title) return;
+  const progress = Number(document.getElementById("goalInitProgress").value) || 0;
+  addGoal(title, progress);
+  e.currentTarget.reset();
+  document.getElementById("goalInitProgress").value = "0";
+  renderGoals();
+  renderGoalProgressDash();
+  saveState();
+  showToast(`เพิ่ม Goal "${title}" แล้ว`);
+});
+
+/* ── Review tabs ── */
+document.querySelectorAll("[data-review-tab]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    _reviewTab = btn.dataset.reviewTab;
+    document.querySelectorAll("[data-review-tab]").forEach(b =>
+      b.classList.toggle("active", b === btn)
+    );
+    renderReview();
+  });
 });
 
 document.getElementById("noteList").addEventListener("submit", (e) => {
@@ -1568,13 +1809,24 @@ document.addEventListener("click", (event) => {
     renderAfterExpense();
     showToast("ลบรายจ่ายแล้ว");
   }
+
+  const deleteGoalId = target.closest("[data-delete-goal]")?.dataset.deleteGoal;
+  if (deleteGoalId) {
+    const goal = state.goals.find(g => g.id === deleteGoalId);
+    if (!goal || !confirm(`ลบ Goal "${goal.title}"?`)) return;
+    state.goals = state.goals.filter(g => g.id !== deleteGoalId);
+    renderGoals();
+    renderGoalProgressDash();
+    saveState();
+    showToast("ลบ Goal แล้ว");
+  }
 });
 
 document.addEventListener("keydown", (e) => {
   if (e.target.matches("input, textarea, select")) return;
   if (e.metaKey || e.ctrlKey || e.altKey) return;
 
-  const viewKeys = { "1": "dashboard", "2": "tasks", "3": "notes", "4": "expenses", "5": "calendar", "6": "secretary" };
+  const viewKeys = { "1": "dashboard", "2": "tasks", "3": "notes", "4": "expenses", "5": "calendar", "6": "goals", "7": "review" };
   if (viewKeys[e.key]) {
     e.preventDefault();
     setView(viewKeys[e.key]);
@@ -1745,30 +1997,6 @@ document.addEventListener("keydown", (e) => {
   updateDisplay();
 })();
 
-/* ── Dashboard assistant chips ── */
-document.querySelectorAll(".dash-assist-chip").forEach(chip => {
-  chip.addEventListener("click", () => {
-    const input = document.getElementById("dashAssistInput");
-    if (input) { input.value = chip.dataset.assist || ""; input.focus(); }
-  });
-});
-
-document.getElementById("dashAssistSend")?.addEventListener("click", () => {
-  const input = document.getElementById("dashAssistInput");
-  if (!input?.value.trim()) return;
-  const result = parseCommand(input.value);
-  state.logs.push(result);
-  input.value = "";
-  render();
-  showToast(result.length < 60 ? result : "ดำเนินการเรียบร้อย");
-});
-
-document.getElementById("dashAssistInput")?.addEventListener("keydown", e => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    document.getElementById("dashAssistSend")?.click();
-  }
-});
 
 /* ── Focus done prompt ── */
 document.getElementById("focusDoneYes")?.addEventListener("click", e => {
