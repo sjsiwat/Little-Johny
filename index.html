@@ -20,7 +20,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css?v=4" />
@@ -45,7 +45,7 @@
             <img src="./johny-cat.svg" class="hp-logo-cat" alt="" aria-hidden="true" />
             <span class="hp-logo-name">Johny Memo</span>
           </a>
-          <button class="hp-nav-btn" id="hpNavLoginBtn" type="button" onclick="document.getElementById('authLoginBtn')?.click()">Log in</button>
+          <button class="hp-nav-btn" id="hpNavLoginBtn" type="button">Log in</button>
         </div>
       </nav>
 
@@ -59,8 +59,8 @@
           <h1 class="hp-hero-title">Your Personal<br>Digital Workspace</h1>
           <p class="hp-hero-desc">Capture ideas, manage tasks, track expenses<br class="hp-desk-br">and plan your day — all in one place.</p>
           <div class="hp-hero-cta">
-            <button class="hp-cta-primary" id="hpGuestBtn" type="button" onclick="enterGuestMode()">Demo Mode</button>
-            <button class="hp-cta-ghost" id="hpLoginBtn" type="button" onclick="document.getElementById('authLoginBtn')?.click()">Log in</button>
+            <button class="hp-cta-primary" id="hpGuestBtn" type="button">Demo Mode</button>
+            <button class="hp-cta-ghost" id="hpLoginBtn" type="button">Log in</button>
           </div>
         </div>
       </section>
@@ -214,7 +214,7 @@
             <span>Johny Memo</span>
           </div>
           <p class="hp-footer-copy">Your personal digital workspace</p>
-          <button class="hp-cta-primary hp-cta-sm" id="hpFooterGuestBtn" type="button" onclick="enterGuestMode()">Demo Mode</button>
+          <button class="hp-cta-primary hp-cta-sm" id="hpFooterGuestBtn" type="button">Demo Mode</button>
         </div>
       </footer>
 
@@ -315,15 +315,10 @@
       <!-- ── Workspace ── -->
       <main class="workspace">
         <header class="topbar">
-          <div>
+          <div class="topbar-left">
             <h1 id="viewTitle">Dashboard</h1>
           </div>
           <div class="topbar-right">
-            <div class="today-card">
-              <span id="todayLabel"></span>
-              <span class="today-time" id="todayTime"></span>
-              <strong id="focusCount">0 focus items</strong>
-            </div>
             <div class="topbar-controls">
               <button class="theme-toggle-icon" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
               <div class="auth-control-wrap">
@@ -390,13 +385,7 @@
           <div class="today-command">
             <div class="tc-left">
               <h2 class="greeting-heading"><span id="greetingHeading">สวัสดีตอนเช้า</span> 👋</h2>
-              <div class="tc-signals">
-                <span class="signal signal--tasks" id="signalTasks">0 งานค้าง</span>
-                <span class="signal signal--expense" id="signalExpense">฿0 วันนี้</span>
-                <span class="signal signal--notes" id="signalNotes" hidden></span>
-              </div>
-              <p class="greeting-date" id="greetingDate">วันนี้</p>
-              <p class="greeting-kicker" id="greetingKicker" style="display:none"></p>
+              <p class="greeting-date" id="greetingDate"><span id="greetingDateText">วันนี้</span><span class="greeting-clock" id="todayTime"></span></p>
               <button class="hero-focus-btn" id="heroFocusBtn" type="button" data-view-jump="tasks">
                 <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
                   <path d="M2 1.5L9.5 5.5L2 9.5V1.5Z" fill="currentColor"/>
@@ -466,35 +455,68 @@
 
         <!-- TASKS -->
         <section class="view" id="tasks" aria-label="Task management">
-          <form class="composer" id="taskForm">
-            <input
-              id="taskTitle"
-              type="text"
-              placeholder="เพิ่มงาน เช่น สรุปค่าใช้จ่ายวันนี้"
-              maxlength="200"
-              required
-            />
-            <select id="taskPriority" aria-label="Priority">
-              <option value="Low">Low</option>
-              <option value="Medium" selected>Medium</option>
-              <option value="High">High</option>
-              <option value="Critical">Critical</option>
-            </select>
-            <input id="taskDue" type="date" aria-label="Due date" />
-            <button type="submit">เพิ่มงาน</button>
-          </form>
-          <div class="toolbar">
-            <button class="chip active" type="button" data-task-filter="all">
-              ทั้งหมด
-            </button>
-            <button class="chip" type="button" data-task-filter="open">
-              ค้าง
-            </button>
-            <button class="chip" type="button" data-task-filter="done">
-              เสร็จแล้ว
-            </button>
+          <div class="task-view-toolbar">
+            <div class="task-view-filters">
+              <button class="chip active" type="button" data-task-filter="all">ทั้งหมด</button>
+              <button class="chip" type="button" data-task-filter="open">ค้าง</button>
+              <button class="chip" type="button" data-task-filter="done">เสร็จแล้ว</button>
+            </div>
+            <div class="task-view-actions">
+              <button class="task-view-toggle" id="taskViewToggle" type="button" aria-label="สลับมุมมอง" title="สลับ List / Kanban">
+                <svg id="iconViewList" width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><rect x="1" y="2.5" width="13" height="2" rx="1" fill="currentColor"/><rect x="1" y="6.5" width="13" height="2" rx="1" fill="currentColor"/><rect x="1" y="10.5" width="13" height="2" rx="1" fill="currentColor"/></svg>
+                <svg id="iconViewKanban" width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true" hidden><rect x="1" y="1" width="4" height="13" rx="1.5" fill="currentColor" opacity=".5"/><rect x="5.5" y="1" width="4" height="9" rx="1.5" fill="currentColor"/><rect x="10" y="1" width="4" height="11" rx="1.5" fill="currentColor" opacity=".7"/></svg>
+              </button>
+              <button class="btn-add-task" id="openAddTask" type="button">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M5.5 1v9M1 5.5h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                เพิ่มงาน
+              </button>
+            </div>
           </div>
-          <div class="item-list" id="taskList"></div>
+
+          <!-- List View -->
+          <div id="taskListView">
+            <div class="item-list" id="taskList"></div>
+          </div>
+
+          <!-- Kanban View -->
+          <div id="taskKanbanView" class="kanban-board" hidden>
+            <div class="kanban-col" data-col-status="todo">
+              <div class="kanban-col-header">
+                <span class="kanban-col-dot kanban-col-dot--todo"></span>
+                <span class="kanban-col-name">สิ่งที่ต้องทำ</span>
+                <span class="kanban-col-count" id="kcount-todo">0</span>
+              </div>
+              <div class="kanban-dropzone" id="kdrop-todo" data-status="todo"></div>
+              <button class="kanban-add-btn" type="button" data-kanban-add="todo">+ เพิ่มงาน</button>
+            </div>
+            <div class="kanban-col" data-col-status="in_progress">
+              <div class="kanban-col-header">
+                <span class="kanban-col-dot kanban-col-dot--in_progress"></span>
+                <span class="kanban-col-name">กำลังทำ</span>
+                <span class="kanban-col-count" id="kcount-in_progress">0</span>
+              </div>
+              <div class="kanban-dropzone" id="kdrop-in_progress" data-status="in_progress"></div>
+              <button class="kanban-add-btn" type="button" data-kanban-add="in_progress">+ เพิ่มงาน</button>
+            </div>
+            <div class="kanban-col" data-col-status="review">
+              <div class="kanban-col-header">
+                <span class="kanban-col-dot kanban-col-dot--review"></span>
+                <span class="kanban-col-name">รอตรวจ</span>
+                <span class="kanban-col-count" id="kcount-review">0</span>
+              </div>
+              <div class="kanban-dropzone" id="kdrop-review" data-status="review"></div>
+              <button class="kanban-add-btn" type="button" data-kanban-add="review">+ เพิ่มงาน</button>
+            </div>
+            <div class="kanban-col" data-col-status="done">
+              <div class="kanban-col-header">
+                <span class="kanban-col-dot kanban-col-dot--done"></span>
+                <span class="kanban-col-name">เสร็จแล้ว</span>
+                <span class="kanban-col-count" id="kcount-done">0</span>
+              </div>
+              <div class="kanban-dropzone" id="kdrop-done" data-status="done"></div>
+              <button class="kanban-add-btn" type="button" data-kanban-add="done">+ เพิ่มงาน</button>
+            </div>
+          </div>
         </section>
 
         <!-- NOTES -->
@@ -603,6 +625,61 @@
       </main>
     </div>
 
+    <!-- Task Add/Edit Modal -->
+    <dialog id="taskModal" class="task-modal" aria-labelledby="taskModalHeading">
+      <form id="taskModalForm" method="dialog" novalidate>
+        <div class="task-modal-header">
+          <h2 id="taskModalHeading" class="task-modal-title">เพิ่มงาน</h2>
+          <button type="button" class="task-modal-close" id="taskModalClose" aria-label="ปิด">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div class="task-modal-body">
+          <div class="task-modal-field task-modal-field--title">
+            <input id="modalTaskTitle" type="text" class="task-modal-input" placeholder="ชื่องาน เช่น สรุปรายงานประจำเดือน" maxlength="200" autocomplete="off" required />
+          </div>
+          <div class="task-modal-field">
+            <textarea id="modalTaskDesc" class="task-modal-textarea" rows="3" placeholder="รายละเอียดเพิ่มเติม (ถ้ามี)…"></textarea>
+          </div>
+          <div class="task-modal-row">
+            <div class="task-modal-field">
+              <label class="task-modal-label" for="modalTaskStatus">สถานะ</label>
+              <select id="modalTaskStatus" class="task-modal-select">
+                <option value="todo">สิ่งที่ต้องทำ</option>
+                <option value="in_progress">กำลังทำ</option>
+                <option value="review">รอตรวจ</option>
+                <option value="done">เสร็จแล้ว</option>
+              </select>
+            </div>
+            <div class="task-modal-field">
+              <label class="task-modal-label" for="modalTaskPriority">ความสำคัญ</label>
+              <select id="modalTaskPriority" class="task-modal-select">
+                <option value="Low">Low</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+              </select>
+            </div>
+            <div class="task-modal-field">
+              <label class="task-modal-label" for="modalTaskDue">วันครบกำหนด</label>
+              <input id="modalTaskDue" type="date" class="task-modal-select" />
+            </div>
+          </div>
+          <div class="task-modal-field">
+            <label class="task-modal-label">ป้ายกำกับ</label>
+            <div class="modal-label-picker" id="modalLabelPicker"></div>
+          </div>
+        </div>
+        <div class="task-modal-footer">
+          <button type="button" class="task-modal-delete-btn" id="taskModalDelete" hidden>ลบงาน</button>
+          <div class="task-modal-footer-right">
+            <button type="button" class="task-modal-cancel-btn" id="taskModalCancel">ยกเลิก</button>
+            <button type="submit" class="task-modal-save-btn">บันทึก</button>
+          </div>
+        </div>
+      </form>
+    </dialog>
+
     <!-- Floating Action Button -->
     <div class="fab-wrap" id="fabWrap">
       <button class="fab-main" id="fabMain" type="button" aria-label="Quick actions" aria-expanded="false">
@@ -623,7 +700,7 @@
           </span>
           <span>โน้ตใหม่</span>
         </button>
-        <button class="fab-item fab-item--task" type="button" data-view-jump="tasks" data-focus-input="taskTitle">
+        <button class="fab-item fab-item--task" type="button" data-open-task-modal>
           <span class="fab-item-icon">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 6l2 2 3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span>
@@ -631,176 +708,6 @@
         </button>
       </div>
     </div>
-
-    <!-- ═══════════════════════════════════════
-         ANIMATED BACKGROUND — soft watercolour drift
-    ═══════════════════════════════════════ -->
-    <script>
-      (function () {
-        const canvas = document.getElementById("bg-canvas");
-        const ctx = canvas.getContext("2d");
-        let W, H, rafId = null, t = 0;
-
-        function isDark() {
-          return document.documentElement.dataset.theme === "dark";
-        }
-        function palette() {
-          return isDark()
-            ? {
-                washes: ["#3a5560","#3d5347","#5a4a36","#5c4030","#5a3f3c"],
-                leaves: ["#6f8f6a","#88a07a","#a89464"],
-                petals: ["#caa089","#b08aa0","#d9c081"],
-                pollen: "rgba(236,227,211,",
-              }
-            : {
-                washes: ["#6f93a6","#94ab8a","#d9c3a3","#c47e5e","#d99a92"],
-                leaves: ["#94ab8a","#aac09a","#7f9a72"],
-                petals: ["#e7b9a4","#d99a92","#e6cf9a"],
-                pollen: "rgba(120,100,70,",
-              };
-        }
-
-        function rand(a, b) { return a + Math.random() * (b - a); }
-        function randInt(a, b) { return Math.floor(rand(a, b)); }
-
-        function resize() {
-          W = canvas.width = window.innerWidth;
-          H = canvas.height = window.innerHeight;
-        }
-
-        /* soft drifting colour washes */
-        let washes;
-        function initWashes() {
-          washes = Array.from({ length: 6 }, (_, i) => ({
-            x: rand(0, W), y: rand(0, H),
-            r: Math.min(W, H) * rand(0.22, 0.42),
-            dx: rand(-0.12, 0.12), dy: rand(-0.1, 0.1),
-            ph: rand(0, Math.PI * 2), ci: i % 5,
-          }));
-        }
-        function drawWashes(p) {
-          ctx.save();
-          ctx.filter = "blur(70px)";
-          ctx.globalCompositeOperation = isDark() ? "lighter" : "multiply";
-          washes.forEach((b) => {
-            const pulse = 1 + Math.sin(t * 0.4 + b.ph) * 0.08;
-            const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r * pulse);
-            const c = p.washes[b.ci];
-            g.addColorStop(0, c + (isDark() ? "55" : "44"));
-            g.addColorStop(1, c + "00");
-            ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.arc(b.x, b.y, b.r * pulse, 0, Math.PI * 2);
-            ctx.fill();
-            b.x += b.dx; b.y += b.dy;
-            if (b.x < -b.r) b.x = W + b.r; if (b.x > W + b.r) b.x = -b.r;
-            if (b.y < -b.r) b.y = H + b.r; if (b.y > H + b.r) b.y = -b.r;
-          });
-          ctx.restore();
-        }
-
-        /* floating leaves + petals */
-        let flora;
-        function initFlora() {
-          flora = Array.from({ length: 16 }, () => {
-            const leaf = Math.random() > 0.45;
-            return {
-              x: rand(0, W), y: rand(-H * 0.2, H),
-              size: rand(9, 20),
-              vy: rand(0.18, 0.5),
-              vx: rand(-0.25, 0.25),
-              rot: rand(0, Math.PI * 2),
-              vr: rand(-0.01, 0.01),
-              sway: rand(0, Math.PI * 2),
-              dsway: rand(0.008, 0.018),
-              leaf,
-              ci: leaf ? randInt(0, 3) : randInt(0, 3),
-            };
-          });
-        }
-        function drawLeaf(f, p) {
-          ctx.save();
-          ctx.translate(f.x + Math.sin(f.sway) * 16, f.y);
-          ctx.rotate(f.rot + Math.sin(f.sway) * 0.3);
-          ctx.globalAlpha = isDark() ? 0.5 : 0.62;
-          if (f.leaf) {
-            ctx.fillStyle = p.leaves[f.ci];
-            ctx.beginPath();
-            ctx.moveTo(0, -f.size);
-            ctx.quadraticCurveTo(f.size * 0.7, 0, 0, f.size);
-            ctx.quadraticCurveTo(-f.size * 0.7, 0, 0, -f.size);
-            ctx.fill();
-            ctx.strokeStyle = isDark() ? "rgba(0,0,0,0.25)" : "rgba(90,110,80,0.4)";
-            ctx.lineWidth = 0.8;
-            ctx.beginPath(); ctx.moveTo(0, -f.size); ctx.lineTo(0, f.size); ctx.stroke();
-          } else {
-            ctx.fillStyle = p.petals[f.ci];
-            for (let i = 0; i < 5; i++) {
-              ctx.save();
-              ctx.rotate((Math.PI * 2 / 5) * i);
-              ctx.beginPath();
-              ctx.ellipse(0, -f.size * 0.55, f.size * 0.34, f.size * 0.6, 0, 0, Math.PI * 2);
-              ctx.fill();
-              ctx.restore();
-            }
-            ctx.fillStyle = isDark() ? "#d9b873" : "#e6c060";
-            ctx.beginPath(); ctx.arc(0, 0, f.size * 0.26, 0, Math.PI * 2); ctx.fill();
-          }
-          ctx.restore();
-        }
-        function updateFlora(p) {
-          flora.forEach((f) => {
-            f.y += f.vy; f.x += f.vx; f.rot += f.vr; f.sway += f.dsway;
-            if (f.y > H + 30) { f.y = -30; f.x = rand(0, W); }
-            if (f.x < -40) f.x = W + 40; if (f.x > W + 40) f.x = -40;
-            drawLeaf(f, p);
-          });
-        }
-
-        /* tiny pollen dust */
-        let pollen;
-        function initPollen() {
-          pollen = Array.from({ length: 38 }, () => ({
-            x: rand(0, W), y: rand(0, H),
-            r: rand(0.8, 2.4),
-            dx: rand(-0.18, 0.18), dy: rand(-0.16, 0.16),
-            pulse: rand(0, Math.PI * 2), dp: rand(0.01, 0.02),
-          }));
-        }
-        function drawPollen(p) {
-          pollen.forEach((d) => {
-            d.pulse += d.dp;
-            const a = (0.25 + Math.abs(Math.sin(d.pulse)) * 0.4) * (isDark() ? 0.5 : 1);
-            ctx.fillStyle = p.pollen + a + ")";
-            ctx.beginPath();
-            ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-            ctx.fill();
-            d.x += d.dx; d.y += d.dy;
-            if (d.x < 0) d.x = W; if (d.x > W) d.x = 0;
-            if (d.y < 0) d.y = H; if (d.y > H) d.y = 0;
-          });
-        }
-
-        function init() {
-          resize(); initWashes(); initFlora(); initPollen();
-        }
-        function draw() {
-          ctx.clearRect(0, 0, W, H);
-          const p = palette();
-          drawWashes(p);
-          drawPollen(p);
-          updateFlora(p);
-          t += 0.016;
-          rafId = requestAnimationFrame(draw);
-        }
-        function pause() { if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
-        function resume() { if (!rafId) draw(); }
-        document.addEventListener("visibilitychange", () => document.hidden ? pause() : resume());
-        window.addEventListener("resize", init);
-        init();
-        draw();
-      })();
-    </script>
 
     <!-- Auth modal — two-screen (login / signup / success / signed-in) -->
     <dialog class="auth-modal" id="authModal">
@@ -945,100 +852,8 @@
       </div>
     </dialog>
 
-    <!-- CATS script removed — replaced by CSS-animated johny-float.png -->
-
-<!-- LINE chat animation (bot: johnymemo) -->
-    <script>
-      (function () {
-        const body = document.getElementById("lineChatBody");
-        if (!body) return;
-        const CAT = '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><polygon points="8,9 6,2 14,7" fill="#2f2823"/><polygon points="24,9 26,2 18,7" fill="#2f2823"/><circle cx="16" cy="17" r="11" fill="#2f2823"/><circle cx="12" cy="16" r="2.1" fill="#d8aa50"/><circle cx="20" cy="16" r="2.1" fill="#d8aa50"/><circle cx="12.3" cy="16.2" r="0.9" fill="#1c1714"/><circle cx="20.3" cy="16.2" r="0.9" fill="#1c1714"/><path d="M14.5 20.5 q1.5 1.4 3 0" stroke="#d99a92" stroke-width="1" fill="none" stroke-linecap="round"/></svg>';
-
-        const SCRIPT = [
-          { who: "in",  text: "สวัสดีครับ ผม johnymemo 🐾\nวันนี้มีอะไรให้จดไหม" },
-          { who: "out", text: "จ่ายค่ากาแฟ 75 บาท" },
-          { who: "in",  typing: 1300, text: "บันทึกแล้ว ☕️\nกาแฟ ฿75 · เครื่องดื่ม\nรายจ่ายวันนี้รวม ฿320" },
-          { who: "out", text: "เพิ่มงาน ส่งรายงาน พรุ่งนี้" },
-          { who: "in",  typing: 1400, text: 'เพิ่มงานแล้ว ✅\n"ส่งรายงาน" · พรุ่งนี้ · High' },
-          { who: "out", text: "วันนี้เหลืองานอะไรบ้าง" },
-          { who: "in",  typing: 1300, text: "เหลือ 2 งานครับ 📋\n• ส่งรายงาน (High)\n• อ่านหนังสือ Clean Code" },
-          { who: "out", text: "ขอบคุณนะ 🙏" },
-          { who: "in",  typing: 1000, text: "ยินดีครับ เดี๋ยวเตือนตอน 9 โมงเช้านะ 🐱" }
-        ];
-
-        let i = 0, timer = null;
-
-        function trim() {
-          while (body.children.length > 7) body.removeChild(body.firstChild);
-          body.scrollTop = body.scrollHeight;
-        }
-        function bubble(msg) {
-          const row = document.createElement("div");
-          row.className = "line-row " + (msg.who === "in" ? "in" : "out") + " line-anim";
-          const av = msg.who === "in" ? '<span class="av">' + CAT + "</span>" : "";
-          row.innerHTML = av + '<div class="line-bubble">' + msg.text.replace(/\n/g, "<br>") + "</div>";
-          body.appendChild(row);
-          trim();
-        }
-        function typing() {
-          const row = document.createElement("div");
-          row.className = "line-row in line-anim";
-          row.innerHTML = '<span class="av">' + CAT + '</span><div class="line-bubble line-typing"><i></i><i></i><i></i></div>';
-          body.appendChild(row);
-          trim();
-          return row;
-        }
-        function step() {
-          const msg = SCRIPT[i % SCRIPT.length];
-          i++;
-          if (msg.who === "in" && msg.typing) {
-            const t = typing();
-            timer = setTimeout(function () {
-              t.remove();
-              bubble(msg);
-              timer = setTimeout(step, 1700);
-            }, msg.typing);
-          } else {
-            bubble(msg);
-            timer = setTimeout(step, msg.who === "out" ? 850 : 1700);
-          }
-        }
-        function start() { if (!timer) step(); }
-        function stop() { if (timer) { clearTimeout(timer); timer = null; } }
-        document.addEventListener("visibilitychange", function () { document.hidden ? stop() : start(); });
-        timer = setTimeout(step, 700);
-      })();
-    </script>
-
     <script src="./auth.js?v=11"></script>
     <script src="./storage.js?v=11"></script>
-    <script src="./app.js?v=11"></script>
-    <script>
-      (function () {
-        const fabMain = document.getElementById('fabMain');
-        const fabMenu = document.getElementById('fabMenu');
-        if (!fabMain || !fabMenu) return;
-        function closeFab() {
-          fabMenu.hidden = true;
-          fabMain.setAttribute('aria-expanded', 'false');
-          fabMain.classList.remove('open');
-        }
-        fabMain.addEventListener('click', function (e) {
-          e.stopPropagation();
-          const isOpen = !fabMenu.hidden;
-          isOpen ? closeFab() : (fabMenu.hidden = false, fabMain.setAttribute('aria-expanded', 'true'), fabMain.classList.add('open'));
-        });
-        document.addEventListener('click', function (e) {
-          if (!fabMenu.hidden && !fabMenu.contains(e.target)) closeFab();
-        });
-        fabMenu.addEventListener('click', function (e) {
-          const item = e.target.closest('.fab-item[data-view-jump]');
-          if (item) setTimeout(closeFab, 120);
-        });
-        document.addEventListener('keydown', function (e) {
-          if (e.key === 'Escape') closeFab();
-        });
-      })();
-    </script>
+    <script type="module" src="./app.js?v=11"></script>
   </body>
 </html>

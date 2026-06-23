@@ -29,9 +29,11 @@ const Storage = (() => {
     return {
       id: row.id,
       title: row.title,
+      description: row.description || '',
       priority: row.priority,
       due: row.due || '',
       status: row.status,
+      labels: Array.isArray(row.labels) ? row.labels : [],
       createdAt: new Date(row.created_at).getTime()
     };
   }
@@ -62,9 +64,11 @@ const Storage = (() => {
       id: task.id,
       user_id: uid,
       title: task.title,
+      description: task.description || null,
       priority: task.priority,
       due: task.due || null,
       status: task.status,
+      labels: task.labels || [],
       created_at: new Date(task.createdAt).toISOString()
     };
   }
