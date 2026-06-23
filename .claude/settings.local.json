@@ -9,7 +9,11 @@
       "Bash(grep -E \"\\\\.\\(md|html|css|js\\)$\")",
       "Skill(impeccable)",
       "Skill(impeccable:*)",
-      "Bash(node /Users/siwat/Documents/GitHub/Little-Johny/.claude/skills/impeccable/scripts/context.mjs --target /Users/siwat/Documents/GitHub/Little-Johny/index.html)"
+      "Bash(node /Users/siwat/Documents/GitHub/Little-Johny/.claude/skills/impeccable/scripts/context.mjs --target /Users/siwat/Documents/GitHub/Little-Johny/index.html)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(node -e ' *)"
     ]
   },
   "hooks": {

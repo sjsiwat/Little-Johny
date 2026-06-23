@@ -1,12 +1,54 @@
-/* STORAGE_KEY moved to storage.js */
+import { pauseCanvas, resumeCanvas } from './canvas.js';
+import './fab.js';
 
+/* ================================================================
+   CONSTANTS
+   ================================================================ */
+
+/* ── Module-level mutable state ── */
 let toastTimer = null;
-let _editingTaskId    = null;
 let _editingNoteId    = null;
 let _editingExpenseId = null;
 let _focusTaskId      = null;
+let _taskModalEditId  = null;
+let _taskView         = "list"; // "list" | "kanban"
+let _dragTaskId       = null;
 
-/* ── Thai public holidays & Buddhist holy days ── */
+/* ── Task / priority ── */
+const PRIORITY_RANK = { Critical: 0, High: 1, Medium: 2, Low: 3 };
+
+const TASK_LABELS = [
+  { id: "urgent",   name: "ด่วน",     color: "#FF453A" },
+  { id: "work",     name: "งาน",      color: "#0A84FF" },
+  { id: "personal", name: "ส่วนตัว",  color: "#BF5AF2" },
+  { id: "followup", name: "ติดตาม",   color: "#FF9F0A" },
+  { id: "idea",     name: "ไอเดีย",   color: "#30D158" },
+  { id: "meeting",  name: "ประชุม",   color: "#64D2FF" },
+];
+
+const STATUS_META = {
+  todo:        { label: "สิ่งที่ต้องทำ", color: "#6F7480" },
+  in_progress: { label: "กำลังทำ",      color: "#0A84FF" },
+  review:      { label: "รอตรวจ",       color: "#FF9F0A" },
+  done:        { label: "เสร็จแล้ว",    color: "#30D158" },
+};
+
+/* ── Expense ── */
+const EXPENSE_CATEGORIES = ["อาหาร","เครื่องดื่ม","เดินทาง","น้ำมัน","ค่าไฟ","ค่าน้ำ","อินเทอร์เน็ต","สุขภาพ","ช้อปปิ้ง","การศึกษา","ลงทุน","อื่นๆ"];
+const EXPENSE_BAR_COLORS = {
+  "อาหาร": "#FF9F0A", "เครื่องดื่ม": "#64D2FF", "เดินทาง": "#BF5AF2",
+  "น้ำมัน": "#FF9F0A", "ค่าไฟ": "#FF6B6B", "ค่าน้ำ": "#64D2FF",
+  "อินเทอร์เน็ต": "#0A84FF", "สุขภาพ": "#30D158", "ช้อปปิ้ง": "#FF6B6B",
+  "การศึกษา": "#30D158", "ลงทุน": "#BF5AF2", "อื่นๆ": "#8E8E93",
+};
+
+/* ── Icons ── */
+const ICON_EDIT = '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M7.5 1.5l2 2-6 6H1.5v-2l6-6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>';
+
+/* ── Thai locale ── */
+const THAI_MONTHS = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+const THAI_DOW    = ["อา","จ","อ","พ","พฤ","ศ","ส"];
+
 const THAI_HOLIDAYS = {
   // 2025
   "2025-01-01": { name: "วันขึ้นปีใหม่", type: "national" },
@@ -49,6 +91,48 @@ const THAI_HOLIDAYS = {
   "2026-12-31": { name: "วันสิ้นปี", type: "national" },
 };
 
+function normalizeStatus(s) {
+  if (s === "Pending")     return "todo";
+  if (s === "Completed")   return "done";
+  if (s === "In Progress") return "in_progress";
+  if (s === "Review")      return "review";
+  return s || "todo";
+}
+
+function isTaskDone(t) { return t.status === "done"; }
+
+function getStatusLabel(status) {
+  return STATUS_META[status]?.label || status;
+}
+
+function getDeadlineInfo(due, done) {
+  if (!due || done) return null;
+  const today = getTodayKey();
+  const diff  = Math.floor((new Date(due) - new Date(today)) / 86400000);
+  if (diff < 0)  return { type: "overdue", days: -diff };
+  if (diff === 0) return { type: "today" };
+  if (diff <= 3)  return { type: "soon",   days: diff };
+  return null;
+}
+
+function renderDeadlineBadge(due, done) {
+  const info = getDeadlineInfo(due, done);
+  if (!info && due)  return `<span class="task-due-chip">${formatDate(due)}</span>`;
+  if (!info)         return "";
+  if (info.type === "overdue") return `<span class="deadline-badge deadline-badge--overdue">เกิน ${info.days} วัน</span>`;
+  if (info.type === "today")   return `<span class="deadline-badge deadline-badge--today">ครบกำหนดวันนี้</span>`;
+  if (info.type === "soon")    return `<span class="deadline-badge deadline-badge--soon">อีก ${info.days} วัน</span>`;
+  return "";
+}
+
+function renderTaskLabelChips(labels) {
+  if (!labels?.length) return "";
+  return labels.map(id => {
+    const l = TASK_LABELS.find(x => x.id === id);
+    return l ? `<span class="task-label-chip" style="--lc:${l.color}">${escapeHtml(l.name)}</span>` : "";
+  }).join("");
+}
+
 let _calYear  = new Date().getFullYear();
 let _calMonth = new Date().getMonth();
 let _calSelectedDate = null;
@@ -80,32 +164,44 @@ function createDemoState() {
       {
         id: crypto.randomUUID(), _isDemo: true,
         title: "ส่งสรุปรายงานประจำเดือนมิถุนายน",
-        priority: "Critical", due: d(0), status: "Pending", createdAt: ts(5)
+        description: "รวบรวมข้อมูลรายจ่ายและรายรับ พร้อม slide สรุปให้ทีม",
+        priority: "Critical", due: d(0), status: "in_progress",
+        labels: ["urgent", "work"], createdAt: ts(5)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "ประชุม Product Review 14:00 น. — เตรียม slide ให้พร้อม",
-        priority: "High", due: d(0), status: "Pending", createdAt: ts(20)
+        title: "ประชุม Product Review 14:00 น.",
+        description: "เตรียม slide deck และ demo ฟีเจอร์ใหม่ให้พร้อม",
+        priority: "High", due: d(0), status: "todo",
+        labels: ["meeting", "work"], createdAt: ts(20)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
         title: "เขียน spec ฟีเจอร์ Notification ส่งทีม Dev",
-        priority: "Medium", due: d(3), status: "Pending", createdAt: ts(60)
+        description: "",
+        priority: "Medium", due: d(3), status: "todo",
+        labels: ["work"], createdAt: ts(60)
+      },
+      {
+        id: crypto.randomUUID(), _isDemo: true,
+        title: "Review Pull Request ของทีม Backend",
+        description: "ดู PR #42 และ #43 เพิ่มเติม",
+        priority: "High", due: d(1), status: "review",
+        labels: ["work"], createdAt: ts(90)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
         title: "อ่านหนังสือก่อนนอน 30 นาที",
-        priority: "Low", due: d(0), status: "Pending", createdAt: ts(90)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "ตรวจสอบ Pull Request ของทีม Backend",
-        priority: "High", due: d(-1), status: "Completed", createdAt: ts(180)
+        description: "",
+        priority: "Low", due: d(0), status: "todo",
+        labels: ["personal"], createdAt: ts(120)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
         title: "อัปเดต README และ documentation",
-        priority: "Low", due: "", status: "Completed", createdAt: ts(300)
+        description: "",
+        priority: "Low", due: "", status: "done",
+        labels: ["work"], createdAt: ts(300)
       }
     ],
 
@@ -217,7 +313,17 @@ const defaultState = {
   ...createDemoState()
 };
 
-let state = Storage.loadLocal(defaultState);
+let state = (() => {
+  const s = Storage.loadLocal(defaultState);
+  // migrate old status values and ensure new fields exist
+  s.tasks = (s.tasks || []).map(t => ({
+    description: "",
+    labels: [],
+    ...t,
+    status: normalizeStatus(t.status),
+  }));
+  return s;
+})();
 
 const views = {
   dashboard: document.getElementById("dashboard"),
@@ -240,6 +346,9 @@ const viewTitles = {
 function saveState() {
   Storage.save(state);
 }
+
+function getTodayKey() { return new Date().toISOString().slice(0, 10); }
+function getMonthKey() { return new Date().toISOString().slice(0, 7); }
 
 function formatMoney(amount) {
   return new Intl.NumberFormat("th-TH", {
@@ -284,12 +393,22 @@ function render() {
   saveState();
 }
 
+function renderAfterTask() {
+  renderShell(); renderDashboard(); renderTasks(); renderCalendar(); renderFocusTaskPicker(); saveState();
+}
+function renderAfterNote() {
+  renderShell(); renderDashboard(); renderNotes(); saveState();
+}
+function renderAfterExpense() {
+  renderShell(); renderDashboard(); renderExpenses(); saveState();
+}
+
 function renderFocusTaskPicker() {
   const picker = document.getElementById("focusTaskPicker");
   if (!picker) return;
   // If the currently focused task was completed or deleted, clear it
   const focusTask = _focusTaskId
-    ? state.tasks.find(t => t.id === _focusTaskId && t.status !== "Completed")
+    ? state.tasks.find(t => t.id === _focusTaskId && !isTaskDone(t))
     : null;
   if (_focusTaskId && !focusTask) _focusTaskId = null;
 
@@ -301,7 +420,7 @@ function renderFocusTaskPicker() {
       </div>`;
   } else {
     const openTasks = state.tasks
-      .filter(t => t.status !== "Completed")
+      .filter(t => !isTaskDone(t))
       .sort((a, b) => { const r = {Critical:0,High:1,Medium:2,Low:3}; return r[a.priority]-r[b.priority]; })
       .slice(0, 10);
     if (!openTasks.length) { picker.innerHTML = ""; return; }
@@ -321,12 +440,13 @@ function updateClock() {
   const now = new Date();
   const timeEl = document.getElementById("todayTime");
   if (timeEl) {
-    timeEl.textContent = now.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    timeEl.textContent = "  ·  " + now.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
   }
 }
 
 function renderShell() {
-  document.getElementById("todayLabel").textContent = new Intl.DateTimeFormat("th-TH", {
+  const todayLabelEl = document.getElementById("todayLabel");
+  if (todayLabelEl) todayLabelEl.textContent = new Intl.DateTimeFormat("th-TH", {
     weekday: "long",
     day: "numeric",
     month: "long"
@@ -334,15 +454,16 @@ function renderShell() {
 
   updateClock();
 
-  const openItems = state.tasks.filter((task) => task.status !== "Completed");
-  document.getElementById("focusCount").textContent = `${openItems.length} focus items`;
+  const openItems = state.tasks.filter((task) => !isTaskDone(task));
+  const focusCountEl = document.getElementById("focusCount");
+  if (focusCountEl) focusCountEl.textContent = `${openItems.length} focus items`;
 
   // ── Quick-tiles (dashboard top) ─────────────────────────
-  const todayKey = new Date().toISOString().slice(0, 10);
+  const todayKey = getTodayKey();
   const todayExpense = state.expenses
     .filter((e) => e.date === todayKey)
     .reduce((s, e) => s + Number(e.amount), 0);
-  const doneTasks = state.tasks.filter((t) => t.status === "Completed");
+  const doneTasks = state.tasks.filter((t) => isTaskDone(t));
 
   const sbTotal   = document.getElementById("sbStatTotal");
   const sbOpen    = document.getElementById("sbStatOpen");
@@ -358,9 +479,8 @@ function renderShell() {
     t.createdAt && new Date(t.createdAt).toISOString().slice(0, 10) === todayKey
   ).length;
   const urgentCount = openItems.filter(t => t.priority === "Critical" || t.priority === "High").length;
-  const monthKey2 = new Date().toISOString().slice(0, 7);
   const monthExpense = state.expenses
-    .filter(e => e.date?.startsWith(monthKey2))
+    .filter(e => e.date?.startsWith(getMonthKey()))
     .reduce((s, e) => s + Number(e.amount), 0);
 
   const sbTrendTotal   = document.getElementById("sbTrendTotal");
@@ -395,14 +515,12 @@ function renderShell() {
     [18, 23, "สวัสดีตอนเย็น", "Good evening"],
     [0,   4, "ดึกแล้วนะ",      "Late night"]
   ];
-  const [,, thaiGreet, enGreet] = greetingMap.find(([s, e]) => hour >= s && hour <= e) ?? greetingMap[0];
+  const [,, thaiGreet] = greetingMap.find(([s, e]) => hour >= s && hour <= e) ?? greetingMap[0];
 
   const greetingHeading = document.getElementById("greetingHeading");
   if (greetingHeading) greetingHeading.textContent = thaiGreet;
-  const greetingKicker = document.getElementById("greetingKicker");
-  if (greetingKicker) greetingKicker.textContent = enGreet;
-  const greetingDate = document.getElementById("greetingDate");
-  if (greetingDate) greetingDate.textContent = new Intl.DateTimeFormat("th-TH", {
+  const greetingDateText = document.getElementById("greetingDateText");
+  if (greetingDateText) greetingDateText.textContent = new Intl.DateTimeFormat("th-TH", {
     weekday: "long", day: "numeric", month: "long", year: "numeric"
   }).format(new Date());
 
@@ -421,20 +539,18 @@ function renderShell() {
   }
 }
 
-setInterval(updateClock, 1000);
+let _clockInterval = null;
 
 function renderDashboard() {
-  const openTasks = state.tasks.filter((task) => task.status !== "Completed");
-  const doneTasks = state.tasks.filter((task) => task.status === "Completed");
-  const monthKey = new Date().toISOString().slice(0, 7);
+  const openTasks = state.tasks.filter((task) => !isTaskDone(task));
+  const doneTasks = state.tasks.filter((task) => isTaskDone(task));
   const monthExpense = state.expenses
-    .filter((expense) => expense.date?.startsWith(monthKey))
+    .filter((expense) => expense.date?.startsWith(getMonthKey()))
     .reduce((sum, expense) => sum + Number(expense.amount), 0);
 
 
-  const priorityRank = { Critical: 0, High: 1, Medium: 2, Low: 3 };
   const focus = [...openTasks]
-    .sort((a, b) => priorityRank[a.priority] - priorityRank[b.priority])
+    .sort((a, b) => PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority])
     .slice(0, 5);
 
   document.getElementById("focusList").innerHTML = focus.length
@@ -456,13 +572,13 @@ function renderDashboard() {
       day: "numeric", month: "long", year: "numeric"
     }).format(new Date());
   }
-  const todayKey = new Date().toISOString().slice(0, 10);
+  const todayKey = getTodayKey();
   const todayTasks = state.tasks.filter(t => t.due === todayKey);
   const calEventsEl = document.getElementById("todayCalEvents");
   if (calEventsEl) {
     if (todayTasks.length) {
       calEventsEl.innerHTML = todayTasks.map(t => `
-        <div class="dash-cal-task dash-cal-task--${t.priority.toLowerCase()}${t.status === 'Completed' ? ' is-done' : ''}">
+        <div class="dash-cal-task dash-cal-task--${t.priority.toLowerCase()}${isTaskDone(t) ? ' is-done' : ''}">
           <span class="dash-cal-pip"></span>
           <span class="dash-cal-title">${escapeHtml(t.title)}</span>
           <span class="priority-${t.priority} dash-cal-badge">${t.priority}</span>
@@ -476,46 +592,6 @@ function renderDashboard() {
   }
 
   renderExpenseBars();
-  renderActivityFeed();
-}
-
-function renderActivityFeed() {
-  const feed = document.getElementById("activityFeed");
-  if (!feed) return;
-
-  const iconTask = `<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><rect x="1" y="1" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 5.5l1.5 1.5 2.5-2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-  const iconNote = `<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><rect x="1.5" y="1" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 4h4M3.5 6h4M3.5 8h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`;
-  const iconExp  = `<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 3v5M4.25 4.25h2a.75.75 0 0 1 0 1.5H4.75a.75.75 0 0 0 0 1.5H7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`;
-
-  const items = [
-    ...state.tasks.map(t => ({ type: "task", title: t.title, sub: t.priority, ts: t.createdAt })),
-    ...state.notes.map(n => ({ type: "note", title: n.title, sub: n.tags || "โน้ต", ts: n.createdAt })),
-    ...state.expenses.map(e => ({ type: "expense", title: e.title, sub: formatMoney(e.amount), ts: e.createdAt }))
-  ].sort((a, b) => b.ts - a.ts).slice(0, 5);
-
-  if (!items.length) {
-    feed.innerHTML = `<p style="font-size:0.78rem;color:var(--ink-faint);text-align:center;padding:1rem 0">ยังไม่มีกิจกรรม</p>`;
-    return;
-  }
-
-  const typeMap = {
-    task:    { icon: iconTask,    cls: "activity-icon--task",    label: "เพิ่มงาน" },
-    note:    { icon: iconNote,    cls: "activity-icon--note",    label: "เพิ่มโน้ต" },
-    expense: { icon: iconExp,     cls: "activity-icon--expense", label: "บันทึกรายจ่าย" }
-  };
-
-  feed.innerHTML = items.map(item => {
-    const m = typeMap[item.type];
-    return `
-      <div class="activity-row">
-        <span class="activity-icon ${m.cls}" aria-hidden="true">${m.icon}</span>
-        <span class="activity-body">
-          <span class="activity-title">${escapeHtml(item.title)}</span>
-          <span class="activity-sub">${escapeHtml(item.sub)}</span>
-        </span>
-        <span class="activity-time">${relativeTime(item.ts)}</span>
-      </div>`;
-  }).join("");
 }
 
 function renderExpenseBars() {
@@ -533,10 +609,11 @@ function renderExpenseBars() {
     ? rows
         .map(([category, total]) => {
           const width = Math.max(6, Math.round((total / max) * 100));
+          const color = EXPENSE_BAR_COLORS[category] || "#0A84FF";
           return `
             <div class="bar-row">
               <div class="bar-label"><span>${category}</span><strong>${formatMoney(total)}</strong></div>
-              <div class="bar-track"><div class="bar-fill" style="width:${width}%"></div></div>
+              <div class="bar-track"><div class="bar-fill" style="width:${width}%; --bar-color:${color};"></div></div>
             </div>
           `;
         })
@@ -545,66 +622,173 @@ function renderExpenseBars() {
 }
 
 function renderTasks() {
+  if (_taskView === "kanban") { renderKanban(); return; }
+
   const filtered = state.tasks.filter((task) => {
-    if (state.taskFilter === "open") return task.status !== "Completed";
-    if (state.taskFilter === "done") return task.status === "Completed";
+    if (state.taskFilter === "open") return !isTaskDone(task);
+    if (state.taskFilter === "done") return isTaskDone(task);
     return true;
+  }).sort((a, b) => {
+    if (a.due && b.due) return a.due.localeCompare(b.due);
+    if (a.due) return -1;
+    if (b.due) return 1;
+    return PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority];
   });
 
   document.getElementById("taskList").innerHTML = filtered.length
-    ? filtered
-        .sort((a, b) => (a.due || "9999").localeCompare(b.due || "9999"))
-        .map((task) => {
-          if (task.id === _editingTaskId) return renderTaskEditForm(task);
-          const done = task.status === "Completed";
-          return `
-            <article class="list-item ${done ? "done" : ""}" aria-label="${escapeHtml(task.title)}${done ? " (เสร็จแล้ว)" : ""}">
-              <div>
-                <span class="item-title">${escapeHtml(task.title)}</span>
-                <span class="item-meta">
-                  <span class="priority-${task.priority}">${task.priority}</span> · ${formatDate(task.due)}${done ? " · ✓ เสร็จแล้ว" : ""}
-                </span>
+    ? filtered.map((task) => {
+        const done = isTaskDone(task);
+        const sm   = STATUS_META[task.status] || STATUS_META.todo;
+        const deadlineBadge = renderDeadlineBadge(task.due, done);
+        const labelChips    = renderTaskLabelChips(task.labels);
+        return `
+          <article class="task-list-item${done ? " is-done" : ""}" data-task-id="${task.id}">
+            <button class="task-check-btn" type="button" data-toggle-task="${task.id}"
+              aria-pressed="${done}" title="${done ? "เปิดงานอีกครั้ง" : "ทำเครื่องหมายเสร็จ"}">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                ${done ? '<path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' : '<rect x="1" y="1" width="10" height="10" rx="2.5" stroke="currentColor" stroke-width="1.5"/>'}
+              </svg>
+            </button>
+            <div class="task-list-body">
+              <div class="task-list-top">
+                <span class="task-list-title">${escapeHtml(task.title)}</span>
+                <span class="task-priority-dot task-priority-dot--${task.priority.toLowerCase()}" title="${task.priority}"></span>
               </div>
-              <div class="item-actions">
-                ${!done ? `<button class="icon-button icon-button--focus${_focusTaskId === task.id ? " is-focusing" : ""}" type="button" data-focus-task="${task.id}" title="Focus session กับงานนี้" aria-label="Focus">
-                  <svg width="10" height="11" viewBox="0 0 10 11" fill="none" aria-hidden="true"><path d="M2 1l7 4.5-7 4.5V1z" fill="currentColor"/></svg>
-                </button>` : ""}
-                <button class="icon-button" type="button" data-toggle-task="${task.id}"
-                  aria-pressed="${done}" title="${done ? "เปิดงานอีกครั้ง" : "ทำเครื่องหมายเสร็จ"}">✓</button>
-                <button class="icon-button icon-button--edit" type="button" data-edit-task="${task.id}" title="แก้ไขงาน" aria-label="แก้ไขงาน">
-                  <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M7.5 1.5l2 2-6 6H1.5v-2l6-6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
-                </button>
-                <button class="icon-button" type="button" data-delete-task="${task.id}" title="ลบงาน">×</button>
+              ${task.description ? `<p class="task-list-desc">${escapeHtml(task.description)}</p>` : ""}
+              <div class="task-list-meta">
+                <span class="task-status-pill" style="--sc:${sm.color}">${sm.label}</span>
+                ${deadlineBadge}
+                ${labelChips}
               </div>
-            </article>
-          `;
-        })
-        .join("")
+            </div>
+            <div class="task-list-actions">
+              ${!done ? `<button class="icon-button icon-button--focus${_focusTaskId === task.id ? " is-focusing" : ""}" type="button" data-focus-task="${task.id}" title="Focus" aria-label="Focus">
+                <svg width="10" height="11" viewBox="0 0 10 11" fill="none" aria-hidden="true"><path d="M2 1l7 4.5-7 4.5V1z" fill="currentColor"/></svg>
+              </button>` : ""}
+              <button class="icon-button icon-button--edit" type="button" data-edit-task="${task.id}" title="แก้ไขงาน" aria-label="แก้ไขงาน">
+                ${ICON_EDIT}
+              </button>
+              <button class="icon-button" type="button" data-delete-task="${task.id}" title="ลบงาน">×</button>
+            </div>
+          </article>`;
+      }).join("")
     : emptyState("ยังไม่มีงานในมุมมองนี้", "tasks", "เพิ่มงาน");
 }
 
-function renderTaskEditForm(task) {
-  const priorities = ["Low", "Medium", "High", "Critical"];
-  const opts = priorities.map(p =>
-    `<option value="${p}"${p === task.priority ? " selected" : ""}>${p}</option>`
-  ).join("");
-  return `
-    <article class="list-item list-item--editing">
-      <form class="task-edit-form" data-edit-form-task="${task.id}">
-        <input class="task-edit-title" type="text" value="${escapeHtml(task.title)}"
-          placeholder="ชื่องาน" required maxlength="200"
-          autocorrect="off" autocapitalize="sentences" enterkeyhint="done" />
-        <div class="task-edit-row">
-          <select class="task-edit-select" aria-label="Priority">${opts}</select>
-          <input class="task-edit-date" type="date" value="${task.due || ""}" aria-label="วันครบกำหนด" />
-          <div class="task-edit-actions">
-            <button type="submit" class="task-edit-save">บันทึก</button>
-            <button type="button" class="task-edit-cancel" data-cancel-edit="${task.id}">ยกเลิก</button>
-          </div>
-        </div>
-      </form>
-    </article>
-  `;
+function renderKanban() {
+  const COLS = ["todo", "in_progress", "review", "done"];
+  COLS.forEach(status => {
+    const tasks = state.tasks
+      .filter(t => t.status === status)
+      .sort((a, b) => PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority]);
+
+    const countEl = document.getElementById(`kcount-${status}`);
+    if (countEl) countEl.textContent = tasks.length;
+
+    const zone = document.getElementById(`kdrop-${status}`);
+    if (!zone) return;
+
+    zone.innerHTML = tasks.length
+      ? tasks.map(t => {
+          const deadlineBadge = renderDeadlineBadge(t.due, isTaskDone(t));
+          const labelChips    = renderTaskLabelChips(t.labels);
+          return `
+            <div class="kanban-card" draggable="true" data-task-id="${t.id}" data-drag-task="${t.id}">
+              <div class="kanban-card-top">
+                <span class="task-priority-dot task-priority-dot--${t.priority.toLowerCase()}" title="${t.priority}"></span>
+                <span class="kanban-card-title">${escapeHtml(t.title)}</span>
+                <button class="kanban-card-edit" type="button" data-edit-task="${t.id}" title="แก้ไข" aria-label="แก้ไขงาน">
+                  ${ICON_EDIT}
+                </button>
+              </div>
+              ${t.description ? `<p class="kanban-card-desc">${escapeHtml(t.description)}</p>` : ""}
+              ${deadlineBadge || labelChips ? `<div class="kanban-card-footer">${deadlineBadge}${labelChips}</div>` : ""}
+            </div>`;
+        }).join("")
+      : `<div class="kanban-empty">ไม่มีงาน</div>`;
+  });
+
+  setupKanbanDragDrop();
+}
+
+function setupKanbanDragDrop() {
+  document.querySelectorAll(".kanban-card").forEach(card => {
+    card.addEventListener("dragstart", e => {
+      _dragTaskId = card.dataset.taskId;
+      card.classList.add("is-dragging");
+      e.dataTransfer.effectAllowed = "move";
+    });
+    card.addEventListener("dragend", () => {
+      card.classList.remove("is-dragging");
+      document.querySelectorAll(".kanban-dropzone").forEach(z => z.classList.remove("drag-over"));
+    });
+  });
+
+  document.querySelectorAll(".kanban-dropzone").forEach(zone => {
+    zone.addEventListener("dragover", e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      zone.classList.add("drag-over");
+    });
+    zone.addEventListener("dragleave", e => {
+      if (!zone.contains(e.relatedTarget)) zone.classList.remove("drag-over");
+    });
+    zone.addEventListener("drop", e => {
+      e.preventDefault();
+      zone.classList.remove("drag-over");
+      const newStatus = zone.dataset.status;
+      if (_dragTaskId && newStatus) {
+        state.tasks = state.tasks.map(t =>
+          t.id === _dragTaskId ? { ...t, status: newStatus } : t
+        );
+        Storage.save(state);
+        renderKanban();
+        renderShell();
+        showToast(`ย้ายงานไป "${getStatusLabel(newStatus)}" แล้ว`);
+      }
+      _dragTaskId = null;
+    });
+  });
+}
+
+/* ── Task Modal ── */
+function openTaskModal(taskId = null, defaultStatus = "todo") {
+  const modal = document.getElementById("taskModal");
+  _taskModalEditId = taskId;
+  const task = taskId ? state.tasks.find(t => t.id === taskId) : null;
+
+  document.getElementById("taskModalHeading").textContent = task ? "แก้ไขงาน" : "เพิ่มงาน";
+  document.getElementById("modalTaskTitle").value   = task?.title || "";
+  document.getElementById("modalTaskDesc").value    = task?.description || "";
+  document.getElementById("modalTaskStatus").value  = task?.status || defaultStatus;
+  document.getElementById("modalTaskPriority").value = task?.priority || "Medium";
+  document.getElementById("modalTaskDue").value     = task?.due || "";
+  document.getElementById("taskModalDelete").hidden = !task;
+
+  renderModalLabelPicker(task?.labels || []);
+  modal.showModal();
+  setTimeout(() => document.getElementById("modalTaskTitle")?.focus(), 50);
+}
+
+function closeTaskModal() {
+  document.getElementById("taskModal")?.close();
+  _taskModalEditId = null;
+}
+
+function renderModalLabelPicker(selectedLabels) {
+  const picker = document.getElementById("modalLabelPicker");
+  if (!picker) return;
+  picker.innerHTML = TASK_LABELS.map(l => `
+    <button type="button" class="modal-label-chip${selectedLabels.includes(l.id) ? " is-selected" : ""}"
+      data-label-id="${l.id}" style="--lc:${l.color}">${escapeHtml(l.name)}
+    </button>`).join("");
+  picker.querySelectorAll(".modal-label-chip").forEach(chip => {
+    chip.addEventListener("click", () => chip.classList.toggle("is-selected"));
+  });
+}
+
+function getSelectedModalLabels() {
+  return [...document.querySelectorAll(".modal-label-chip.is-selected")].map(c => c.dataset.labelId);
 }
 
 function renderNotes() {
@@ -622,7 +806,7 @@ function renderNotes() {
               </div>
               <div class="item-actions">
                 <button class="icon-button icon-button--edit" type="button" data-edit-note="${note.id}" title="แก้ไขโน้ต" aria-label="แก้ไขโน้ต">
-                  <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M7.5 1.5l2 2-6 6H1.5v-2l6-6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                  ${ICON_EDIT}
                 </button>
                 <button class="icon-button" type="button" data-delete-note="${note.id}" title="ลบโน้ต">×</button>
               </div>
@@ -656,8 +840,8 @@ function renderNoteEditForm(note) {
 }
 
 function renderExpenses() {
-  const todayKey  = new Date().toISOString().slice(0, 10);
-  const monthKey  = new Date().toISOString().slice(0, 7);
+  const todayKey  = getTodayKey();
+  const monthKey  = getMonthKey();
   const todayExps = state.expenses.filter(e => e.date === todayKey);
   const monthExps = state.expenses.filter(e => e.date?.startsWith(monthKey));
   const todayTotal = todayExps.reduce((s, e) => s + Number(e.amount), 0);
@@ -695,7 +879,7 @@ function renderExpenses() {
               </div>
               <div class="item-actions">
                 <button class="icon-button icon-button--edit" type="button" data-edit-expense="${expense.id}" title="แก้ไขรายจ่าย" aria-label="แก้ไขรายจ่าย">
-                  <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M7.5 1.5l2 2-6 6H1.5v-2l6-6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                  ${ICON_EDIT}
                 </button>
                 <button class="icon-button" type="button" data-delete-expense="${expense.id}" title="ลบรายจ่าย">×</button>
               </div>
@@ -707,8 +891,7 @@ function renderExpenses() {
 }
 
 function renderExpenseEditForm(expense) {
-  const categories = ["อาหาร","เครื่องดื่ม","เดินทาง","น้ำมัน","ค่าไฟ","ค่าน้ำ","อินเทอร์เน็ต","สุขภาพ","ช้อปปิ้ง","การศึกษา","ลงทุน","อื่นๆ"];
-  const catOpts = categories.map(c =>
+  const catOpts = EXPENSE_CATEGORIES.map(c =>
     `<option value="${c}"${c === expense.category ? " selected" : ""}>${c}</option>`
   ).join("");
   return `
@@ -733,15 +916,11 @@ function renderExpenseEditForm(expense) {
   `;
 }
 
-const THAI_MONTHS = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
-const THAI_DOW   = ["อา","จ","อ","พ","พฤ","ศ","ส"];
-
 function renderCalendar() {
   const el = document.getElementById("calendar");
   if (!el) return;
 
-  const today    = new Date();
-  const todayKey = today.toISOString().slice(0, 10);
+  const todayKey = getTodayKey();
   const thaiYear = _calYear + 543;
 
   // Build tasks-by-date lookup
@@ -773,11 +952,10 @@ function renderCalendar() {
     const dow        = new Date(_calYear, _calMonth, d).getDay();
     const isWeekend  = dow === 0 || dow === 6;
 
-    const priorityRank = { Critical: 0, High: 1, Medium: 2, Low: 3 };
     const dotColors = [...tasks]
-      .sort((a, b) => (priorityRank[a.priority] ?? 9) - (priorityRank[b.priority] ?? 9))
+      .sort((a, b) => (PRIORITY_RANK[a.priority] ?? 9) - (PRIORITY_RANK[b.priority] ?? 9))
       .slice(0, 3)
-      .map(t => `<span class="cal-dot cal-dot--${t.priority.toLowerCase()}${t.status === 'Completed' ? ' cal-dot--done' : ''}"></span>`)
+      .map(t => `<span class="cal-dot cal-dot--${t.priority.toLowerCase()}${isTaskDone(t) ? ' cal-dot--done' : ''}"></span>`)
       .join("");
 
     cells += `
@@ -835,13 +1013,13 @@ function renderCalDayPanel(dateKey, tasks) {
   const thaiYear  = Number(y) + 543;
   const dateLabel = `${Number(d)} ${THAI_MONTHS[Number(m) - 1]} ${thaiYear}`;
 
-  const openTasks = tasks.filter(t => t.status !== "Completed");
-  const doneTasks = tasks.filter(t => t.status === "Completed");
+  const openTasks = tasks.filter(t => !isTaskDone(t));
+  const doneTasks = tasks.filter(t => isTaskDone(t));
   const allRows   = [...openTasks, ...doneTasks];
 
   const taskRows = allRows.length
     ? allRows.map(t => `
-        <div class="cal-task-row${t.status === "Completed" ? " is-done" : ""}">
+        <div class="cal-task-row${isTaskDone(t) ? " is-done" : ""}">
           <span class="cal-task-pip cal-task-pip--${t.priority.toLowerCase()}"></span>
           <span class="cal-task-name">${escapeHtml(t.title)}</span>
           <span class="priority-${t.priority} cal-task-badge">${t.priority}</span>
@@ -942,7 +1120,8 @@ function showApp() {
   document.querySelector(".app-shell")?.style.removeProperty("display");
   document.getElementById("bg-canvas")?.style.setProperty("display", "none");
   document.querySelector(".paper-grain")?.style.setProperty("display", "none");
-  document.querySelector(".cat-roam-float")?.style.setProperty("display", "none");
+  pauseCanvas();
+  if (!_clockInterval) _clockInterval = setInterval(updateClock, 1000);
 }
 
 function showHomepage() {
@@ -951,7 +1130,9 @@ function showHomepage() {
   document.querySelector(".app-shell")?.style.setProperty("display", "none");
   document.getElementById("bg-canvas")?.style.removeProperty("display");
   document.querySelector(".paper-grain")?.style.removeProperty("display");
-  document.querySelector(".cat-roam-float")?.style.removeProperty("display");
+  resumeCanvas();
+  clearInterval(_clockInterval);
+  _clockInterval = null;
 }
 
 function freshDemoState() {
@@ -965,13 +1146,15 @@ function enterGuestMode() {
   setView("dashboard");
 }
 
-function addTask(title, priority = "Medium", due = "") {
+function addTask(title, priority = "Medium", due = "", status = "todo", description = "", labels = []) {
   state.tasks.unshift({
     id: crypto.randomUUID(),
     title,
+    description,
     priority,
     due,
-    status: "Pending",
+    status,
+    labels,
     createdAt: Date.now()
   });
 }
@@ -986,7 +1169,7 @@ function addNote(title, body = "", tags = "") {
   });
 }
 
-function addExpense(title, amount, category = "อื่นๆ", date = new Date().toISOString().slice(0, 10)) {
+function addExpense(title, amount, category = "อื่นๆ", date = getTodayKey()) {
   state.expenses.unshift({
     id: crypto.randomUUID(),
     title,
@@ -1040,7 +1223,7 @@ function parseCommand(rawText) {
   }
 
   if (text.includes("วันนี้มีงานอะไร")) {
-    const openTasks = state.tasks.filter((task) => task.status !== "Completed");
+    const openTasks = state.tasks.filter((task) => !isTaskDone(task));
     return openTasks.length
       ? `งานค้างตอนนี้: ${openTasks.map((task) => task.title).join(", ")}`
       : "วันนี้ยังไม่มีงานค้าง";
@@ -1067,22 +1250,11 @@ document.querySelectorAll("[data-view-jump]").forEach((button) => {
 
 document.getElementById("themeToggle").addEventListener("click", () => {
   state.theme = state.theme === "dark" ? "light" : "dark";
-  render();
+  document.documentElement.dataset.theme = state.theme;
+  saveState();
 });
 
-document.getElementById("loadDemoData")?.addEventListener("click", loadDemoData);
-
-document.getElementById("taskForm").addEventListener("submit", (event) => {
-  event.preventDefault();
-  const title = document.getElementById("taskTitle").value.trim();
-  if (!title) return;
-  addTask(title, document.getElementById("taskPriority").value, document.getElementById("taskDue").value);
-  event.currentTarget.reset();
-  document.getElementById("taskPriority").value = "Medium";
-  render();
-  showToast(`เพิ่มงาน "${title}" แล้ว`);
-});
-
+/* ── Task filter chips ── */
 document.querySelectorAll("[data-task-filter]").forEach((button) => {
   button.addEventListener("click", () => {
     state.taskFilter = button.dataset.taskFilter;
@@ -1093,17 +1265,97 @@ document.querySelectorAll("[data-task-filter]").forEach((button) => {
   });
 });
 
+/* ── Task view toggle (list / kanban) ── */
+document.getElementById("taskViewToggle")?.addEventListener("click", () => {
+  _taskView = _taskView === "list" ? "kanban" : "list";
+  const listView   = document.getElementById("taskListView");
+  const kanbanView = document.getElementById("taskKanbanView");
+  const iconList   = document.getElementById("iconViewList");
+  const iconKanban = document.getElementById("iconViewKanban");
+  if (_taskView === "kanban") {
+    listView.hidden   = true;
+    kanbanView.hidden = false;
+    if (iconList)   iconList.hidden   = true;
+    if (iconKanban) iconKanban.hidden = false;
+    renderKanban();
+  } else {
+    listView.hidden   = false;
+    kanbanView.hidden = true;
+    if (iconList)   iconList.hidden   = false;
+    if (iconKanban) iconKanban.hidden = true;
+    renderTasks();
+  }
+});
+
+/* ── Open add task modal ── */
+document.getElementById("openAddTask")?.addEventListener("click", () => openTaskModal());
+
+/* ── Task modal form submit ── */
+document.getElementById("taskModalForm")?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const title = document.getElementById("modalTaskTitle").value.trim();
+  if (!title) return;
+  const status      = document.getElementById("modalTaskStatus").value;
+  const priority    = document.getElementById("modalTaskPriority").value;
+  const due         = document.getElementById("modalTaskDue").value;
+  const description = document.getElementById("modalTaskDesc").value.trim();
+  const labels      = getSelectedModalLabels();
+
+  if (_taskModalEditId) {
+    state.tasks = state.tasks.map(t =>
+      t.id === _taskModalEditId ? { ...t, title, description, status, priority, due, labels } : t
+    );
+    showToast(`อัปเดตงาน "${title}" แล้ว`);
+  } else {
+    addTask(title, priority, due, status, description, labels);
+    showToast(`เพิ่มงาน "${title}" แล้ว`);
+  }
+  closeTaskModal();
+  renderAfterTask();
+});
+
+/* ── Task modal cancel & close ── */
+document.getElementById("taskModalCancel")?.addEventListener("click", closeTaskModal);
+document.getElementById("taskModalClose")?.addEventListener("click", closeTaskModal);
+document.getElementById("taskModal")?.addEventListener("click", e => {
+  if (e.target === e.currentTarget) closeTaskModal();
+});
+
+/* ── Task modal delete ── */
+document.getElementById("taskModalDelete")?.addEventListener("click", () => {
+  const task = _taskModalEditId && state.tasks.find(t => t.id === _taskModalEditId);
+  if (!task || !confirm(`ลบงาน "${task.title}"?`)) return;
+  state.tasks = state.tasks.filter(t => t.id !== _taskModalEditId);
+  closeTaskModal();
+  renderAfterTask();
+  showToast("ลบงานแล้ว");
+});
+
+/* ── Kanban add buttons ── */
+document.addEventListener("click", e => {
+  const btn = e.target.closest("[data-kanban-add]");
+  if (btn) openTaskModal(null, btn.dataset.kanbanAdd);
+});
+
+/* ── FAB open task modal ── */
+document.addEventListener("click", e => {
+  if (e.target.closest("[data-open-task-modal]")) {
+    setView("tasks");
+    openTaskModal();
+  }
+});
+
 document.getElementById("noteForm").addEventListener("submit", (event) => {
   event.preventDefault();
   const title = document.getElementById("noteTitle").value.trim();
   if (!title) return;
   addNote(title, document.getElementById("noteBody").value.trim(), document.getElementById("noteTags").value.trim());
   event.currentTarget.reset();
-  render();
+  renderAfterNote();
   showToast(`บันทึกโน้ต "${title}" แล้ว`);
 });
 
-document.getElementById("expenseDate").value = new Date().toISOString().slice(0, 10);
+document.getElementById("expenseDate").value = getTodayKey();
 document.getElementById("expenseForm").addEventListener("submit", (event) => {
   event.preventDefault();
   const title = document.getElementById("expenseTitle").value.trim();
@@ -1111,8 +1363,8 @@ document.getElementById("expenseForm").addEventListener("submit", (event) => {
   if (!title || !amount) return;
   addExpense(title, amount, document.getElementById("expenseCategory").value, document.getElementById("expenseDate").value);
   event.currentTarget.reset();
-  document.getElementById("expenseDate").value = new Date().toISOString().slice(0, 10);
-  render();
+  document.getElementById("expenseDate").value = getTodayKey();
+  renderAfterExpense();
   showToast(`บันทึก ${title} ${formatMoney(Number(amount))} แล้ว`);
 });
 
@@ -1138,7 +1390,7 @@ document.getElementById("noteList").addEventListener("submit", (e) => {
     n.id === id ? { ...n, title: newTitle, body: newBody, tags: newTags } : n
   );
   _editingNoteId = null;
-  render();
+  renderAfterNote();
   showToast("อัปเดตโน้ตแล้ว");
 });
 
@@ -1156,26 +1408,11 @@ document.getElementById("expenseList").addEventListener("submit", (e) => {
     ex.id === id ? { ...ex, title: newTitle, amount: newAmount, category: newCat, date: newDate } : ex
   );
   _editingExpenseId = null;
-  render();
+  renderAfterExpense();
   showToast("อัปเดตรายจ่ายแล้ว");
 });
 
-document.getElementById("taskList").addEventListener("submit", (e) => {
-  const form = e.target.closest("[data-edit-form-task]");
-  if (!form) return;
-  e.preventDefault();
-  const id = form.dataset.editFormTask;
-  const newTitle = form.querySelector(".task-edit-title").value.trim();
-  const newPriority = form.querySelector(".task-edit-select").value;
-  const newDue = form.querySelector(".task-edit-date").value;
-  if (!newTitle) return;
-  state.tasks = state.tasks.map(t =>
-    t.id === id ? { ...t, title: newTitle, priority: newPriority, due: newDue } : t
-  );
-  _editingTaskId = null;
-  render();
-  showToast("อัปเดตงานแล้ว");
-});
+/* inline task edit handler removed — editing now uses the modal */
 
 document.addEventListener("submit", e => {
   const form = e.target.closest("#calAddForm");
@@ -1233,8 +1470,7 @@ document.addEventListener("click", (event) => {
   const deleteTaskId = target.dataset.deleteTask;
   const deleteNoteId = target.dataset.deleteNote;
   const deleteExpenseId = target.dataset.deleteExpense;
-  const editTaskId      = target.closest("[data-edit-task]")?.dataset.editTask;
-  const cancelEditId    = target.closest("[data-cancel-edit]")?.dataset.cancelEdit;
+  const editTaskId = target.closest("[data-edit-task]")?.dataset.editTask;
   // Focus task
   if (target.closest("[data-focus-task]")) {
     const id = target.closest("[data-focus-task]").dataset.focusTask;
@@ -1268,20 +1504,10 @@ document.addEventListener("click", (event) => {
   }
 
   if (editTaskId) {
-    _editingTaskId = editTaskId;
-    renderTasks();
-    setTimeout(() => {
-      const inp = document.querySelector(".task-edit-title");
-      if (inp) { inp.focus(); inp.select(); }
-    }, 30);
+    openTaskModal(editTaskId);
     return;
   }
 
-  if (cancelEditId !== undefined) {
-    _editingTaskId = null;
-    renderTasks();
-    return;
-  }
 
   if (editNoteId) {
     _editingNoteId = editNoteId;
@@ -1310,11 +1536,11 @@ document.addEventListener("click", (event) => {
   if (toggleId) {
     const task = state.tasks.find((t) => t.id === toggleId);
     state.tasks = state.tasks.map((t) =>
-      t.id === toggleId ? { ...t, status: t.status === "Completed" ? "Pending" : "Completed" } : t
+      t.id === toggleId ? { ...t, status: isTaskDone(t) ? "todo" : "done" } : t
     );
-    render();
+    renderAfterTask();
     if (task) {
-      const nowDone = state.tasks.find((t) => t.id === toggleId)?.status === "Completed";
+      const nowDone = isTaskDone(state.tasks.find((t) => t.id === toggleId));
       showToast(nowDone ? `เสร็จแล้ว: ${task.title}` : `เปิดงานอีกครั้ง: ${task.title}`);
     }
   }
@@ -1323,7 +1549,7 @@ document.addEventListener("click", (event) => {
     const task = state.tasks.find((t) => t.id === deleteTaskId);
     if (!task || !confirm(`ลบงาน "${task.title}"?`)) return;
     state.tasks = state.tasks.filter((t) => t.id !== deleteTaskId);
-    render();
+    renderAfterTask();
     showToast("ลบงานแล้ว");
   }
 
@@ -1331,7 +1557,7 @@ document.addEventListener("click", (event) => {
     const note = state.notes.find((n) => n.id === deleteNoteId);
     if (!note || !confirm(`ลบโน้ต "${note.title}"?`)) return;
     state.notes = state.notes.filter((n) => n.id !== deleteNoteId);
-    render();
+    renderAfterNote();
     showToast("ลบโน้ตแล้ว");
   }
 
@@ -1339,7 +1565,7 @@ document.addEventListener("click", (event) => {
     const expense = state.expenses.find((e) => e.id === deleteExpenseId);
     if (!expense || !confirm(`ลบรายการ "${expense.title}"?`)) return;
     state.expenses = state.expenses.filter((e) => e.id !== deleteExpenseId);
-    render();
+    renderAfterExpense();
     showToast("ลบรายจ่ายแล้ว");
   }
 });
@@ -1431,7 +1657,7 @@ document.addEventListener("keydown", (e) => {
   }
 
   function showDonePrompt() {
-    const ft = _focusTaskId ? state.tasks.find(t => t.id === _focusTaskId && t.status !== "Completed") : null;
+    const ft = _focusTaskId ? state.tasks.find(t => t.id === _focusTaskId && !isTaskDone(t)) : null;
     if (ft) {
       const prompt = document.getElementById("focusDonePrompt");
       const textEl = document.getElementById("focusDoneText");
@@ -1548,10 +1774,9 @@ document.getElementById("dashAssistInput")?.addEventListener("keydown", e => {
 document.getElementById("focusDoneYes")?.addEventListener("click", e => {
   const taskId = e.currentTarget.dataset.completeTask;
   if (taskId) {
-    state.tasks = state.tasks.map(t => t.id === taskId ? { ...t, status: "Completed" } : t);
-    Storage.save(state);
+    state.tasks = state.tasks.map(t => t.id === taskId ? { ...t, status: "done" } : t);
     _focusTaskId = null;
-    render();
+    renderAfterTask();
     showToast("งานเสร็จแล้ว 🎉 เยี่ยมมาก!");
   }
   document.getElementById("focusDonePrompt").hidden = true;
@@ -1590,11 +1815,7 @@ function updateSyncStatus(status) {
   }
 }
 
-function mergeById(local, cloud) {
-  const map = new Map();
-  [...local, ...cloud].forEach(item => map.set(item.id, item));
-  return [...map.values()].sort((a, b) => b.createdAt - a.createdAt);
-}
+
 
 function updateAuthBar(user) {
   const loggedInRow = document.getElementById("authLoggedInRow");
@@ -1773,13 +1994,6 @@ async function initAuth() {
     showHomepage();
   });
 
-  /* logout from sidebar user panel */
-  document.getElementById("authLogoutBtn")?.addEventListener("click", async () => {
-    await Auth.signOut();
-    state = Storage.loadLocal(defaultState);
-    render();
-    showHomepage();
-  });
 }
 
 /* ── Homepage button wiring ──
@@ -1808,3 +2022,4 @@ if ("serviceWorker" in navigator) {
     });
   });
 }
+

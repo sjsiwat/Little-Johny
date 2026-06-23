@@ -9,7 +9,7 @@
    New: layered animated bg (blobs + rings + particles + lines)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
 
 /* ── Tokens — Ghibli watercolour (cream / dusty-blue / terracotta) ── */
 :root {
@@ -195,7 +195,6 @@ body {
   padding-left: 0.55rem;
   padding-right: 0.55rem;
 }
-.app-shell.sidebar-collapsed .brand-cat-img { width: 32px; }
 .app-shell.sidebar-collapsed .brand-text,
 .app-shell.sidebar-collapsed .sidebar-section { display: none; }
 
@@ -222,37 +221,6 @@ body {
   margin-bottom: 0.45rem;
   padding-left: 0.2rem;
 }
-
-/* Quick action buttons */
-.quick-action-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.3rem 0.6rem;
-  border-radius: 7px;
-  border: none;
-  background: transparent;
-  color: var(--ink-muted);
-  font-family: var(--font-body);
-  font-size: 0.78rem;
-  font-weight: 500;
-  text-align: left;
-  transition: background var(--t-fast), color var(--t-fast);
-}
-.quick-action-btn:hover { background: var(--surface-soft); color: var(--ink); }
-.quick-action-btn .qa-icon {
-  width: 1.35rem;
-  height: 1.35rem;
-  border-radius: 5px;
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  font-size: 0.7rem;
-}
-.qa-icon--task { background: rgba(10,132,255,0.15); color: #0A84FF; }
-.qa-icon--expense { background: rgba(48,209,88,0.15); color: #30D158; }
-.qa-icon--note { background: rgba(255,159,10,0.15); color: #FF9F0A; }
 
 /* Focus timer */
 .focus-timer-wrap {
@@ -525,28 +493,6 @@ body {
   border-bottom: 1px solid var(--line);
 }
 
-/* ── Cat in sidebar brand ── */
-.brand-cat {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.brand-cat-img {
-  display: block;
-  width: clamp(72px, 80%, 108px);
-  height: auto;
-  filter: drop-shadow(0 4px 10px rgba(74,64,54,0.15));
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
-}
-
-.brand-cat:hover .brand-cat-img { transform: scale(1.08); }
-
-[data-theme="dark"] .brand-cat-img {
-  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
-}
-
 .brand strong {
   display: block;
   font-size: 0.875rem;
@@ -573,101 +519,6 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/* ── Cat Mascot (canvas, painterly) ── */
-.cat-mascot {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  height: 124px;
-  margin: -0.25rem 0 0.4rem;
-}
-
-.cat-mascot canvas {
-  width: 138px;
-  height: 124px;
-  filter: drop-shadow(0 6px 8px rgba(74,64,54,0.16));
-  cursor: grab;
-}
-.cat-mascot canvas:active { cursor: grabbing; }
-
-@keyframes cat-float {
-  0%,100% { transform: translateY(0) rotate(-1deg); }
-  25%      { transform: translateY(-5px) rotate(0deg); }
-  50%      { transform: translateY(-8px) rotate(1deg); }
-  75%      { transform: translateY(-4px) rotate(0deg); }
-}
-
-/* Tail wag */
-.cat-tail {
-  transform-origin: 58px 60px;
-  animation: tail-wag 1.8s ease-in-out infinite;
-}
-
-@keyframes tail-wag {
-  0%,100% { transform: rotate(0deg); }
-  30%     { transform: rotate(18deg); }
-  70%     { transform: rotate(-12deg); }
-}
-
-/* Blink eyes */
-.cat-eye-l, .cat-eye-r,
-.cat-pupil-l, .cat-pupil-r {
-  animation: cat-blink 4s ease-in-out infinite;
-}
-
-@keyframes cat-blink {
-  0%,45%,55%,100% { transform: scaleY(1); }
-  48%,52%         { transform: scaleY(0.05); }
-}
-
-/* Ear twitch */
-.cat-ear-l {
-  transform-origin: 29px 22px;
-  animation: ear-l 5s ease-in-out infinite;
-}
-.cat-ear-r {
-  transform-origin: 51px 22px;
-  animation: ear-r 5s ease-in-out infinite 0.6s;
-}
-
-@keyframes ear-l {
-  0%,80%,100% { transform: rotate(0deg); }
-  85%         { transform: rotate(-8deg); }
-  92%         { transform: rotate(4deg); }
-}
-@keyframes ear-r {
-  0%,80%,100% { transform: rotate(0deg); }
-  85%         { transform: rotate(8deg); }
-  92%         { transform: rotate(-4deg); }
-}
-
-/* Whisker twitch */
-.whisker {
-  animation: whisker-twitch 3s ease-in-out infinite;
-}
-
-@keyframes whisker-twitch {
-  0%,70%,100% { opacity: 1; }
-  75%         { opacity: 0.4; }
-  80%         { opacity: 1; }
-}
-
-/* Dark mode cat: lighter outline */
-[data-theme="dark"] .cat-svg ellipse.cat-body,
-[data-theme="dark"] .cat-svg circle.cat-head,
-[data-theme="dark"] .cat-svg polygon.cat-ear-l,
-[data-theme="dark"] .cat-svg polygon.cat-ear-r,
-[data-theme="dark"] .cat-svg ellipse[cx="32"],
-[data-theme="dark"] .cat-svg ellipse[cx="48"] {
-  fill: #c0bab0;
-  stroke: #a09890;
-}
-
-[data-theme="dark"] .cat-tail {
-  stroke: #c0bab0;
 }
 
 /* ── Nav list ── */
@@ -718,28 +569,6 @@ body {
   background: var(--primary);
   font-weight: 600;
   box-shadow: 0 2px 10px rgba(90,143,168,0.30);
-}
-
-.theme-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  padding: 0.55rem 0.8rem;
-  margin-top: 1rem;
-  border-radius: var(--radius-md);
-  border: 1.5px dashed var(--line);
-  background: var(--surface-soft);
-  color: var(--ink-muted);
-  font-family: var(--font-body);
-  font-size: 0.82rem;
-  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast) var(--ease-snap);
-}
-
-.theme-toggle:hover {
-  transform: translateY(-2px);
-  color: var(--ink);
-  background: var(--surface);
 }
 
 /* ============================================================
@@ -1920,7 +1749,6 @@ body::before {
   }
 
   .nav-link::before { display: none; }
-  .theme-toggle { max-width: 11rem; }
 
   .dashboard-grid,
   .quick-start-grid,
@@ -3165,7 +2993,6 @@ body::before {
 }
 [data-theme="dark"] .brand strong { font-size: 0.8rem; }
 [data-theme="dark"] .brand span   { font-size: 0.63rem; }
-[data-theme="dark"] .brand-cat-img { width: clamp(46px, 65%, 72px); }
 [data-theme="dark"] .nav-link {
   font-size: 0.78rem;
   padding: 0.28rem 0.65rem;
@@ -3919,4 +3746,723 @@ body::before {
 
 .cal-add-btn:hover {
   opacity: 0.85;
+}
+
+/* ═══════════════════════════════════════════════
+   TASK SYSTEM — Toolbar, List, Kanban, Modal
+═══════════════════════════════════════════════ */
+
+/* ── Task View Toolbar ── */
+.task-view-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.task-view-filters { display: flex; gap: 0.375rem; }
+.task-view-actions { display: flex; align-items: center; gap: 0.5rem; }
+
+.task-view-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.task-view-toggle:hover {
+  background: var(--surface-soft);
+  color: var(--ink);
+  border-color: var(--border-strong, rgba(255,255,255,0.12));
+}
+
+.btn-add-task {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.875rem;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.btn-add-task:hover { opacity: 0.88; }
+
+/* ── Task List Item (new) ── */
+.task-list-item {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: start;
+  gap: 0.625rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin-bottom: 0.375rem;
+  transition: background 0.15s, border-color 0.15s;
+}
+.task-list-item:hover { background: var(--surface-soft); }
+.task-list-item.is-done { opacity: 0.52; }
+.task-list-item.is-done .task-list-title { text-decoration: line-through; color: var(--ink-faint); }
+
+[data-theme="dark"] .task-list-item {
+  background: #1C1F27;
+  border-color: rgba(255,255,255,0.06);
+}
+[data-theme="dark"] .task-list-item:hover { background: #222631; }
+
+.task-check-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--ink-faint);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.task-check-btn:hover { color: var(--green); background: color-mix(in srgb, var(--green) 10%, transparent); }
+.is-done .task-check-btn { color: var(--green); }
+
+.task-list-body { min-width: 0; }
+.task-list-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+.task-list-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.4;
+}
+.task-list-desc {
+  font-size: 0.78rem;
+  color: var(--ink-secondary);
+  margin: 0 0 0.375rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.task-list-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+}
+.task-list-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding-top: 2px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.task-list-item:hover .task-list-actions { opacity: 1; }
+
+/* ── Priority dot ── */
+.task-priority-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.task-priority-dot--critical { background: var(--accent); }
+.task-priority-dot--high     { background: var(--amber); }
+.task-priority-dot--medium   { background: var(--blue); }
+.task-priority-dot--low      { background: var(--ink-faint); }
+
+/* ── Status pill ── */
+.task-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  background: color-mix(in srgb, var(--sc) 14%, transparent);
+  color: var(--sc);
+  border: 1px solid color-mix(in srgb, var(--sc) 25%, transparent);
+}
+
+/* ── Due date chip ── */
+.task-due-chip {
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+}
+
+/* ── Deadline badges ── */
+.deadline-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.deadline-badge--overdue {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.deadline-badge--today {
+  background: color-mix(in srgb, var(--amber) 15%, transparent);
+  color: var(--amber);
+  border: 1px solid color-mix(in srgb, var(--amber) 30%, transparent);
+}
+.deadline-badge--soon {
+  background: color-mix(in srgb, var(--blue) 15%, transparent);
+  color: var(--blue);
+  border: 1px solid color-mix(in srgb, var(--blue) 30%, transparent);
+}
+
+/* ── Label chips ── */
+.task-label-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 500;
+  background: color-mix(in srgb, var(--lc) 15%, transparent);
+  color: var(--lc);
+  border: 1px solid color-mix(in srgb, var(--lc) 25%, transparent);
+}
+
+/* ═══════════════════════════════════════════════
+   KANBAN BOARD
+═══════════════════════════════════════════════ */
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+  min-height: 400px;
+}
+
+@media (max-width: 900px) {
+  .kanban-board { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .kanban-board { grid-template-columns: 1fr; }
+}
+
+.kanban-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--surface-soft, rgba(255,255,255,0.03));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.625rem;
+  min-height: 200px;
+}
+[data-theme="dark"] .kanban-col {
+  background: #181B22;
+  border-color: rgba(255,255,255,0.06);
+}
+
+.kanban-col-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.25rem 0.625rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.5rem;
+}
+.kanban-col-name {
+  flex: 1;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.kanban-col-count {
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.05rem 0.45rem;
+  font-weight: 600;
+}
+.kanban-col-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.kanban-col-dot--todo        { background: #6F7480; }
+.kanban-col-dot--in_progress { background: #0A84FF; }
+.kanban-col-dot--review      { background: #FF9F0A; }
+.kanban-col-dot--done        { background: #30D158; }
+
+.kanban-dropzone {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  flex: 1;
+  min-height: 80px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.kanban-dropzone.drag-over {
+  background: color-mix(in srgb, var(--blue) 8%, transparent);
+  outline: 2px dashed color-mix(in srgb, var(--blue) 40%, transparent);
+  outline-offset: -2px;
+}
+
+.kanban-empty {
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.kanban-add-btn {
+  display: block;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.4rem;
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 7px;
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  text-align: center;
+}
+.kanban-add-btn:hover {
+  background: var(--surface);
+  color: var(--ink-secondary);
+  border-color: var(--blue);
+  border-style: solid;
+}
+
+/* ── Kanban Card ── */
+.kanban-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 0.625rem 0.75rem;
+  cursor: grab;
+  transition: box-shadow 0.15s, opacity 0.15s, transform 0.15s;
+  user-select: none;
+}
+.kanban-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  border-color: var(--border-strong, rgba(255,255,255,0.1));
+}
+.kanban-card.is-dragging {
+  opacity: 0.45;
+  transform: scale(0.97);
+  cursor: grabbing;
+}
+[data-theme="dark"] .kanban-card {
+  background: #222631;
+  border-color: rgba(255,255,255,0.08);
+}
+[data-theme="dark"] .kanban-card:hover {
+  background: #252A35;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.kanban-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+.kanban-card-title {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.4;
+}
+.kanban-card-edit {
+  opacity: 0;
+  background: transparent;
+  border: none;
+  color: var(--ink-faint);
+  cursor: pointer;
+  padding: 0.125rem;
+  border-radius: 4px;
+  transition: opacity 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.kanban-card:hover .kanban-card-edit { opacity: 1; }
+.kanban-card-edit:hover { color: var(--ink); }
+
+.kanban-card-desc {
+  font-size: 0.74rem;
+  color: var(--ink-faint);
+  margin: 0 0 0.375rem;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.kanban-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.375rem;
+}
+
+/* ═══════════════════════════════════════════════
+   TASK MODAL
+═══════════════════════════════════════════════ */
+.task-modal {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(560px, calc(100vw - 2rem));
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 0;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+}
+[data-theme="dark"] .task-modal {
+  background: #1C1F27;
+  border-color: rgba(255,255,255,0.1);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+}
+.task-modal::backdrop {
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+}
+.task-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.125rem 1.25rem 0.875rem;
+  border-bottom: 1px solid var(--border);
+}
+.task-modal-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+.task-modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--ink-faint);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+.task-modal-close:hover { background: var(--surface-soft); color: var(--ink); }
+
+.task-modal-body {
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+.task-modal-field { display: flex; flex-direction: column; gap: 0.35rem; }
+.task-modal-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.task-modal-field--title .task-modal-input {
+  font-size: 1rem;
+  font-weight: 500;
+}
+.task-modal-input, .task-modal-textarea, .task-modal-select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-soft, rgba(255,255,255,0.04));
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.task-modal-input:focus,
+.task-modal-textarea:focus,
+.task-modal-select:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue) 18%, transparent);
+}
+[data-theme="dark"] .task-modal-input,
+[data-theme="dark"] .task-modal-textarea,
+[data-theme="dark"] .task-modal-select {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.08);
+  color: #F5F5F7;
+}
+.task-modal-textarea { resize: vertical; min-height: 72px; }
+.task-modal-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.625rem;
+}
+@media (max-width: 480px) {
+  .task-modal-row { grid-template-columns: 1fr 1fr; }
+  .task-modal-row .task-modal-field:last-child { grid-column: 1 / -1; }
+}
+
+.modal-label-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+.modal-label-chip {
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid color-mix(in srgb, var(--lc) 30%, transparent);
+  background: color-mix(in srgb, var(--lc) 10%, transparent);
+  color: color-mix(in srgb, var(--lc) 70%, var(--ink));
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.modal-label-chip.is-selected {
+  background: color-mix(in srgb, var(--lc) 25%, transparent);
+  border-color: var(--lc);
+  color: var(--lc);
+}
+.modal-label-chip:hover { border-color: var(--lc); }
+
+.task-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--border);
+  gap: 0.5rem;
+}
+.task-modal-footer-right { display: flex; gap: 0.5rem; }
+
+.task-modal-save-btn {
+  padding: 0.45rem 1.125rem;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.task-modal-save-btn:hover { opacity: 0.88; }
+
+.task-modal-cancel-btn {
+  padding: 0.45rem 0.875rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.83rem;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.task-modal-cancel-btn:hover { background: var(--surface-soft); }
+
+.task-modal-delete-btn {
+  padding: 0.45rem 0.875rem;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 8px;
+  font-size: 0.83rem;
+  color: var(--accent);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.task-modal-delete-btn:hover {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kanban-card, .task-list-item, .task-modal { transition: none; }
+}
+
+/* ============================================================
+   REDESIGN v5 — macOS Premium Dashboard Polish
+   ============================================================ */
+
+/* ── Topbar: clean left side with live clock ── */
+.topbar-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+}
+
+.topbar-clock {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+[data-theme="dark"] .topbar-clock {
+  color: #4A4E58;
+}
+
+/* ── Dashboard grid: equal-height row panels ── */
+.dashboard-grid {
+  align-items: stretch;
+}
+
+.dashboard-grid .panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.focus-panel .item-list,
+#todayCalEvents,
+#expenseBars {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* ── Stat card micro-interactions ── */
+[data-theme="dark"] .sb-stat {
+  transition:
+    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.18s;
+}
+
+[data-theme="dark"] .sb-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.52);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Dashboard panel hover ── */
+[data-theme="dark"] .dashboard-grid .panel {
+  transition:
+    box-shadow 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.18s;
+}
+
+[data-theme="dark"] .dashboard-grid .panel:hover {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.38);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Priority pill badges ── */
+.priority-Critical,
+.priority-High,
+.priority-Medium,
+.priority-Low {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.priority-Critical {
+  background: rgba(255, 59, 48, 0.15);
+  color: #ff5f57;
+}
+
+.priority-High {
+  background: rgba(255, 149, 0, 0.15);
+  color: #ffb340;
+}
+
+.priority-Medium {
+  background: rgba(10, 132, 255, 0.12);
+  color: #5EA2FF;
+}
+
+.priority-Low {
+  background: rgba(52, 199, 89, 0.12);
+  color: #5ee38a;
+}
+
+/* ── Expense bar: per-category color support ── */
+[data-theme="dark"] .bar-fill {
+  background: var(--bar-color, linear-gradient(90deg, #0A84FF, #5EA2FF));
+  box-shadow: 0 0 8px color-mix(in srgb, var(--bar-color, #0A84FF) 30%, transparent);
+}
+
+/* ── Greeting: tighter without signal tags ── */
+.tc-left {
+  gap: 0.6rem;
+}
+
+.greeting-clock {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.55;
+}
+
+/* ── ghost buttons in dark mode: smooth underline on hover ── */
+[data-theme="dark"] .ghost-button {
+  transition: color 0.15s;
+}
+
+/* ── FAB: smoother open/close ── */
+.fab-main {
+  transition:
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    background 160ms,
+    box-shadow 220ms,
+    rotate 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Reduced motion: suppress new transitions ── */
+@media (prefers-reduced-motion: reduce) {
+  .sb-stat,
+  .dashboard-grid .panel,
+  .fab-main { transition: none !important; }
+  [data-theme="dark"] .sb-stat:hover,
+  [data-theme="dark"] .dashboard-grid .panel:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
 }
