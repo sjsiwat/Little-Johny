@@ -92,6 +92,18 @@ const Storage = (() => {
     };
   }
 
+  /* ── Deduplicate items by title — keeps latest createdAt per unique title ── */
+  function dedupeByTitle(items) {
+    const map = new Map();
+    items.forEach(item => {
+      const key = item.title.trim().toLowerCase();
+      if (!map.has(key) || item.createdAt > map.get(key).createdAt) {
+        map.set(key, item);
+      }
+    });
+    return [...map.values()].sort((a, b) => b.createdAt - a.createdAt);
+  }
+
   /* ── Cloud sync: upsert current items, delete orphans ── */
   async function syncTable(table, items, toRow, uid) {
     const db = Auth.db;
@@ -160,9 +172,9 @@ const Storage = (() => {
         ]);
         if (tasksRes.error || notesRes.error || expensesRes.error) return null;
         return {
-          tasks: tasksRes.data.map(rowToTask),
-          notes: notesRes.data.map(rowToNote),
-          expenses: expensesRes.data.map(rowToExpense)
+          tasks:    dedupeByTitle(tasksRes.data.map(rowToTask)),
+          notes:    dedupeByTitle(notesRes.data.map(rowToNote)),
+          expenses: dedupeByTitle(expensesRes.data.map(rowToExpense))
         };
       } catch (err) {
         console.error('[storage] loadCloud failed:', err);
