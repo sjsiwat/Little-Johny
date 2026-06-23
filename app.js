@@ -449,12 +449,30 @@ function renderDashboard() {
         .join("")
     : emptyState("ยังไม่มีโน้ต ลองบันทึกไอเดียหรือความคิดแรกของ Johny OS", "notes", "เขียนโน้ต");
 
-  // Calendar heading
+  // Calendar heading + today's tasks
   const calHead = document.getElementById("calTodayHeading");
   if (calHead) {
     calHead.textContent = new Intl.DateTimeFormat("th-TH", {
       day: "numeric", month: "long", year: "numeric"
     }).format(new Date());
+  }
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const todayTasks = state.tasks.filter(t => t.due === todayKey);
+  const calEventsEl = document.getElementById("todayCalEvents");
+  if (calEventsEl) {
+    if (todayTasks.length) {
+      calEventsEl.innerHTML = todayTasks.map(t => `
+        <div class="dash-cal-task dash-cal-task--${t.priority.toLowerCase()}${t.status === 'Completed' ? ' is-done' : ''}">
+          <span class="dash-cal-pip"></span>
+          <span class="dash-cal-title">${escapeHtml(t.title)}</span>
+          <span class="priority-${t.priority} dash-cal-badge">${t.priority}</span>
+        </div>`).join("");
+    } else {
+      calEventsEl.innerHTML = `<div class="cal-empty-state">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" style="opacity:0.35"><rect x="2.5" y="5" width="23" height="20.5" rx="4.5" stroke="currentColor" stroke-width="1.8"/><path d="M9 2.5v5M19 2.5v5M2.5 12h23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <p>ไม่มีกำหนดการวันนี้</p>
+      </div>`;
+    }
   }
 
   renderExpenseBars();
