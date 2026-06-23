@@ -4466,3 +4466,38 @@ body::before {
     box-shadow: none !important;
   }
 }
+
+/* LINE Link Panel */
+.line-link-panel {
+  margin-top: 1.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.line-link-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+.line-link-status {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--accent);
+}
+.line-link-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+.line-link-input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+.line-link-input-row input {
+  flex: 1;
+  letter-spacing: 0.2em;
+  font-size: 1.1rem;
+}

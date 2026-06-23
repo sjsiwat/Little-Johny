@@ -2023,3 +2023,71 @@ if ("serviceWorker" in navigator) {
   });
 }
 
+
+// LINE Bot Linking
+const LINE_WORKER_URL = 'https://johny-line-bot.sj-siwat.workers.dev'
+
+function initLineLink() {
+  const panel = document.getElementById('lineLinkPanel')
+  const btn = document.getElementById('lineLinkBtn')
+  const input = document.getElementById('lineLinkCode')
+  const status = document.getElementById('lineLinkStatus')
+  const form = document.getElementById('lineLinkForm')
+
+  const stored = localStorage.getItem('lineUserId')
+  if (stored) {
+    showLinked(stored, status, form)
+  }
+
+  btn?.addEventListener('click', async () => {
+    const code = input.value.trim()
+    if (code.length !== 6) return showToast('กรอกรหัส 6 หลัก')
+
+    btn.disabled = true
+    btn.textContent = 'กำลังตรวจสอบ...'
+    try {
+      const res = await fetch(`${LINE_WORKER_URL}/link/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+
+      localStorage.setItem('lineUserId', data.lineUserId)
+      showLinked(data.lineUserId, status, form)
+      showToast('เชื่อมบัญชี LINE สำเร็จ!')
+      loadLineNotes(data.lineUserId)
+    } catch (err) {
+      showToast(err.message || 'เกิดข้อผิดพลาด')
+      btn.disabled = false
+      btn.textContent = 'เชื่อม'
+    }
+  })
+}
+
+function showLinked(userId, status, form) {
+  status.textContent = '✓ เชื่อมแล้ว'
+  form.innerHTML = `<p class="line-link-hint">LINE เชื่อมกับ JohnyMemo แล้ว <button type="button" id="lineUnlinkBtn" style="color:var(--danger);background:none;border:none;cursor:pointer;padding:0">ยกเลิก</button></p><div id="lineNoteList"></div>`
+  document.getElementById('lineUnlinkBtn')?.addEventListener('click', () => {
+    localStorage.removeItem('lineUserId')
+    location.reload()
+  })
+  loadLineNotes(userId)
+}
+
+async function loadLineNotes(userId) {
+  const container = document.getElementById('lineNoteList')
+  if (!container) return
+  const res = await fetch(`${LINE_WORKER_URL}/notes/${userId}`)
+  const { notes } = await res.json()
+  if (notes.length === 0) {
+    container.innerHTML = '<p class="line-link-hint">ยังไม่มีโน้ตจาก LINE</p>'
+    return
+  }
+  container.innerHTML = notes.map(n =>
+    `<div class="item-row"><span>${n.text}</span><small style="color:var(--text-muted)">${new Date(n.createdAt).toLocaleDateString('th-TH')}</small></div>`
+  ).join('')
+}
+
+initLineLink()
