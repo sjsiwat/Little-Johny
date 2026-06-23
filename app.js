@@ -25,124 +25,136 @@ function createDemoState() {
     dt.setDate(dt.getDate() + offsetDays);
     return dt.toISOString().slice(0, 10);
   };
-  const t = (offsetMs) => Date.now() - Math.abs(offsetMs);
+  const ts = (offsetMin) => Date.now() - offsetMin * 60000;
 
   return {
+    // ── Tasks: ครบทุก priority × status ──────────────────────
     tasks: [
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "ส่งสรุปรายงานยอดขายให้ทีม",
-        priority: "Critical",
-        due: d(0),
-        status: "Pending",
-        createdAt: t(1000)
+        title: "ส่งสรุปรายงานประจำเดือนมิถุนายน",
+        priority: "Critical", due: d(0), status: "Pending", createdAt: ts(5)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "ประชุม Product Sync 14:00 — เตรียม slide ก่อนนะ",
-        priority: "High",
-        due: d(0),
-        status: "Pending",
-        createdAt: t(2000)
+        title: "ประชุม Product Review 14:00 น. — เตรียม slide ให้พร้อม",
+        priority: "High", due: d(0), status: "Pending", createdAt: ts(20)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "เขียน spec ฟีเจอร์ Notification ให้ครบก่อนส่งทีม Dev",
-        priority: "Medium",
-        due: d(2),
-        status: "Pending",
-        createdAt: t(3000)
+        title: "เขียน spec ฟีเจอร์ Notification ส่งทีม Dev",
+        priority: "Medium", due: d(3), status: "Pending", createdAt: ts(60)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "ออกกำลังกาย 30 นาที",
-        priority: "Low",
-        due: d(0),
-        status: "Pending",
-        createdAt: t(4000)
+        title: "อ่านหนังสือก่อนนอน 30 นาที",
+        priority: "Low", due: d(0), status: "Pending", createdAt: ts(90)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "ทบทวน PR code ของทีม backend",
-        priority: "High",
-        due: d(-1),
-        status: "Completed",
-        createdAt: t(5000)
+        title: "ตรวจสอบ Pull Request ของทีม Backend",
+        priority: "High", due: d(-1), status: "Completed", createdAt: ts(180)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "อัปเดต dependencies ใน project",
-        priority: "Low",
-        due: "",
-        status: "Completed",
-        createdAt: t(6000)
+        title: "อัปเดต README และ documentation",
+        priority: "Low", due: "", status: "Completed", createdAt: ts(300)
       }
     ],
+
+    // ── Notes: ครบทุกรูปแบบการใช้งาน ─────────────────────────
     notes: [
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "ไอเดีย Q3: ฟีเจอร์ที่อยากทำ",
-        body: "• Reminder แจ้งเตือนก่อน deadline\n• Export รายจ่ายเป็น PDF\n• Dark mode เต็มรูปแบบ\n• Shortcut เพิ่มงานด้วยเสียง\n• Weekly summary ส่งเข้า LINE",
-        tags: "ไอเดีย, แผนงาน, Q3",
-        createdAt: t(1000)
+        title: "ไอเดีย Feature Q3",
+        body: "• Reminder แจ้งเตือนก่อน deadline อัตโนมัติ\n• Export รายจ่ายเป็น PDF รายเดือน\n• Focus Timer เชื่อมกับ task โดยตรง\n• Weekly summary รายงานสรุปประจำสัปดาห์\n• Shortcut เพิ่มงานด้วยเสียง",
+        tags: "ไอเดีย, product, Q3",
+        createdAt: ts(10)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "สรุป Meeting วันนี้",
-        body: "Sprint goal: ปิด 3 feature ภายใน 2 สัปดาห์\nBlock: รอ design จาก UX team\nAction item:\n- @Beam ส่ง mockup ภายใน พฤ.\n- @Me เขียน API spec ก่อน ศ.",
+        title: "สรุป Sprint Meeting 23 มิ.ย.",
+        body: "Sprint Goal: ปิด 3 feature ภายใน 2 สัปดาห์\n\n✅ เสร็จแล้ว: Login, Dashboard, Tasks CRUD\n🔄 กำลังทำ: Notes inline edit, Expenses chart\n⛔ Blocked: รอ design จาก UX team\n\nAction items:\n→ @Beam ส่ง mockup ภายใน พฤ. นี้\n→ @Me เขียน API spec ก่อน ศ.",
         tags: "ประชุม, sprint, สรุป",
-        createdAt: t(2000)
+        createdAt: ts(120)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "คำคมที่ชอบ",
-        body: "\"Done is better than perfect.\"\n— Mark Zuckerberg\n\n\"Start before you're ready. Don't prepare, begin.\"\n— Mel Robbins\n\n\"ความสำเร็จ คือผลรวมของความพยายามเล็กๆ ที่ทำทุกวัน\"",
-        tags: "แรงบันดาลใจ",
-        createdAt: t(3000)
+        title: "แรงบันดาลใจ",
+        body: "\"Done is better than perfect.\"\n— Mark Zuckerberg\n\n\"ความสำเร็จ คือผลรวมของความพยายามเล็กๆ น้อยๆ ที่ทำทุกวัน\"\n\n\"The secret of getting ahead is getting started.\"\n— Mark Twain",
+        tags: "แรงบันดาล, คำคม",
+        createdAt: ts(240)
       }
     ],
+
+    // ── Expenses: หลายหมวด หลายวัน — กราฟสรุปโชว์ครบ ──────────
     expenses: [
+      // วันนี้
       {
         id: crypto.randomUUID(), _isDemo: true,
         title: "กาแฟ Oat Latte",
-        amount: 95,
-        category: "เครื่องดื่ม",
-        date: d(0),
-        createdAt: t(1000)
+        amount: 95, category: "เครื่องดื่ม", date: d(0), createdAt: ts(30)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
         title: "ข้าวกลางวัน + น้ำ",
-        amount: 130,
-        category: "อาหาร",
-        date: d(0),
-        createdAt: t(2000)
+        amount: 135, category: "อาหาร", date: d(0), createdAt: ts(90)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "BTS Skytrain",
-        amount: 52,
-        category: "เดินทาง",
-        date: d(0),
-        createdAt: t(3000)
+        title: "BTS ไป-กลับ",
+        amount: 84, category: "เดินทาง", date: d(0), createdAt: ts(120)
       },
+      // เมื่อวาน
+      {
+        id: crypto.randomUUID(), _isDemo: true,
+        title: "อาหารเย็น ชาบู",
+        amount: 380, category: "อาหาร", date: d(-1), createdAt: ts(300)
+      },
+      {
+        id: crypto.randomUUID(), _isDemo: true,
+        title: "ชาไข่มุก",
+        amount: 65, category: "เครื่องดื่ม", date: d(-1), createdAt: ts(360)
+      },
+      {
+        id: crypto.randomUUID(), _isDemo: true,
+        title: "Grab ไปห้าง",
+        amount: 120, category: "เดินทาง", date: d(-1), createdAt: ts(420)
+      },
+      // 3 วันก่อน
       {
         id: crypto.randomUUID(), _isDemo: true,
         title: "ค่ายา + วิตามิน",
-        amount: 350,
-        category: "สุขภาพ",
-        date: d(-1),
-        createdAt: t(4000)
+        amount: 350, category: "สุขภาพ", date: d(-3), createdAt: ts(600)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
+        title: "เสื้อยืด Uniqlo",
+        amount: 590, category: "ช้อปปิ้ง", date: d(-3), createdAt: ts(660)
+      },
+      // ต้นเดือน
+      {
+        id: crypto.randomUUID(), _isDemo: true,
         title: "Netflix รายเดือน",
-        amount: 419,
-        category: "อื่นๆ",
-        date: d(-3),
-        createdAt: t(5000)
+        amount: 419, category: "อื่นๆ", date: d(-8), createdAt: ts(1440)
+      },
+      {
+        id: crypto.randomUUID(), _isDemo: true,
+        title: "ค่าอินเทอร์เน็ตบ้าน",
+        amount: 599, category: "อินเทอร์เน็ต", date: d(-10), createdAt: ts(2000)
+      },
+      {
+        id: crypto.randomUUID(), _isDemo: true,
+        title: "ค่าอาหารเช้า + กาแฟ",
+        amount: 110, category: "อาหาร", date: d(-5), createdAt: ts(900)
+      },
+      {
+        id: crypto.randomUUID(), _isDemo: true,
+        title: "ออกกำลังกาย รายเดือน",
+        amount: 450, category: "สุขภาพ", date: d(-12), createdAt: ts(2400)
       }
     ],
+
     logs: [
       "ลองพิมพ์: เพิ่มงาน ประชุมทีมพรุ่งนี้ 10 โมง",
       "ลองพิมพ์: จ่าย กาแฟ 95 เครื่องดื่ม",
