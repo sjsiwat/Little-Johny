@@ -751,7 +751,13 @@ function showHomepage() {
   document.querySelector(".cat-roam-float")?.style.removeProperty("display");
 }
 
+function freshDemoState() {
+  return { theme: state.theme || "dark", taskFilter: "all", ...createDemoState() };
+}
+
 function enterGuestMode() {
+  state = freshDemoState(); // always reset to clean demo — ignore any stale localStorage
+  render();
   showApp();
   setView("dashboard");
 }
