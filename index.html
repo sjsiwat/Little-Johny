@@ -272,9 +272,22 @@
                 <circle class="focus-ring-bg" cx="32" cy="32" r="28"/>
                 <circle class="focus-ring-arc" id="focusArc" cx="32" cy="32" r="28"/>
               </svg>
-              <span class="focus-time-label" id="focusTimerLabel" aria-live="off">25:00</span>
+              <span class="focus-time-label" id="focusTimerLabel" aria-live="off" tabindex="0" title="แตะเพื่อตั้งเวลา">25:00</span>
+              <input class="focus-time-input" id="focusTimeInput" type="number" min="1" max="99" value="25" hidden aria-label="ตั้งเวลา (นาที)" />
             </div>
-            <button class="focus-timer-btn" id="focusTimerBtn" type="button">▶ Start</button>
+            <div class="focus-presets">
+              <button class="focus-preset" data-minutes="5" type="button">5</button>
+              <button class="focus-preset" data-minutes="15" type="button">15</button>
+              <button class="focus-preset focus-preset--active" data-minutes="25" type="button">25</button>
+              <button class="focus-preset" data-minutes="50" type="button">50</button>
+            </div>
+            <div class="focus-timer-actions">
+              <button class="focus-timer-btn" id="focusTimerBtn" type="button">▶ Start</button>
+              <button class="focus-timer-reset" id="focusTimerReset" type="button" aria-label="รีเซ็ต" title="รีเซ็ต">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M12.5 2A6 6 0 1 0 13.5 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><polyline points="10.5,0 13.5,2 10.5,4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+            <button class="focus-finish-btn" id="focusFinishBtn" type="button" hidden>✓ เสร็จสิ้นก่อนกำหนด</button>
           </div>
           <div id="focusTaskPicker"></div>
           <div class="focus-done-prompt" id="focusDonePrompt" hidden>
