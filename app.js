@@ -1071,63 +1071,142 @@ document.addEventListener("keydown", (e) => {
 
 /* ── Focus timer (Pomodoro) ── */
 (function initFocusTimer() {
-  const btn   = document.getElementById("focusTimerBtn");
-  const label = document.getElementById("focusTimerLabel");
-  const arc   = document.getElementById("focusArc");
-  if (!btn || !label || !arc) return;
+  const btnStart  = document.getElementById("focusTimerBtn");
+  const btnReset  = document.getElementById("focusTimerReset");
+  const btnFinish = document.getElementById("focusFinishBtn");
+  const label     = document.getElementById("focusTimerLabel");
+  const input     = document.getElementById("focusTimeInput");
+  const arc       = document.getElementById("focusArc");
+  if (!btnStart || !arc) return;
 
-  const TOTAL = 25 * 60;
   const CIRCUMFERENCE = 2 * Math.PI * 28;
   arc.style.strokeDasharray = CIRCUMFERENCE;
 
-  let remaining = TOTAL;
+  let totalSecs = 25 * 60;
+  let remaining = totalSecs;
   let interval  = null;
   let running   = false;
 
+  function fmt(secs) {
+    return `${String(Math.floor(secs / 60)).padStart(2, "0")}:${String(secs % 60).padStart(2, "0")}`;
+  }
+
   function updateDisplay() {
-    const m = String(Math.floor(remaining / 60)).padStart(2, "0");
-    const s = String(remaining % 60).padStart(2, "0");
-    label.textContent = `${m}:${s}`;
-    arc.style.strokeDashoffset = CIRCUMFERENCE * (1 - remaining / TOTAL);
+    if (label) label.textContent = fmt(remaining);
+    arc.style.strokeDashoffset = CIRCUMFERENCE * (1 - remaining / totalSecs);
+  }
+
+  function setTotal(mins) {
+    totalSecs = Math.max(1, Math.min(99, mins)) * 60;
+    remaining = totalSecs;
+    updateDisplay();
+    document.querySelectorAll(".focus-preset").forEach(b =>
+      b.classList.toggle("focus-preset--active", Number(b.dataset.minutes) === mins)
+    );
+  }
+
+  function playChime() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [[523.25, 0], [659.25, 0.22], [783.99, 0.44], [1046.5, 0.66]].forEach(([freq, delay]) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = "sine"; osc.frequency.value = freq;
+        const t = ctx.currentTime + delay;
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(0.22, t + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + (delay < 0.6 ? 0.55 : 1.0));
+        osc.start(t); osc.stop(t + 1.1);
+      });
+      setTimeout(() => ctx.close(), 2500);
+    } catch (e) {}
+  }
+
+  function showDonePrompt() {
+    const ft = _focusTaskId ? state.tasks.find(t => t.id === _focusTaskId && t.status !== "Completed") : null;
+    if (ft) {
+      const prompt = document.getElementById("focusDonePrompt");
+      const textEl = document.getElementById("focusDoneText");
+      const yesBtn = document.getElementById("focusDoneYes");
+      if (prompt && textEl && yesBtn) {
+        textEl.textContent = ft.title;
+        yesBtn.dataset.completeTask = _focusTaskId;
+        prompt.hidden = false;
+      }
+    } else {
+      showToast("⏰ Focus session เสร็จแล้ว! พักสักครู่");
+    }
   }
 
   function stop() {
-    clearInterval(interval);
-    interval = null;
-    running = false;
-    btn.textContent = "▶ Start";
-    btn.classList.remove("running");
+    clearInterval(interval); interval = null; running = false;
+    btnStart.textContent = "▶ Start";
+    btnStart.classList.remove("running");
+    if (btnFinish) btnFinish.hidden = true;
+    arc.style.stroke = "#0A84FF";
   }
 
-  btn.addEventListener("click", () => {
+  function reset() {
+    stop();
+    remaining = totalSecs;
+    updateDisplay();
+  }
+
+  // ── Start / Pause
+  btnStart.addEventListener("click", () => {
     if (running) {
-      stop();
+      clearInterval(interval); interval = null; running = false;
+      btnStart.textContent = "▶ Resume";
+      btnStart.classList.remove("running");
     } else {
-      if (remaining === 0) { remaining = TOTAL; updateDisplay(); }
+      if (remaining <= 0) { remaining = totalSecs; updateDisplay(); }
       running = true;
-      btn.textContent = "⏸ Pause";
-      btn.classList.add("running");
+      btnStart.textContent = "⏸ Pause";
+      btnStart.classList.add("running");
+      if (btnFinish) btnFinish.hidden = false;
+      arc.style.stroke = "#0A84FF";
       interval = setInterval(() => {
         remaining--;
         updateDisplay();
         if (remaining <= 0) {
-          stop();
-          const ft = _focusTaskId ? state.tasks.find(t => t.id === _focusTaskId) : null;
-          if (ft) {
-            const prompt = document.getElementById("focusDonePrompt");
-            const textEl = document.getElementById("focusDoneText");
-            const yesBtn = document.getElementById("focusDoneYes");
-            if (prompt && textEl && yesBtn) {
-              textEl.textContent = ft.title;
-              yesBtn.dataset.completeTask = _focusTaskId;
-              prompt.hidden = false;
-            }
-          } else {
-            showToast("⏰ Focus session เสร็จแล้ว! พักสักครู่");
-          }
+          stop(); playChime(); showDonePrompt();
         }
       }, 1000);
     }
+  });
+
+  // ── Reset
+  btnReset?.addEventListener("click", reset);
+
+  // ── Manual finish early
+  btnFinish?.addEventListener("click", () => {
+    stop(); remaining = 0; updateDisplay(); playChime(); showDonePrompt();
+  });
+
+  // ── Preset chips
+  document.querySelectorAll(".focus-preset").forEach(btn => {
+    btn.addEventListener("click", () => { if (!running) setTotal(Number(btn.dataset.minutes)); });
+  });
+
+  // ── Tap label to set custom time
+  label?.addEventListener("click", () => {
+    if (running || !input) return;
+    input.value = Math.round(totalSecs / 60);
+    label.hidden = true; input.hidden = false;
+    input.focus(); input.select();
+  });
+  label?.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") label.click(); });
+
+  function commitInput() {
+    const mins = parseInt(input.value, 10);
+    if (!isNaN(mins) && mins >= 1) setTotal(mins);
+    input.hidden = true; if (label) label.hidden = false;
+  }
+  input?.addEventListener("blur", commitInput);
+  input?.addEventListener("keydown", e => {
+    if (e.key === "Enter") { e.preventDefault(); commitInput(); }
+    if (e.key === "Escape") { input.hidden = true; if (label) label.hidden = false; }
   });
 
   updateDisplay();
