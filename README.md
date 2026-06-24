@@ -67,6 +67,68 @@ Local → Git commit → GitHub → Cloudflare Pages → johny.siwat.me
 
 ---
 
+## LINE Bot Integration
+
+> Repository: `johny-line-bot` — Cloudflare Workers + Hono
+
+### Architecture: LINE ↔ Supabase
+
+```
+LINE User A ──เชื่อมบัญชี──► Supabase Auth (alice@gmail.com)
+LINE User B ──เชื่อมบัญชี──► Supabase Auth (bob@gmail.com)
+                                    │
+                          line_users table
+                    ┌───────────────┬──────────┐
+                    │ line_user_id  │ user_id  │
+                    ├───────────────┼──────────┤
+                    │ Uaaa…         │ uuid-A   │
+                    │ Ubbb…         │ uuid-B   │
+                    └───────────────┴──────────┘
+```
+
+**ข้อมูลแยกกันโดย `user_id` — ไม่มีทางปนกัน**
+
+- LINE bot กรองทุก query ด้วย `?user_id=eq.<uuid>` (service role key)
+- Web app ป้องกันด้วย Supabase RLS policy (JWT)
+- 1 LINE account ↔ 1 Supabase account เท่านั้น
+
+### ขั้นตอนเชื่อมบัญชี
+
+```
+1. User พิม "เชื่อมบัญชี" ใน LINE
+   └─► Bot สร้างรหัส 6 หลัก → เก็บ KV: link:CODE → LINE_USER_ID (TTL 10 นาที)
+
+2. User กรอกรหัสในเว็บ JohnyMemo
+   └─► Web ส่ง POST /link/verify {code, supabaseUserId}
+
+3. Worker ตรวจสอบรหัส → บันทึก mapping ลง line_users table (ถาวร)
+   └─► {line_user_id: "Uaaa…", user_id: "uuid-A"}
+```
+
+### LINE Bot Commands
+
+| คำสั่ง | ผล |
+|---|---|
+| `+งาน [ชื่องาน]` | เพิ่มงานใหม่ลง Supabase |
+| `งานค้าง` / `งานเสร็จ` | ดูสถานะงาน |
+| `จ่าย [ชื่อ] [จำนวน]` | บันทึกรายจ่าย (auto-detect หมวด) |
+| `รายจ่าย` / `รายจ่ายเดือนนี้` | ดูสรุปรายจ่าย |
+| `บันทึก [ข้อความ]` | บันทึกโน้ต |
+| `โน้ต` | ดูโน้ตทั้งหมด |
+| `เชื่อมบัญชี` | เริ่มกระบวนการเชื่อม LINE ↔ JohnyMemo |
+| `คำสั่ง` | แสดงรายการคำสั่งทั้งหมด |
+
+### Stack
+
+```
+LINE Messaging API → Cloudflare Worker (Hono) → Supabase REST API
+                                │
+                         Cloudflare KV
+                    (link codes + unlinked notes)
+```
+
+---
+
 ## Roadmap
 
 ### Phase 2 — Cloud & Integrations
