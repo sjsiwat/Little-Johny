@@ -44,6 +44,12 @@ const EXPENSE_BAR_COLORS = {
   "การศึกษา": "#30D158", "ลงทุน": "#BF5AF2", "อื่นๆ": "#8E8E93",
 };
 
+const EXPENSE_ICONS = {
+  "อาหาร":"🍜","เครื่องดื่ม":"☕","เดินทาง":"🚌","น้ำมัน":"⛽",
+  "ค่าไฟ":"⚡","ค่าน้ำ":"💧","อินเทอร์เน็ต":"📡","สุขภาพ":"🏥",
+  "ช้อปปิ้ง":"🛍️","การศึกษา":"📚","ลงทุน":"📈","อื่นๆ":"📦",
+};
+
 /* ── Icons ── */
 const ICON_EDIT = '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M7.5 1.5l2 2-6 6H1.5v-2l6-6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>';
 
@@ -1038,91 +1044,77 @@ function renderReview() {
 }
 
 function renderTaskListItem(task) {
-  const done          = isTaskDone(task);
-  const sm            = STATUS_META[task.status] || STATUS_META.todo;
-  const deadlineBadge = renderDeadlineBadge(task.due, done);
-  const labelChips    = renderTaskLabelChips(task.labels);
-  const hasTarget     = task.target_value != null && Number(task.target_value) > 0;
-  const prog          = hasTarget ? Math.min(Math.round((Number(task.progress_value) || 0) / Number(task.target_value) * 100), 100) : 0;
-  const progMode      = _taskProgressMode.get(task.id) || 'value';
-  const goalBadge     = (() => {
-    if (!task.goal_id) return "";
-    const g = state.goals.find(g => g.id === task.goal_id);
-    return g ? `<span class="item-goal-badge" style="--gc:${g.color}">${escapeHtml(g.title)}</span>` : "";
-  })();
-
+  const done     = isTaskDone(task);
+  const PC       = { Critical:'#FF453A', High:'#FF9F0A', Medium:'#0A84FF', Low:'#8E8E93' };
+  const pColor   = PC[task.priority] || '#8E8E93';
+  const hasTarget = task.target_value != null && Number(task.target_value) > 0;
+  const prog     = hasTarget ? Math.min(Math.round((Number(task.progress_value)||0)/Number(task.target_value)*100),100) : 0;
+  const progMode = _taskProgressMode.get(task.id) || 'value';
   const progressLabel = progMode === 'pct'
     ? `${prog}%`
-    : `${formatNum(task.progress_value)} / ${formatNum(task.target_value)}${task.target_unit ? " " + escapeHtml(task.target_unit) : ""}`;
+    : `${formatNum(task.progress_value)} / ${formatNum(task.target_value)}${task.target_unit ? ' '+escapeHtml(task.target_unit) : ''}`;
+
+  const labelChips = task.labels?.map(id => {
+    const l = TASK_LABELS.find(x => x.id === id);
+    return l ? `<span class="tli-label" style="--lc:${l.color}">${escapeHtml(l.name)}</span>` : '';
+  }).join('') || '';
+
+  const dueChip = (() => {
+    if (!task.due) return '';
+    const info = getDeadlineInfo(task.due, done);
+    if (!info) return `<span class="tli-due">${formatDate(task.due)}</span>`;
+    if (info.type === 'overdue') return `<span class="tli-due tli-due--overdue">เกิน ${info.days} วัน</span>`;
+    if (info.type === 'today')   return `<span class="tli-due tli-due--today">วันนี้</span>`;
+    if (info.type === 'soon')    return `<span class="tli-due tli-due--soon">อีก ${info.days} วัน</span>`;
+    return `<span class="tli-due">${formatDate(task.due)}</span>`;
+  })();
+
+  const goalBadge = (() => {
+    if (!task.goal_id) return '';
+    const g = state.goals.find(g => g.id === task.goal_id);
+    return g ? `<span class="tli-goal" style="--gc:${g.color}">${escapeHtml(g.title)}</span>` : '';
+  })();
 
   return `
-    <article class="task-list-item${done ? " is-done" : ""}${hasTarget ? " has-target" : ""}" data-task-id="${task.id}">
-      <button class="task-check-btn" type="button" data-toggle-task="${task.id}"
-        aria-pressed="${done}" title="${done ? "เปิดงานอีกครั้ง" : "ทำเครื่องหมายเสร็จ"}">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-          ${done ? '<path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' : '<rect x="1" y="1" width="10" height="10" rx="2.5" stroke="currentColor" stroke-width="1.5"/>'}
-        </svg>
-      </button>
-      <div class="task-list-body">
-        <div class="task-list-top">
-          <span class="task-list-title">${escapeHtml(task.title)}</span>
-          <span class="task-priority-dot task-priority-dot--${task.priority.toLowerCase()}" title="${task.priority}"></span>
-        </div>
-        ${task.description ? `<p class="task-list-desc">${escapeHtml(task.description)}</p>` : ""}
-        <div class="task-list-meta">
-          <span class="task-status-pill" style="--sc:${sm.color}">${sm.label}</span>
-          ${deadlineBadge}
-          ${labelChips}
-          ${goalBadge}
-        </div>
-
-        ${hasTarget ? `
-        <div class="task-progress-row">
-          <div class="task-progress-track">
-            <div class="task-progress-fill" style="width:${prog}%"></div>
-          </div>
-          <span class="task-progress-label">${progressLabel}</span>
-          <button class="task-progress-mode-btn" type="button" data-toggle-progress-mode="${task.id}"
-            title="${progMode === 'pct' ? 'แสดงค่าจริง' : 'แสดงเป็น %'}">
-            ${progMode === 'pct' ? '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M3 2.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM10 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>' : '%'}
-          </button>
-          ${!done ? `<button class="task-log-btn" type="button" data-log-task="${task.id}">+ บันทึก</button>` : ""}
-          <button class="task-progress-remove-btn" type="button" data-remove-progress="${task.id}" title="ลบ Progress Bar">×</button>
-        </div>
-        <div class="task-log-input-row" id="logRow-${task.id}" hidden>
-          <span class="task-log-unit-prefix">${escapeHtml(task.target_unit || "")}</span>
-          <input class="task-log-input" type="number" placeholder="เพิ่ม เช่น 500" min="0" step="any" data-log-input="${task.id}" />
-          <button class="task-log-confirm" type="button" data-log-confirm="${task.id}">บันทึก</button>
-          <button class="task-log-cancel" type="button" data-log-cancel="${task.id}">ยกเลิก</button>
-        </div>` : ""}
-
-        ${!hasTarget && !done ? `
-        <div class="task-add-progress-inline" id="addProgRow-${task.id}" hidden>
-          <input class="task-log-input task-quick-target" type="number" placeholder="เป้าหมาย เช่น 10000" min="0" step="any" data-quick-target="${task.id}" />
-          <input class="task-log-input task-quick-unit" type="text" placeholder="หน่วย เช่น บาท วัน ครั้ง" maxlength="20" data-quick-unit="${task.id}" />
-          <button class="task-log-confirm" type="button" data-quick-confirm="${task.id}">เพิ่ม</button>
-          <button class="task-log-cancel" type="button" data-quick-cancel="${task.id}">ยกเลิก</button>
-        </div>` : ""}
-      </div>
-
-      <div class="task-list-actions">
-        ${!done && !hasTarget ? `
-        <button class="icon-button icon-button--progress" type="button" data-add-progress="${task.id}" title="เพิ่ม Progress Bar" aria-label="เพิ่ม Progress Bar">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-            <rect x="1" y="7" width="2" height="4" rx="0.5" fill="currentColor" opacity="0.4"/>
-            <rect x="4.5" y="4" width="2" height="7" rx="0.5" fill="currentColor" opacity="0.65"/>
-            <rect x="8" y="1" width="2" height="10" rx="0.5" fill="currentColor"/>
-            <path d="M10.5 2.5L9 1l-1.5 1.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>` : ""}
-        ${!done ? `<button class="icon-button icon-button--focus${_focusTaskId === task.id ? " is-focusing" : ""}" type="button" data-focus-task="${task.id}" title="Focus" aria-label="Focus">
-          <svg width="10" height="11" viewBox="0 0 10 11" fill="none" aria-hidden="true"><path d="M2 1l7 4.5-7 4.5V1z" fill="currentColor"/></svg>
-        </button>` : ""}
-        <button class="icon-button icon-button--edit" type="button" data-edit-task="${task.id}" title="แก้ไขงาน" aria-label="แก้ไขงาน">
-          ${ICON_EDIT}
+    <article class="tli${done ? ' tli--done' : ''}" data-task-id="${task.id}">
+      <div class="tli-row">
+        <button class="tli-check" type="button" data-toggle-task="${task.id}" aria-pressed="${done}" title="${done ? 'เปิดงานอีกครั้ง' : 'ทำเครื่องหมายเสร็จ'}">
+          ${done ? `<svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden="true"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>` : ''}
         </button>
-        <button class="icon-button" type="button" data-delete-task="${task.id}" title="ลบงาน">×</button>
+        <span class="tli-dot" style="background:${done ? '#8E8E93' : pColor}"></span>
+        <span class="tli-title">${escapeHtml(task.title)}</span>
+        <span class="tli-badge" style="--bc:${pColor}18;--bt:${pColor}">${task.priority}</span>
+        ${labelChips}
+        ${goalBadge}
+        ${dueChip}
+        <div class="tli-acts">
+          ${!done && !hasTarget ? `<button class="tli-act" type="button" data-add-progress="${task.id}" title="เพิ่ม Progress Bar" aria-label="เพิ่ม Progress Bar"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><rect x="1" y="6.5" width="1.5" height="3" rx="0.4" fill="currentColor" opacity=".4"/><rect x="3.5" y="3.5" width="1.5" height="6" rx="0.4" fill="currentColor" opacity=".7"/><rect x="6.5" y="1" width="1.5" height="8.5" rx="0.4" fill="currentColor"/></svg></button>` : ''}
+          ${!done ? `<button class="tli-act${_focusTaskId === task.id ? ' is-focusing' : ''}" type="button" data-focus-task="${task.id}" title="Focus" aria-label="Focus"><svg width="8" height="9" viewBox="0 0 8 9" fill="none" aria-hidden="true"><path d="M1 1.5l6 3-6 3V1.5z" fill="currentColor"/></svg></button>` : ''}
+          <button class="tli-act" type="button" data-edit-task="${task.id}" title="แก้ไขงาน" aria-label="แก้ไขงาน">${ICON_EDIT}</button>
+          <button class="tli-act tli-act--del" type="button" data-delete-task="${task.id}" title="ลบงาน">×</button>
+        </div>
       </div>
+      ${task.description ? `<p class="tli-desc">${escapeHtml(task.description)}</p>` : ''}
+      ${hasTarget ? `
+      <div class="tli-prog" style="--prog:${prog/100}">
+        <div class="tli-prog-track"><div class="tli-prog-fill" style="background:${pColor}"></div></div>
+        <span class="tli-prog-lbl">${progressLabel}</span>
+        <button class="tli-prog-mode" type="button" data-toggle-progress-mode="${task.id}" title="${progMode==='pct'?'แสดงค่าจริง':'แสดงเป็น %'}">${progMode==='pct'?'123':'%'}</button>
+        ${!done ? `<button class="tli-prog-log-btn" type="button" data-log-task="${task.id}">+ บันทึก</button>` : ''}
+        <button class="tli-prog-rm" type="button" data-remove-progress="${task.id}" title="ลบ Progress Bar">×</button>
+      </div>
+      <div class="tli-log-row" id="logRow-${task.id}" hidden>
+        <span class="tli-log-pfx">${escapeHtml(task.target_unit||'')}</span>
+        <input class="tli-log-inp" type="number" placeholder="เพิ่ม เช่น 500" min="0" step="any" data-log-input="${task.id}" />
+        <button class="tli-log-ok" type="button" data-log-confirm="${task.id}">บันทึก</button>
+        <button class="tli-log-x" type="button" data-log-cancel="${task.id}">ยกเลิก</button>
+      </div>` : (!done ? `
+      <div class="tli-addprog-row" id="addProgRow-${task.id}" hidden>
+        <input class="tli-log-inp" type="number" placeholder="เป้าหมาย เช่น 10000" min="0" step="any" data-quick-target="${task.id}" />
+        <input class="tli-log-inp tli-log-unit-inp" type="text" placeholder="หน่วย เช่น บาท วัน ครั้ง" maxlength="20" data-quick-unit="${task.id}" />
+        <button class="tli-log-ok" type="button" data-quick-confirm="${task.id}">เพิ่ม</button>
+        <button class="tli-log-x" type="button" data-quick-cancel="${task.id}">ยกเลิก</button>
+      </div>` : '')}
     </article>`;
 }
 
@@ -1165,23 +1157,34 @@ function renderKanban() {
     const zone = document.getElementById(`kdrop-${status}`);
     if (!zone) return;
 
+    const PC = { Critical:'#FF453A', High:'#FF9F0A', Medium:'#0A84FF', Low:'#8E8E93' };
     zone.innerHTML = tasks.length
       ? tasks.map(t => {
-          const deadlineBadge = renderDeadlineBadge(t.due, isTaskDone(t));
-          const labelChips    = renderTaskLabelChips(t.labels);
+          const pColor = PC[t.priority] || '#8E8E93';
+          const done   = isTaskDone(t);
+          const labels = t.labels?.map(id => {
+            const l = TASK_LABELS.find(x => x.id === id);
+            return l ? `<span class="tli-label" style="--lc:${l.color}">${escapeHtml(l.name)}</span>` : '';
+          }).join('') || '';
+          const dueChip = (() => {
+            if (!t.due) return '';
+            const info = getDeadlineInfo(t.due, done);
+            if (!info) return `<span class="tli-due">${formatDate(t.due)}</span>`;
+            if (info.type === 'overdue') return `<span class="tli-due tli-due--overdue">เกิน ${info.days} วัน</span>`;
+            if (info.type === 'today')   return `<span class="tli-due tli-due--today">วันนี้</span>`;
+            return `<span class="tli-due">${formatDate(t.due)}</span>`;
+          })();
           return `
             <div class="kanban-card" draggable="true" data-task-id="${t.id}" data-drag-task="${t.id}">
               <div class="kanban-card-top">
-                <span class="task-priority-dot task-priority-dot--${t.priority.toLowerCase()}" title="${t.priority}"></span>
+                <span class="tli-dot" style="background:${pColor};flex-shrink:0"></span>
                 <span class="kanban-card-title">${escapeHtml(t.title)}</span>
-                <button class="kanban-card-edit" type="button" data-edit-task="${t.id}" title="แก้ไข" aria-label="แก้ไขงาน">
-                  ${ICON_EDIT}
-                </button>
+                <button class="tli-act" type="button" data-edit-task="${t.id}" title="แก้ไข" aria-label="แก้ไขงาน" style="opacity:0.6">${ICON_EDIT}</button>
               </div>
-              ${t.description ? `<p class="kanban-card-desc">${escapeHtml(t.description)}</p>` : ""}
-              ${deadlineBadge || labelChips ? `<div class="kanban-card-footer">${deadlineBadge}${labelChips}</div>` : ""}
+              ${t.description ? `<p class="kanban-card-desc">${escapeHtml(t.description)}</p>` : ''}
+              ${labels || dueChip ? `<div class="kanban-card-footer">${labels}${dueChip}</div>` : ''}
             </div>`;
-        }).join("")
+        }).join('')
       : `<div class="kanban-empty">ไม่มีงาน</div>`;
   });
 
@@ -1289,36 +1292,37 @@ function getSelectedModalLabels() {
 }
 
 function renderNotes() {
-  document.getElementById("noteList").innerHTML = state.notes.length
-    ? [...state.notes]
-        .sort((a, b) => b.createdAt - a.createdAt)
-        .map((note) => {
-          if (note.id === _editingNoteId) return renderNoteEditForm(note);
-          const noteGoal = note.goal_id ? state.goals.find(g => g.id === note.goal_id) : null;
-          const actions = note._isKVLine
-            ? `<div class="item-actions">
-                <button class="icon-button" type="button" data-delete-note="${note.id}" title="ลบโน้ต">×</button>
-               </div>`
-            : `<div class="item-actions">
-                <button class="icon-button icon-button--edit" type="button" data-edit-note="${note.id}" title="แก้ไขโน้ต" aria-label="แก้ไขโน้ต">
-                  ${ICON_EDIT}
-                </button>
-                <button class="icon-button" type="button" data-delete-note="${note.id}" title="ลบโน้ต">×</button>
-               </div>`;
-          return `
-            <article class="list-item">
-              <div>
-                <span class="item-title">${escapeHtml(note.title)}</span>
-                <span class="item-meta">${escapeHtml(note.tags || "ไม่มี tag")} · ${relativeTime(note.createdAt)}</span>
-                ${noteGoal ? `<span class="item-goal-badge" style="--gc:${noteGoal.color}">${escapeHtml(noteGoal.title)}</span>` : ""}
-                ${note.body ? `<p class="muted">${escapeHtml(note.body)}</p>` : ""}
-              </div>
-              ${actions}
-            </article>
-          `;
-        })
-        .join("")
-    : emptyState("ยังไม่มีโน้ต เริ่มจดสิ่งที่คิดได้เลย", "notes", "เขียนโน้ต");
+  const el = document.getElementById("noteList");
+  if (!state.notes.length) {
+    el.className = "item-list";
+    el.innerHTML = emptyState("ยังไม่มีโน้ต เริ่มจดสิ่งที่คิดได้เลย", "notes", "เขียนโน้ต");
+    return;
+  }
+  el.className = "note-card-grid";
+  el.innerHTML = [...state.notes]
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .map(note => {
+      if (note.id === _editingNoteId) return `<div class="note-card-edit-wrap">${renderNoteEditForm(note)}</div>`;
+      const noteGoal = note.goal_id ? state.goals.find(g => g.id === note.goal_id) : null;
+      const tags = note.tags ? note.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+      const acts = note._isKVLine
+        ? `<button class="note-card-act note-card-act--del" type="button" data-delete-note="${note.id}" title="ลบโน้ต">×</button>`
+        : `<button class="note-card-act" type="button" data-edit-note="${note.id}" title="แก้ไขโน้ต" aria-label="แก้ไขโน้ต">${ICON_EDIT}</button>
+           <button class="note-card-act note-card-act--del" type="button" data-delete-note="${note.id}" title="ลบโน้ต">×</button>`;
+      return `
+        <article class="note-card" data-note-id="${note.id}">
+          <div class="note-card-head">
+            <span class="note-card-title">${escapeHtml(note.title)}</span>
+            <div class="note-card-acts">${acts}</div>
+          </div>
+          ${note.body ? `<p class="note-card-body">${escapeHtml(note.body.slice(0,140))}${note.body.length>140?'…':''}</p>` : ''}
+          <div class="note-card-foot">
+            ${tags.map(t => `<span class="tli-label" style="--lc:#5a8fa8">${escapeHtml(t)}</span>`).join('')}
+            ${noteGoal ? `<span class="tli-goal" style="--gc:${noteGoal.color}">${escapeHtml(noteGoal.title)}</span>` : ''}
+            <span class="note-card-date">${relativeTime(note.createdAt)}</span>
+          </div>
+        </article>`;
+    }).join('');
 }
 
 function renderNoteEditForm(note) {
@@ -1349,22 +1353,21 @@ function renderNoteEditForm(note) {
 }
 
 function renderExpenseItem(expense) {
-  const expGoal = expense.goal_id ? state.goals.find(g => g.id === expense.goal_id) : null;
+  const expGoal  = expense.goal_id ? state.goals.find(g => g.id === expense.goal_id) : null;
+  const icon     = EXPENSE_ICONS[expense.category] || '📦';
+  const catColor = EXPENSE_BAR_COLORS[expense.category] || '#8E8E93';
   return `
-    <article class="list-item">
-      <div>
-        <span class="item-title">${escapeHtml(expense.title)} · ${formatMoney(expense.amount)}</span>
-        <span class="item-meta">${escapeHtml(expense.category)}</span>
-        ${expGoal ? `<span class="item-goal-badge" style="--gc:${expGoal.color}">${escapeHtml(expGoal.title)}</span>` : ""}
+    <article class="exp-item" data-expense-id="${expense.id}">
+      <span class="exp-icon" style="background:${catColor}20">${icon}</span>
+      <span class="exp-name">${escapeHtml(expense.title)}</span>
+      <span class="exp-cat">${escapeHtml(expense.category)}</span>
+      ${expGoal ? `<span class="tli-goal" style="--gc:${expGoal.color}">${escapeHtml(expGoal.title)}</span>` : ''}
+      <span class="exp-amt">−${formatMoney(expense.amount)}</span>
+      <div class="exp-acts">
+        <button class="tli-act" type="button" data-edit-expense="${expense.id}" title="แก้ไขรายจ่าย" aria-label="แก้ไขรายจ่าย">${ICON_EDIT}</button>
+        <button class="tli-act tli-act--del" type="button" data-delete-expense="${expense.id}" title="ลบรายจ่าย">×</button>
       </div>
-      <div class="item-actions">
-        <button class="icon-button icon-button--edit" type="button" data-edit-expense="${expense.id}" title="แก้ไขรายจ่าย" aria-label="แก้ไขรายจ่าย">
-          ${ICON_EDIT}
-        </button>
-        <button class="icon-button" type="button" data-delete-expense="${expense.id}" title="ลบรายจ่าย">×</button>
-      </div>
-    </article>
-  `;
+    </article>`;
 }
 
 function renderExpenses() {
@@ -1414,9 +1417,9 @@ function renderExpenses() {
   }
 
   if (_expensePeriod === 'today') {
-    listEl.innerHTML = filtered.map(e =>
+    listEl.innerHTML = `<div class="exp-list-box">${filtered.map(e =>
       e.id === _editingExpenseId ? renderExpenseEditForm(e) : renderExpenseItem(e)
-    ).join("");
+    ).join("")}</div>`;
     return;
   }
 
@@ -1434,12 +1437,12 @@ function renderExpenses() {
       e.id === _editingExpenseId ? renderExpenseEditForm(e) : renderExpenseItem(e)
     ).join("");
     return `
-      <div class="expense-date-group">
-        <div class="expense-date-header">
-          <span class="expense-date-label">${formatDate(date)}</span>
-          <span class="expense-date-total">${formatMoney(dayTotal)}</span>
+      <div class="exp-date-group">
+        <div class="exp-date-header">
+          <span class="exp-date-label">${formatDate(date)}</span>
+          <span class="exp-date-total">${formatMoney(dayTotal)}</span>
         </div>
-        ${rows}
+        <div class="exp-list-box">${rows}</div>
       </div>`;
   }).join("");
 }
@@ -1607,17 +1610,15 @@ function renderCalDayPanel(dateKey, tasks) {
 
 
 function renderSimpleTask(task) {
+  const PC = { Critical:'#FF453A', High:'#FF9F0A', Medium:'#0A84FF', Low:'#8E8E93' };
+  const pColor = PC[task.priority] || '#8E8E93';
   return `
-    <article class="list-item">
-      <div class="task-row">
-        <span class="task-dot task-dot--${task.priority}" aria-hidden="true"></span>
-        <div>
-          <span class="item-title">${escapeHtml(task.title)}</span>
-          <span class="item-meta"><span class="priority-${task.priority}">${task.priority}</span>${task.due ? " · " + formatDate(task.due) : ""}</span>
-        </div>
-      </div>
-    </article>
-  `;
+    <div class="dash-task-row">
+      <span class="tli-dot" style="background:${pColor}"></span>
+      <span class="dash-task-title">${escapeHtml(task.title)}</span>
+      <span class="tli-badge" style="--bc:${pColor}18;--bt:${pColor}">${task.priority}</span>
+      ${task.due ? `<span class="tli-due">${formatDate(task.due)}</span>` : ''}
+    </div>`;
 }
 
 function relativeTime(ts) {
@@ -1634,12 +1635,13 @@ function relativeTime(ts) {
 }
 
 function renderSimpleNote(note) {
+  const tags = note.tags ? note.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
   return `
-    <article class="list-item">
-      <span class="item-title">${escapeHtml(note.title)}</span>
-      <span class="item-meta">${relativeTime(note.createdAt)}${note.tags ? " · " + escapeHtml(note.tags) : ""}</span>
-    </article>
-  `;
+    <div class="dash-note-row">
+      <span class="dash-note-title">${escapeHtml(note.title)}</span>
+      ${tags.slice(0,2).map(t => `<span class="tli-label" style="--lc:#5a8fa8">${escapeHtml(t)}</span>`).join('')}
+      <span class="note-card-date">${relativeTime(note.createdAt)}</span>
+    </div>`;
 }
 
 function emptyState(message, view = "dashboard", action = "เริ่มใช้งาน") {
@@ -1689,11 +1691,61 @@ function freshDemoState() {
   return { theme: state.theme || "dark", taskFilter: "open", goals: [], ...createDemoState() };
 }
 
-function enterGuestMode() {
-  state = freshDemoState(); // always reset to clean demo — ignore any stale localStorage
-  render();
-  showApp();
-  setView("dashboard");
+function renderHomepageDemo() {
+  const demo = freshDemoState();
+
+  // Stats
+  const total   = demo.tasks.length;
+  const pending = demo.tasks.filter(t => t.status !== 'done').length;
+  const done    = demo.tasks.filter(t => t.status === 'done').length;
+  const monthExp = demo.expenses.reduce((s, e) => s + e.amount, 0);
+
+  const $ = id => document.getElementById(id);
+  if ($('hpDemoStatAll'))     $('hpDemoStatAll').textContent     = total;
+  if ($('hpDemoStatPending')) $('hpDemoStatPending').textContent = pending;
+  if ($('hpDemoStatDone'))    $('hpDemoStatDone').textContent    = done;
+  if ($('hpDemoStatExpense')) $('hpDemoStatExpense').textContent = `฿${monthExp.toLocaleString()}`;
+
+  // Focus list: top open tasks by priority
+  const PRI_RANK  = { Critical: 0, High: 1, Medium: 2, Low: 3 };
+  const PRI_COLOR = { Critical: '#FF453A', High: '#FF9F0A', Medium: '#0A84FF', Low: '#8E8E93' };
+  const open = demo.tasks
+    .filter(t => t.status !== 'done')
+    .sort((a, b) => (PRI_RANK[a.priority] ?? 9) - (PRI_RANK[b.priority] ?? 9))
+    .slice(0, 5);
+
+  const focusEl = $('hpDemoFocus');
+  if (focusEl) {
+    focusEl.innerHTML = open.map(t => `
+      <li class="hp-demo-task-item">
+        <span class="hp-demo-task-dot" style="background:${PRI_COLOR[t.priority] || '#8E8E93'}"></span>
+        <span class="hp-demo-task-name">${t.title}</span>
+        <span class="hp-demo-task-tag">${t.priority}</span>
+      </li>`).join('');
+  }
+
+  // Expense bars: top categories
+  const CAT_COLOR = {
+    "อาหาร": "#FF9F0A", "เครื่องดื่ม": "#64D2FF", "เดินทาง": "#BF5AF2",
+    "น้ำมัน": "#FF9F0A", "ค่าไฟ": "#FF6B6B", "สุขภาพ": "#30D158",
+    "ช้อปปิ้ง": "#FF6B6B", "อินเทอร์เน็ต": "#0A84FF", "อื่นๆ": "#8E8E93",
+  };
+  const catTotals = {};
+  demo.expenses.forEach(e => { catTotals[e.category] = (catTotals[e.category] || 0) + e.amount; });
+  const maxAmt = Math.max(...Object.values(catTotals), 1);
+  const topCats = Object.entries(catTotals).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+  const barsEl = $('hpDemoBars');
+  if (barsEl) {
+    barsEl.innerHTML = topCats.map(([cat, amt]) => `
+      <div class="hp-demo-bar-row">
+        <span class="hp-demo-bar-label">${cat}</span>
+        <div class="hp-demo-bar-track">
+          <div class="hp-demo-bar-fill" style="width:${(amt / maxAmt * 100).toFixed(1)}%;background:${CAT_COLOR[cat] || '#8E8E93'}"></div>
+        </div>
+        <span class="hp-demo-bar-amt">฿${amt.toLocaleString()}</span>
+      </div>`).join('');
+  }
 }
 
 function addTask(title, priority = "Medium", due = "", status = "todo", description = "", labels = [], goalId = null, targetValue = null, targetUnit = "") {
@@ -2588,8 +2640,11 @@ function updateAuthBar(user) {
 
   if (loggedInRow) loggedInRow.hidden = !user;
   if (guestRow)    guestRow.hidden = !!user;
-  if (emailEl) { emailEl.textContent = user ? user.email : ""; emailEl.hidden = !user; }
-  if (subtitle) subtitle.textContent = user ? user.email : "Personal workspace";
+
+  const lineInfo = Auth.getLineInfo();
+  const displayLabel = lineInfo?.displayName || (user ? user.email : '');
+  if (emailEl) { emailEl.textContent = displayLabel; emailEl.hidden = !user; }
+  if (subtitle) subtitle.textContent = user ? (lineInfo?.displayName || 'Connected') : 'Personal workspace';
 }
 
 async function onSignedIn(user) {
@@ -2598,6 +2653,10 @@ async function onSignedIn(user) {
   _syncedUserId = user.id;
 
   showApp();
+  updateAuthBar(user);
+
+  // Fetch LINE profile early so display name and plan are ready
+  await Auth.fetchLineInfo();
   updateAuthBar(user);
 
   updateSyncStatus('loading');
@@ -2628,7 +2687,57 @@ async function onSignedIn(user) {
   updateSyncStatus('idle');
 }
 
+/* ── Auth modal helpers — module-scope so homepage buttons can call openAuthModal() directly ── */
+const _authModal         = document.getElementById("authModal");
+const _authLoginPanel    = document.getElementById("authLoginPanel");
+const _authSignedInPanel = document.getElementById("authSignedInPanel");
+
+function _showAuthPanel(name) {
+  [_authLoginPanel, _authSignedInPanel].forEach(p => { if (p) p.hidden = true; });
+  if (name === 'login'    && _authLoginPanel)    _authLoginPanel.hidden    = false;
+  if (name === 'signedIn' && _authSignedInPanel) _authSignedInPanel.hidden = false;
+}
+
+function openAuthModal() {
+  const errEl = document.getElementById('authError');
+  if (errEl) { errEl.textContent = ''; errEl.hidden = true; }
+  _showAuthPanel(Auth.isLoggedIn() ? 'signedIn' : 'login');
+  _authModal.showModal();
+}
+
 async function initAuth() {
+  /* ── Handle ?auth_error= from LINE callback ── */
+  const urlParams = new URLSearchParams(location.search);
+  const authErr = urlParams.get('auth_error');
+  if (authErr) {
+    history.replaceState(null, '', location.pathname + location.hash);
+    showToast(`เข้าสู่ระบบไม่สำเร็จ: ${authErr}`, 4000);
+  }
+
+  /* ── Modal wiring ── */
+  document.getElementById("authLoginBtn")?.addEventListener("click", openAuthModal);
+  document.getElementById("authModalClose")?.addEventListener("click", () => _authModal.close());
+  _authModal.addEventListener("click", e => { if (e.target === _authModal) _authModal.close(); });
+  _authModal.addEventListener("click", e => { if (e.target.closest("[data-auth-close]")) _authModal.close(); });
+
+  document.getElementById("authLineLoginBtn")?.addEventListener("click", () => Auth.signInWithLine());
+
+  document.getElementById("authLogoutTopBtn")?.addEventListener("click", async () => {
+    await Auth.signOut();
+    state = Storage.loadLocal(defaultState);
+    render();
+    showHomepage();
+  });
+
+  document.getElementById("authLogoutModalBtn")?.addEventListener("click", async () => {
+    await Auth.signOut();
+    state = Storage.loadLocal(defaultState);
+    render();
+    _authModal.close();
+    showHomepage();
+  });
+
+  /* ── Async init ── */
   const user = await Auth.init();
   updateAuthBar(user);
   if (user) {
@@ -2641,148 +2750,22 @@ async function initAuth() {
     updateAuthBar(u);
     if (event === "SIGNED_IN")  onSignedIn(u);
     if (event === "SIGNED_OUT") {
-      _syncedUserId = null; // allow next sign-in to sync fresh
+      _syncedUserId = null;
       showToast("ออกจากระบบแล้ว — ข้อมูล local ยังอยู่");
       showHomepage();
     }
   });
-
-  /* ── Modal elements ── */
-  const modal          = document.getElementById("authModal");
-  const loginPanel     = document.getElementById("authLoginPanel");
-  const signupPanel    = document.getElementById("authSignupPanel");
-  const successPanel   = document.getElementById("authSuccessPanel");
-  const signedInPanel  = document.getElementById("authSignedInPanel");
-  const loginForm      = document.getElementById("authLoginForm");
-  const signupForm     = document.getElementById("authSignupForm");
-  const loginErr       = document.getElementById("authError");
-  const signupErr      = document.getElementById("authSignupError");
-
-  const panels = [loginPanel, signupPanel, successPanel, signedInPanel];
-  function showPanel(name) {
-    const map = { login: loginPanel, signup: signupPanel, success: successPanel, signedIn: signedInPanel };
-    panels.forEach(p => { if (p) p.hidden = true; });
-    if (map[name]) map[name].hidden = false;
-  }
-
-  /* Login button (guest state) → open modal */
-  document.getElementById("authLoginBtn").addEventListener("click", () => {
-    if (loginErr)  loginErr.textContent = "";
-    if (loginForm) loginForm.reset();
-    showPanel("login");
-    modal.showModal();
-  });
-
-  /* Logout button (logged-in state) → sign out directly */
-  document.getElementById("authLogoutTopBtn").addEventListener("click", async () => {
-    await Auth.signOut();
-    state = Storage.loadLocal(defaultState);
-    render();
-    showHomepage();
-  });
-
-  /* close on backdrop click */
-  modal.addEventListener("click", e => { if (e.target === modal) modal.close(); });
-
-  /* all [data-auth-close] elements */
-  modal.addEventListener("click", e => {
-    if (e.target.closest("[data-auth-close]")) modal.close();
-  });
-
-  /* explicit close X on login panel */
-  document.getElementById("authModalClose")?.addEventListener("click", () => modal.close());
-
-  /* guest mode button */
-  document.getElementById("authGuestBtn")?.addEventListener("click", () => {
-    modal.close();
-    enterGuestMode();
-  });
-
-  /* switch to signup */
-  document.getElementById("authSwitchSignup")?.addEventListener("click", () => {
-    if (signupErr) signupErr.textContent = "";
-    if (signupForm) signupForm.reset();
-    showPanel("signup");
-  });
-
-  /* switch back to login */
-  document.getElementById("authSwitchLogin")?.addEventListener("click", () => {
-    if (loginErr) loginErr.textContent = "";
-    if (loginForm) loginForm.reset();
-    showPanel("login");
-  });
-
-  /* back from success to login */
-  document.getElementById("authSuccessBackBtn")?.addEventListener("click", () => {
-    if (loginErr) loginErr.textContent = "";
-    if (loginForm) loginForm.reset();
-    showPanel("login");
-  });
-
-  /* login form submit */
-  loginForm?.addEventListener("submit", async e => {
-    e.preventDefault();
-    const email    = document.getElementById("authEmail").value.trim();
-    const password = document.getElementById("authPassword").value;
-    const btn      = loginForm.querySelector("button[type='submit']");
-    btn.disabled   = true;
-    loginErr.textContent = "";
-    try {
-      await Auth.signIn(email, password);
-      modal.close();
-    } catch (err) {
-      loginErr.textContent = err.message || "เกิดข้อผิดพลาด";
-    } finally {
-      btn.disabled = false;
-    }
-  });
-
-  /* signup form submit */
-  signupForm?.addEventListener("submit", async e => {
-    e.preventDefault();
-    const email    = document.getElementById("authSignupEmail").value.trim();
-    const password = document.getElementById("authSignupPassword").value;
-    const confirm  = document.getElementById("authSignupConfirm").value;
-    const btn      = signupForm.querySelector("button[type='submit']");
-    signupErr.textContent = "";
-    if (password !== confirm) {
-      signupErr.textContent = "Password ไม่ตรงกัน";
-      return;
-    }
-    btn.disabled = true;
-    try {
-      await Auth.signUp(email, password);
-      showPanel("success");
-    } catch (err) {
-      signupErr.textContent = err.message || "เกิดข้อผิดพลาด";
-    } finally {
-      btn.disabled = false;
-    }
-  });
-
-  /* logout from signed-in panel */
-  document.getElementById("authLogoutModalBtn")?.addEventListener("click", async () => {
-    await Auth.signOut();
-    state = Storage.loadLocal(defaultState);
-    render();
-    modal.close();
-    showHomepage();
-  });
-
 }
 
 /* ── Homepage button wiring ──
    hpNavLoginBtn / hpLoginBtn: open auth modal (dialog goes to top-layer,
    visible even while app-shell is display:none)
    hpGuestBtn / hpFooterGuestBtn: enter guest mode instantly ── */
-document.getElementById("hpNavLoginBtn")?.addEventListener("click", () => {
-  document.getElementById("authLoginBtn")?.click();
-});
-document.getElementById("hpLoginBtn")?.addEventListener("click", () => {
-  document.getElementById("authLoginBtn")?.click();
-});
-document.getElementById("hpGuestBtn")?.addEventListener("click", enterGuestMode);
-document.getElementById("hpFooterGuestBtn")?.addEventListener("click", enterGuestMode);
+document.getElementById("hpNavLoginBtn")?.addEventListener("click", openAuthModal);
+document.getElementById("hpLoginBtn")?.addEventListener("click", openAuthModal);
+document.getElementById("hpFooterLoginBtn")?.addEventListener("click", openAuthModal);
+
+renderHomepageDemo();
 
 Storage.onSyncChange(updateSyncStatus);
 window.addEventListener('online',  () => updateSyncStatus('idle'));
@@ -2822,7 +2805,6 @@ function renderLineSidebar(lineInfo) {
   }
 
   if (lineInfo) {
-    // Logged in + LINE linked
     dot.classList.add('line-status-dot--connected')
     text.textContent = 'เชื่อมต่อแล้ว'
 
@@ -2835,10 +2817,25 @@ function renderLineSidebar(lineInfo) {
       }
       if (name) name.textContent = lineInfo.displayName || 'LINE User'
       if (badge) {
-        badge.textContent = lineInfo.tier === 'premium' ? '⭐ Premium' : 'Free'
-        badge.className = 'line-tier-badge' + (lineInfo.tier === 'premium' ? ' line-tier-badge--premium' : '')
+        const isPro = lineInfo.plan === 'pro'
+        badge.textContent = isPro ? 'Pro' : 'Free'
+        badge.className = 'line-tier-badge' + (isPro ? ' line-tier-badge--premium' : '')
       }
       card.hidden = false
+    }
+
+    /* Update signed-in panel in auth modal */
+    const modalPic  = document.getElementById('authSignedInPic')
+    const modalName = document.getElementById('authSignedInName')
+    const planBadge = document.getElementById('authPlanBadge')
+    if (modalPic && lineInfo.pictureUrl) {
+      modalPic.src = lineInfo.pictureUrl
+      modalPic.hidden = false
+    }
+    if (modalName) modalName.textContent = lineInfo.displayName || 'LINE User'
+    if (planBadge) {
+      planBadge.textContent = lineInfo.plan === 'pro' ? 'Pro' : 'Free'
+      planBadge.className = 'auth-plan-badge' + (lineInfo.plan === 'pro' ? ' auth-plan-badge--pro' : '')
     }
   } else {
     // Logged in but not a LINE user (email-only account)
