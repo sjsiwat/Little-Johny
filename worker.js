@@ -92,7 +92,7 @@ async function handleLineCallback(request, env) {
         body: JSON.stringify({ email, email_confirm: true }),
       });
       const newUser = await createRes.json();
-      if (!newUser.id) throw new Error('Failed to create Supabase user');
+      if (!newUser.id) throw new Error(`Failed to create Supabase user: ${JSON.stringify(newUser)}`);
       userId = newUser.id;
 
       await fetch(`${supaUrl}/rest/v1/line_users`, {
