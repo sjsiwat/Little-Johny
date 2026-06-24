@@ -2263,18 +2263,19 @@ function updateSyncStatus(status) {
   const label = document.getElementById('syncLabel');
   if (!dot || !label) return;
   const states = {
-    idle:    { cls: 'status-dot--online',  text: 'อยู่ในระบบ' },
-    pending: { cls: 'status-dot--syncing', text: 'รอซิงค์…' },
-    syncing: { cls: 'status-dot--syncing', text: 'กำลังซิงค์…' },
-    synced:  { cls: 'status-dot--online',  text: 'ซิงค์แล้ว ✓' },
+    idle:    { cls: 'status-dot--online',  text: '' },
+    loading: { cls: 'status-dot--syncing', text: 'กำลังโหลด…' },
+    pending: { cls: 'status-dot--syncing', text: 'รอบันทึก…' },
+    syncing: { cls: 'status-dot--syncing', text: 'กำลังบันทึก…' },
+    synced:  { cls: 'status-dot--online',  text: 'บันทึกแล้ว ✓' },
     offline: { cls: 'status-dot--offline', text: 'ออฟไลน์' },
-    error:   { cls: 'status-dot--error',   text: 'ซิงค์ไม่สำเร็จ' }
+    error:   { cls: 'status-dot--error',   text: 'บันทึกไม่สำเร็จ' }
   };
   const s = states[status] || states.idle;
   dot.className = `status-dot ${s.cls}`;
   label.textContent = s.text;
   if (status === 'synced') {
-    setTimeout(() => { if (label.textContent === 'ซิงค์แล้ว ✓') updateSyncStatus('idle'); }, 3000);
+    setTimeout(() => { if (label.textContent === 'บันทึกแล้ว ✓') updateSyncStatus('idle'); }, 3000);
   }
 }
 
@@ -2300,20 +2301,16 @@ async function onSignedIn(user) {
   showApp();
   updateAuthBar(user);
 
-  // Guest mode is ephemeral — nothing was saved, so cloud is always authoritative.
-  updateSyncStatus('syncing');
-  showToast("กำลังซิงค์ข้อมูล…");
+  updateSyncStatus('loading');
   const cloud = await Storage.loadCloud();
 
   if (cloud) {
     state = { ...state, tasks: cloud.tasks, notes: cloud.notes, expenses: cloud.expenses, goals: cloud.goals };
     showToast(cloud.tasks.length > 0 ? `โหลดข้อมูลจาก cloud (${cloud.tasks.length} งาน)` : "เชื่อมต่อแล้ว ✓");
     render();
-    updateSyncStatus('synced');
-  } else {
-    updateSyncStatus('error');
-    showToast("ซิงค์ไม่สำเร็จ — ข้อมูล local ยังอยู่ครบ");
   }
+  // loadCloud failure is non-critical — local data still intact, next save will retry
+  updateSyncStatus('idle');
 }
 
 async function initAuth() {
