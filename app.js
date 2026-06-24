@@ -2642,7 +2642,7 @@ function updateAuthBar(user) {
   if (guestRow)    guestRow.hidden = !!user;
 
   const lineInfo = Auth.getLineInfo();
-  const displayLabel = lineInfo?.displayName || (user ? user.email : '');
+  const displayLabel = lineInfo?.displayName || (user ? 'LINE User' : '');
   if (emailEl) { emailEl.textContent = displayLabel; emailEl.hidden = !user; }
   if (subtitle) subtitle.textContent = user ? (lineInfo?.displayName || 'Connected') : 'Personal workspace';
 }
