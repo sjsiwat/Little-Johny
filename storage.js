@@ -159,11 +159,12 @@ const Storage = (() => {
     const expenses = state.expenses.filter(e => !e._isDemo);
     const goals    = (state.goals || []).filter(g => !g._isDemo);
     try {
+      // Goals must be synced first — tasks/notes/expenses have FK references to goals
+      await syncTable('goals', goals, goalToRow, uid);
       await Promise.all([
         syncTable('tasks',    tasks,    taskToRow,    uid),
         syncTable('notes',    notes,    noteToRow,    uid),
         syncTable('expenses', expenses, expenseToRow, uid),
-        syncTable('goals',    goals,    goalToRow,    uid),
       ]);
       if (_syncChangeListener) _syncChangeListener('synced');
     } catch (err) {
