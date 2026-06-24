@@ -71,7 +71,10 @@ async function handleLineCallback(request, env) {
     );
     const lineUsers = await lookupRes.json();
 
+    // Email is always deterministic — no need to fetch it later
+    const lineEmail = `line_${lineUserId}@johny.internal`;
     let userId;
+
     if (Array.isArray(lineUsers) && lineUsers.length > 0) {
       userId = lineUsers[0].user_id;
       // Refresh profile info
@@ -84,63 +87,44 @@ async function handleLineCallback(request, env) {
         }
       );
     } else {
-      // Auto-create Supabase auth user for first-time LINE Login
-      const email = `line_${lineUserId}@johny.internal`;
+      // Try to create Supabase auth user
       const createRes = await fetch(`${supaUrl}/auth/v1/admin/users`, {
         method: 'POST',
         headers: supaHeaders,
-        body: JSON.stringify({ email, email_confirm: true }),
+        body: JSON.stringify({ email: lineEmail, email_confirm: true }),
       });
       const newUser = await createRes.json();
 
-      // Handle race condition: user already exists in auth but no line_users record
-      if (!newUser.id && newUser.error_code === 'email_exists') {
+      if (newUser.id) {
+        userId = newUser.id;
+      } else if (newUser.error_code === 'email_exists') {
+        // Auth user exists but line_users record is missing — look up by email
         const listRes = await fetch(
-          `${supaUrl}/auth/v1/admin/users?email=${encodeURIComponent(email)}&page=1&per_page=1`,
+          `${supaUrl}/auth/v1/admin/users?email=${encodeURIComponent(lineEmail)}&page=1&per_page=1`,
           { headers: supaHeaders }
         );
         const listData = await listRes.json();
-        const existingUser = listData?.users?.[0];
-        if (!existingUser?.id) throw new Error('email_exists but could not find existing user');
-        userId = existingUser.id;
-        // Create the missing line_users record and skip to magic link
-        await fetch(`${supaUrl}/rest/v1/line_users`, {
-          method: 'POST',
-          headers: { ...supaHeaders, Prefer: 'return=minimal' },
-          body: JSON.stringify({ line_user_id: lineUserId, user_id: userId, display_name: displayName, picture_url: pictureUrl, plan: 'free' }),
-        });
-      } else if (!newUser.id) {
+        userId = listData?.users?.[0]?.id;
+        if (!userId) throw new Error('email_exists but could not find existing user');
+      } else {
         throw new Error(`Failed to create Supabase user: ${JSON.stringify(newUser)}`);
       }
-      userId = newUser.id;
 
+      // Create line_users record (upsert to handle duplicates gracefully)
       await fetch(`${supaUrl}/rest/v1/line_users`, {
         method: 'POST',
-        headers: { ...supaHeaders, Prefer: 'return=minimal' },
-        body: JSON.stringify({
-          line_user_id: lineUserId,
-          user_id: userId,
-          display_name: displayName,
-          picture_url: pictureUrl,
-          plan: 'free',
-        }),
+        headers: { ...supaHeaders, Prefer: 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify({ line_user_id: lineUserId, user_id: userId, display_name: displayName, picture_url: pictureUrl, plan: 'free' }),
       });
     }
 
-    // 4. Fetch email for magic link
-    const userRes = await fetch(`${supaUrl}/auth/v1/admin/users/${userId}`, {
-      headers: supaHeaders,
-    });
-    const userData = await userRes.json();
-    if (!userData.email) throw new Error('Could not fetch user email');
-
-    // 5. Generate magic link → redirects browser into Supabase session
+    // 4. Generate magic link using the deterministic email
     const linkRes = await fetch(`${supaUrl}/auth/v1/admin/generate_link`, {
       method: 'POST',
       headers: supaHeaders,
       body: JSON.stringify({
         type: 'magiclink',
-        email: userData.email,
+        email: lineEmail,
         options: { redirect_to: origin },
       }),
     });
