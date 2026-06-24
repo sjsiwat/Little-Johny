@@ -92,7 +92,26 @@ async function handleLineCallback(request, env) {
         body: JSON.stringify({ email, email_confirm: true }),
       });
       const newUser = await createRes.json();
-      if (!newUser.id) throw new Error(`Failed to create Supabase user: ${JSON.stringify(newUser)}`);
+
+      // Handle race condition: user already exists in auth but no line_users record
+      if (!newUser.id && newUser.error_code === 'email_exists') {
+        const listRes = await fetch(
+          `${supaUrl}/auth/v1/admin/users?email=${encodeURIComponent(email)}&page=1&per_page=1`,
+          { headers: supaHeaders }
+        );
+        const listData = await listRes.json();
+        const existingUser = listData?.users?.[0];
+        if (!existingUser?.id) throw new Error('email_exists but could not find existing user');
+        userId = existingUser.id;
+        // Create the missing line_users record and skip to magic link
+        await fetch(`${supaUrl}/rest/v1/line_users`, {
+          method: 'POST',
+          headers: { ...supaHeaders, Prefer: 'return=minimal' },
+          body: JSON.stringify({ line_user_id: lineUserId, user_id: userId, display_name: displayName, picture_url: pictureUrl, plan: 'free' }),
+        });
+      } else if (!newUser.id) {
+        throw new Error(`Failed to create Supabase user: ${JSON.stringify(newUser)}`);
+      }
       userId = newUser.id;
 
       await fetch(`${supaUrl}/rest/v1/line_users`, {
