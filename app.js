@@ -2786,6 +2786,14 @@ function initLineConnect() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
 
+      // Save LINE userId ↔ Supabase userId link to database
+      if (Auth.isLoggedIn()) {
+        await Auth.db.from('line_users').upsert({
+          line_user_id: data.lineUserId,
+          user_id: Auth.getUser().id
+        })
+      }
+
       localStorage.setItem('lineUserId', data.lineUserId)
       backdrop.hidden = true
       setConnectedUI(true)
