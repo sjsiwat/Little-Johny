@@ -34,6 +34,16 @@ const Storage = (() => {
       due: row.due || '',
       status: row.status,
       labels: Array.isArray(row.labels) ? row.labels : [],
+      goal_id: row.goal_id || null,
+      createdAt: new Date(row.created_at).getTime()
+    };
+  }
+
+  function rowToGoal(row) {
+    return {
+      id: row.id,
+      title: row.title,
+      color: row.color || '#0A84FF',
       createdAt: new Date(row.created_at).getTime()
     };
   }
@@ -44,6 +54,7 @@ const Storage = (() => {
       title: row.title,
       body: row.body || '',
       tags: row.tags || '',
+      goal_id: row.goal_id || null,
       createdAt: new Date(row.created_at).getTime()
     };
   }
@@ -55,6 +66,7 @@ const Storage = (() => {
       amount: Number(row.amount),
       category: row.category,
       date: row.date || '',
+      goal_id: row.goal_id || null,
       createdAt: new Date(row.created_at).getTime()
     };
   }
@@ -69,7 +81,18 @@ const Storage = (() => {
       due: task.due || null,
       status: task.status,
       labels: task.labels || [],
+      goal_id: task.goal_id || null,
       created_at: new Date(task.createdAt).toISOString()
+    };
+  }
+
+  function goalToRow(goal, uid) {
+    return {
+      id: goal.id,
+      user_id: uid,
+      title: goal.title,
+      color: goal.color || '#0A84FF',
+      created_at: new Date(goal.createdAt).toISOString()
     };
   }
 
@@ -80,6 +103,7 @@ const Storage = (() => {
       title: note.title,
       body: note.body || '',
       tags: note.tags || '',
+      goal_id: note.goal_id || null,
       created_at: new Date(note.createdAt).toISOString()
     };
   }
@@ -92,6 +116,7 @@ const Storage = (() => {
       amount: expense.amount,
       category: expense.category,
       date: expense.date || null,
+      goal_id: expense.goal_id || null,
       created_at: new Date(expense.createdAt).toISOString()
     };
   }
@@ -132,11 +157,13 @@ const Storage = (() => {
     const tasks    = state.tasks.filter(t => !t._isDemo);
     const notes    = state.notes.filter(n => !n._isDemo);
     const expenses = state.expenses.filter(e => !e._isDemo);
+    const goals    = (state.goals || []).filter(g => !g._isDemo);
     try {
       await Promise.all([
-        syncTable('tasks', tasks, taskToRow, uid),
-        syncTable('notes', notes, noteToRow, uid),
-        syncTable('expenses', expenses, expenseToRow, uid)
+        syncTable('tasks',    tasks,    taskToRow,    uid),
+        syncTable('notes',    notes,    noteToRow,    uid),
+        syncTable('expenses', expenses, expenseToRow, uid),
+        syncTable('goals',    goals,    goalToRow,    uid),
       ]);
       if (_syncChangeListener) _syncChangeListener('synced');
     } catch (err) {
@@ -169,16 +196,18 @@ const Storage = (() => {
       const uid = Auth.getUser().id;
       const db = Auth.db;
       try {
-        const [tasksRes, notesRes, expensesRes] = await Promise.all([
+        const [tasksRes, notesRes, expensesRes, goalsRes] = await Promise.all([
           db.from('tasks').select('*').eq('user_id', uid),
           db.from('notes').select('*').eq('user_id', uid),
-          db.from('expenses').select('*').eq('user_id', uid)
+          db.from('expenses').select('*').eq('user_id', uid),
+          db.from('goals').select('*').eq('user_id', uid),
         ]);
-        if (tasksRes.error || notesRes.error || expensesRes.error) return null;
+        if (tasksRes.error || notesRes.error || expensesRes.error || goalsRes.error) return null;
         return {
           tasks:    dedupeByTitle(tasksRes.data.map(rowToTask)),
           notes:    dedupeByTitle(notesRes.data.map(rowToNote)),
-          expenses: dedupeByTitle(expensesRes.data.map(rowToExpense))
+          expenses: dedupeByTitle(expensesRes.data.map(rowToExpense)),
+          goals:    goalsRes.data.map(rowToGoal).sort((a, b) => b.createdAt - a.createdAt),
         };
       } catch (err) {
         console.error('[storage] loadCloud failed:', err);
