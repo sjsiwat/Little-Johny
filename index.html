@@ -59,149 +59,522 @@
           <h1 class="hp-hero-title">Your Personal<br>Digital Workspace</h1>
           <p class="hp-hero-desc">Capture ideas, manage tasks, track expenses<br class="hp-desk-br">and plan your day — all in one place.</p>
           <div class="hp-hero-cta">
-            <button class="hp-cta-primary" id="hpGuestBtn" type="button">Demo Mode</button>
-            <button class="hp-cta-ghost" id="hpLoginBtn" type="button">Log in</button>
+            <button class="hp-cta-primary" id="hpLoginBtn" type="button">Log in with LINE</button>
           </div>
         </div>
       </section>
 
-      <!-- demo workspace preview -->
+      <!-- dashboard preview — populated by renderHomepageDemo() in app.js -->
       <section class="hp-preview" aria-label="Product preview">
         <div class="hp-preview-inner">
           <div class="hp-preview-header">
-            <span class="hp-badge">Demo Preview</span>
+            <span class="hp-badge">Dashboard Preview</span>
             <h2 class="hp-preview-title">Everything in one place</h2>
-            <p class="hp-preview-caption">A snapshot of your workspace. Try Demo Mode to explore it live.</p>
+            <p class="hp-preview-caption">ล็อกอินด้วย LINE เพื่อเข้าถึง Dashboard ของคุณ</p>
           </div>
-          <div class="hp-cards" aria-hidden="true">
 
-            <!-- tasks -->
-            <div class="hp-card hp-card--tasks">
-              <div class="hp-card-head">
-                <span class="hp-card-icon hp-icon-blue">
-                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1.5" y="1.5" width="12" height="12" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M4 7.5l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </span>
-                <span class="hp-card-label">Tasks</span>
-                <span class="hp-card-chip">3 pending</span>
-              </div>
-              <ul class="hp-task-list">
-                <li><span class="hp-dot hp-dot--high"></span><span class="hp-task-text">Finish AWS Project</span><span class="hp-tag hp-tag--high">High</span></li>
-                <li><span class="hp-dot hp-dot--med"></span><span class="hp-task-text">Workout</span><span class="hp-tag hp-tag--med">Med</span></li>
-                <li><span class="hp-dot hp-dot--low"></span><span class="hp-task-text">Update Resume</span><span class="hp-tag hp-tag--low">Low</span></li>
-              </ul>
+          <div class="hp-dash-frame" aria-hidden="true">
+            <!-- mock browser bar -->
+            <div class="hp-dash-frame-bar">
+              <span class="hp-frame-dot"></span>
+              <span class="hp-frame-dot"></span>
+              <span class="hp-frame-dot"></span>
+              <span class="hp-frame-url">johny.siwat.me · Dashboard</span>
             </div>
 
-            <!-- notes -->
-            <div class="hp-card hp-card--notes">
-              <div class="hp-card-head">
-                <span class="hp-card-icon hp-icon-amber">
-                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="2" y="1" width="11" height="13" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 5h6M4.5 7.5h6M4.5 10h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                </span>
-                <span class="hp-card-label">Notes</span>
-              </div>
-              <div class="hp-note">
-                <strong>Second Brain</strong>
-                <p>Building a second brain in the browser. Capture everything, forget nothing.</p>
-                <span class="hp-note-tag">#productivity</span>
-              </div>
-            </div>
+            <!-- dashboard body -->
+            <div class="hp-dash-frame-body">
 
-            <!-- expenses -->
-            <div class="hp-card hp-card--expenses">
-              <div class="hp-card-head">
-                <span class="hp-card-icon hp-icon-sage">
-                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M7.5 4v7M6 5.5h3a1 1 0 0 1 0 2H6.5a1 1 0 0 0 0 2H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                </span>
-                <span class="hp-card-label">Expenses</span>
-              </div>
-              <ul class="hp-exp-list">
-                <li><span>Coffee</span><strong>฿70</strong></li>
-                <li><span>Lunch</span><strong>฿60</strong></li>
-              </ul>
-              <div class="hp-exp-total"><span>Today</span><strong>฿130</strong></div>
-            </div>
-
-            <!-- planning / calendar -->
-            <div class="hp-card hp-card--plan">
-              <div class="hp-card-head">
-                <span class="hp-card-icon hp-icon-rose">
-                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1.5" y="3" width="12" height="10.5" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 1.5v3M10 1.5v3M1.5 6.5h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                </span>
-                <span class="hp-card-label">Planning</span>
-                <span class="hp-card-chip">Jun 2026</span>
-              </div>
-              <div class="hp-mini-cal">
-                <div class="hp-cal-row hp-cal-wdays"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
-                <div class="hp-cal-row"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
-                <div class="hp-cal-row"><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span></div>
-                <div class="hp-cal-row"><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span></div>
-                <div class="hp-cal-row"><span class="hp-cal-today">22</span><span>23</span><span>24</span><span class="hp-cal-event">25</span><span>26</span><span>27</span><span>28</span></div>
-                <div class="hp-cal-row"><span>29</span><span>30</span></div>
-              </div>
-            </div>
-
-            <!-- AI assistant chat preview -->
-            <div class="hp-card hp-card--chat" aria-hidden="true">
-              <div class="hp-chat-head">
-                <span class="hp-card-icon hp-icon-blue">
-                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 5.5v.5M7.5 4.5v.5M10.5 5.5v.5M4.5 8c.5 1.5 6 1.5 6 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-                </span>
-                <span class="hp-chat-title">JohnyMemo AI</span>
-                <span class="hp-chat-soon">Coming Soon</span>
-              </div>
-              <div class="hp-chat-body">
-                <div class="hp-cm hp-cm--in hp-cm-anim" style="animation-delay:0.3s">
-                  <div class="hp-cm-bubble">วันนี้มีงานอะไรที่ต้องทำบ้าง?</div>
+              <!-- stat tiles -->
+              <div class="hp-demo-tiles">
+                <div class="hp-demo-tile hp-demo-tile--blue">
+                  <strong id="hpDemoStatAll"></strong>
+                  <span>งานทั้งหมด</span>
                 </div>
-                <div class="hp-cm hp-cm--out hp-cm-anim" style="animation-delay:1s">
-                  <div class="hp-cm-bubble">คุณมี 3 งานค้าง — Finish AWS Project (High), Workout (Med), Update Resume (Low) ✓</div>
+                <div class="hp-demo-tile hp-demo-tile--orange">
+                  <strong id="hpDemoStatPending"></strong>
+                  <span>ค้างอยู่</span>
                 </div>
-                <div class="hp-cm hp-cm--in hp-cm-anim" style="animation-delay:1.9s">
-                  <div class="hp-cm-bubble">เพิ่มงาน "Design Review" ด่วนด้วย</div>
+                <div class="hp-demo-tile hp-demo-tile--green">
+                  <strong id="hpDemoStatDone"></strong>
+                  <span>เสร็จแล้ว</span>
                 </div>
-                <div class="hp-cm-typing hp-cm-anim" style="animation-delay:2.6s">
-                  <span></span><span></span><span></span>
+                <div class="hp-demo-tile hp-demo-tile--red">
+                  <strong id="hpDemoStatExpense"></strong>
+                  <span>รายจ่ายเดือนนี้</span>
                 </div>
               </div>
-            </div>
 
+              <!-- two-column panels -->
+              <div class="hp-demo-panels">
+                <div class="hp-demo-panel">
+                  <div class="hp-demo-panel-head">โฟกัสวันนี้</div>
+                  <ul class="hp-demo-focus-list" id="hpDemoFocus"></ul>
+                </div>
+                <div class="hp-demo-panel">
+                  <div class="hp-demo-panel-head">สรุปรายจ่าย</div>
+                  <div class="hp-demo-bar-list" id="hpDemoBars"></div>
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- features -->
-      <section class="hp-features" aria-label="Product features">
-        <div class="hp-features-inner">
-          <h2 class="hp-features-title">Simple tools. Powerful habits.</h2>
-          <div class="hp-features-grid">
-            <article class="hp-feature">
-              <div class="hp-feat-icon hp-feat-icon--blue">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5" stroke="currentColor" stroke-width="2"/><path d="M7 12l3.5 3.5 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <!-- ══════════════════════════════════════════════════════
+           FEATURE SHOWCASE — 1 feature per section
+           ══════════════════════════════════════════════════════ -->
+
+      <!-- ── 1. Tasks ── -->
+      <section class="hp-feat-section" aria-label="Tasks feature">
+        <div class="hp-feat-inner">
+          <div class="hp-feat-header">
+            <span class="hp-badge">Tasks</span>
+            <h2 class="hp-feat-title">จัดงานทุกชิ้น ไม่มีตกหล่น</h2>
+            <p class="hp-feat-desc">ตั้ง Priority · กำหนดวันครบกำหนด · ติดป้ายกำกับ · Filter แยกสถานะได้ทันที</p>
+          </div>
+          <div class="hp-dash-frame" aria-hidden="true">
+            <div class="hp-dash-frame-bar">
+              <span class="hp-frame-dot"></span><span class="hp-frame-dot"></span><span class="hp-frame-dot"></span>
+              <span class="hp-frame-url">johny.siwat.me · Tasks</span>
+            </div>
+            <div class="hp-dash-frame-body">
+              <div class="hfm-toolbar">
+                <div class="hfm-chips">
+                  <span class="hfm-chip">ทั้งหมด</span>
+                  <span class="hfm-chip hfm-chip--active">ค้าง</span>
+                  <span class="hfm-chip">เสร็จแล้ว</span>
+                </div>
+                <span class="hfm-btn"><svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M4.5 1v7M1 4.5h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> เพิ่มงาน</span>
               </div>
-              <h3>Tasks</h3>
-              <p>Organize your day with priorities, due dates, and a focused view of what matters now.</p>
-            </article>
-            <article class="hp-feature">
-              <div class="hp-feat-icon hp-feat-icon--amber">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="2" width="18" height="20" rx="4.5" stroke="currentColor" stroke-width="2"/><path d="M7.5 8h9M7.5 12h9M7.5 16h5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <div class="hfm-task-list">
+                <div class="hfm-task-row">
+                  <span class="hfm-check"></span>
+                  <span class="hfm-prio-dot" style="background:#FF453A"></span>
+                  <span class="hfm-task-name">ส่งรายงานประจำเดือน</span>
+                  <span class="hfm-badge" style="--bc:#FF453A18;--bt:#FF453A">Critical</span>
+                  <span class="hfm-label" style="--lc:#FF453A">ด่วน</span>
+                  <span class="hfm-label" style="--lc:#0A84FF">งาน</span>
+                  <span class="hfm-due">25 มิ.ย.</span>
+                </div>
+                <div class="hfm-task-row">
+                  <span class="hfm-check"></span>
+                  <span class="hfm-prio-dot" style="background:#FF9F0A"></span>
+                  <span class="hfm-task-name">Goals Module Integration</span>
+                  <span class="hfm-badge" style="--bc:#FF9F0A18;--bt:#FF9F0A">High</span>
+                  <span class="hfm-label" style="--lc:#0A84FF">งาน</span>
+                  <span class="hfm-due">28 มิ.ย.</span>
+                </div>
+                <div class="hfm-task-row">
+                  <span class="hfm-check"></span>
+                  <span class="hfm-prio-dot" style="background:#FF9F0A"></span>
+                  <span class="hfm-task-name">ประชุม Product Review 14:00 น.</span>
+                  <span class="hfm-badge" style="--bc:#FF9F0A18;--bt:#FF9F0A">High</span>
+                  <span class="hfm-label" style="--lc:#64D2FF">ประชุม</span>
+                  <span class="hfm-due">วันนี้</span>
+                </div>
+                <div class="hfm-task-row">
+                  <span class="hfm-check"></span>
+                  <span class="hfm-prio-dot" style="background:#0A84FF"></span>
+                  <span class="hfm-task-name">LINE Bot Integration</span>
+                  <span class="hfm-badge" style="--bc:#0A84FF18;--bt:#0A84FF">Medium</span>
+                  <span class="hfm-label" style="--lc:#0A84FF">งาน</span>
+                </div>
+                <div class="hfm-task-row hfm-task-row--done">
+                  <span class="hfm-check hfm-check--checked">✓</span>
+                  <span class="hfm-prio-dot" style="background:#8E8E93"></span>
+                  <span class="hfm-task-name">Setup Supabase Database</span>
+                  <span class="hfm-badge" style="--bc:#30D15818;--bt:#30D158">เสร็จแล้ว</span>
+                </div>
               </div>
-              <h3>Notes</h3>
-              <p>Capture thoughts, ideas, and knowledge in a clean and searchable personal notebook.</p>
-            </article>
-            <article class="hp-feature">
-              <div class="hp-feat-icon hp-feat-icon--sage">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="2"/><path d="M12 5.5v13M9.5 8.5h5a2 2 0 0 1 0 4h-3.5a2 2 0 0 0 0 4H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 2. Kanban Board ── -->
+      <section class="hp-feat-section hp-feat-section--alt" aria-label="Kanban feature">
+        <div class="hp-feat-inner">
+          <div class="hp-feat-header">
+            <span class="hp-badge">Kanban Board</span>
+            <h2 class="hp-feat-title">เห็นภาพรวม ลาก-วางได้ทันที</h2>
+            <p class="hp-feat-desc">สลับระหว่าง List กับ Kanban กดเดียว ลากการ์ดข้ามคอลัมน์เพื่ออัปเดตสถานะ</p>
+          </div>
+          <div class="hp-dash-frame" aria-hidden="true">
+            <div class="hp-dash-frame-bar">
+              <span class="hp-frame-dot"></span><span class="hp-frame-dot"></span><span class="hp-frame-dot"></span>
+              <span class="hp-frame-url">johny.siwat.me · Tasks — Kanban</span>
+            </div>
+            <div class="hp-dash-frame-body">
+              <div class="hfm-kanban">
+                <div class="hfm-kcol">
+                  <div class="hfm-kcol-head"><span class="hfm-kcol-dot" style="background:#6F7480"></span>สิ่งที่ต้องทำ<span class="hfm-kcol-count">2</span></div>
+                  <div class="hfm-kcard">ส่งรายงานประจำเดือน<br><span class="hfm-badge" style="--bc:#FF453A18;--bt:#FF453A">Critical</span></div>
+                  <div class="hfm-kcard">อ่านหนังสือก่อนนอน<br><span class="hfm-badge" style="--bc:#8E8E9318;--bt:#8E8E93">Low</span></div>
+                </div>
+                <div class="hfm-kcol">
+                  <div class="hfm-kcol-head"><span class="hfm-kcol-dot" style="background:#0A84FF"></span>กำลังทำ<span class="hfm-kcol-count">2</span></div>
+                  <div class="hfm-kcard">Goals Module Integration<br><span class="hfm-badge" style="--bc:#FF9F0A18;--bt:#FF9F0A">High</span></div>
+                  <div class="hfm-kcard">LINE Bot Integration<br><span class="hfm-badge" style="--bc:#0A84FF18;--bt:#0A84FF">Medium</span></div>
+                </div>
+                <div class="hfm-kcol">
+                  <div class="hfm-kcol-head"><span class="hfm-kcol-dot" style="background:#FF9F0A"></span>รอตรวจ<span class="hfm-kcol-count">1</span></div>
+                  <div class="hfm-kcard">ประชุม Product Review<br><span class="hfm-badge" style="--bc:#FF9F0A18;--bt:#FF9F0A">High</span></div>
+                </div>
+                <div class="hfm-kcol">
+                  <div class="hfm-kcol-head"><span class="hfm-kcol-dot" style="background:#30D158"></span>เสร็จแล้ว<span class="hfm-kcol-count">1</span></div>
+                  <div class="hfm-kcard hfm-kcard--done">Setup Supabase Database<br><span class="hfm-badge" style="--bc:#30D15818;--bt:#30D158">เสร็จแล้ว</span></div>
+                </div>
               </div>
-              <h3>Expenses</h3>
-              <p>Track spending by category with instant summaries and a clear monthly overview.</p>
-            </article>
-            <article class="hp-feature">
-              <div class="hp-feat-icon hp-feat-icon--rose">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="4" width="19" height="17.5" rx="4.5" stroke="currentColor" stroke-width="2"/><path d="M7 2v4M17 2v4M2.5 10.5h19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="8" cy="15.5" r="1.5" fill="currentColor" opacity=".5"/><circle cx="12" cy="15.5" r="1.5" fill="currentColor" opacity=".3"/><circle cx="16" cy="15.5" r="1.5" fill="currentColor" opacity=".3"/></svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 3. Notes ── -->
+      <section class="hp-feat-section" aria-label="Notes feature">
+        <div class="hp-feat-inner">
+          <div class="hp-feat-header">
+            <span class="hp-badge">Notes</span>
+            <h2 class="hp-feat-title">จดทุกความคิด ค้นหาได้ทุกที่</h2>
+            <p class="hp-feat-desc">เขียนโน้ต ติดแท็ก เชื่อม Goal และค้นหาผ่านเว็บหรือ LINE Bot ได้เลย</p>
+          </div>
+          <div class="hp-dash-frame" aria-hidden="true">
+            <div class="hp-dash-frame-bar">
+              <span class="hp-frame-dot"></span><span class="hp-frame-dot"></span><span class="hp-frame-dot"></span>
+              <span class="hp-frame-url">johny.siwat.me · Notes</span>
+            </div>
+            <div class="hp-dash-frame-body">
+              <div class="hfm-note-editor">
+                <div class="hfm-note-title-bar">หัวข้อโน้ต…</div>
+                <div class="hfm-note-body-bar">เขียนความคิด ไอเดีย หรือความรู้ไว้ตรงนี้</div>
+                <div class="hfm-note-footer-bar">
+                  <span class="hfm-label" style="--lc:#0A84FF">work</span>
+                  <span class="hfm-label" style="--lc:#BF5AF2">idea</span>
+                  <span style="margin-left:auto"><span class="hfm-btn hfm-btn--sm">บันทึกโน้ต</span></span>
+                </div>
               </div>
-              <h3>Daily Planning</h3>
-              <p>Start each day with clarity. Your priorities, tasks, and goals — front and center.</p>
-            </article>
+              <div class="hfm-note-list">
+                <div class="hfm-note-card">
+                  <div class="hfm-note-card-title">ไอเดีย Johny v3 — Dark Mode</div>
+                  <div class="hfm-note-card-preview">เพิ่ม theme switcher ด้วย CSS custom props ไม่ต้อง reload หน้า ใช้ data-theme attribute…</div>
+                  <div class="hfm-note-card-footer">
+                    <span class="hfm-label" style="--lc:#BF5AF2">ไอเดีย</span>
+                    <span class="hfm-label" style="--lc:#0A84FF">งาน</span>
+                    <span class="hfm-note-card-date">24 มิ.ย.</span>
+                  </div>
+                </div>
+                <div class="hfm-note-card">
+                  <div class="hfm-note-card-title">สรุปประชุม Q2 Planning</div>
+                  <div class="hfm-note-card-preview">1. เปิดตัว LINE Bot 2. ทำ Dashboard v2 3. เพิ่ม Expense report รายปี…</div>
+                  <div class="hfm-note-card-footer">
+                    <span class="hfm-label" style="--lc:#64D2FF">ประชุม</span>
+                    <span class="hfm-note-card-date">23 มิ.ย.</span>
+                  </div>
+                </div>
+                <div class="hfm-note-card">
+                  <div class="hfm-note-card-title">กาแฟ Cold Brew สูตร Johny</div>
+                  <div class="hfm-note-card-preview">กาแฟบด 80g ต่อน้ำ 1L แช่ตู้เย็น 18-24 ชั่วโมง กรองผ่านผ้าขาวบาง…</div>
+                  <div class="hfm-note-card-footer">
+                    <span class="hfm-label" style="--lc:#FF9F0A">ส่วนตัว</span>
+                    <span class="hfm-note-card-date">20 มิ.ย.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 4. Expenses ── -->
+      <section class="hp-feat-section hp-feat-section--alt" aria-label="Expenses feature">
+        <div class="hp-feat-inner">
+          <div class="hp-feat-header">
+            <span class="hp-badge">Expenses</span>
+            <h2 class="hp-feat-title">ติดตามรายจ่ายทุกบาท</h2>
+            <p class="hp-feat-desc">บันทึกรายจ่าย แยกหมวดหมู่ ดูสรุปรายวัน เดือน หรือปี ได้ในคลิกเดียว</p>
+          </div>
+          <div class="hp-dash-frame" aria-hidden="true">
+            <div class="hp-dash-frame-bar">
+              <span class="hp-frame-dot"></span><span class="hp-frame-dot"></span><span class="hp-frame-dot"></span>
+              <span class="hp-frame-url">johny.siwat.me · Expenses</span>
+            </div>
+            <div class="hp-dash-frame-body">
+              <div class="hfm-chips">
+                <span class="hfm-chip">วันนี้</span>
+                <span class="hfm-chip hfm-chip--active">เดือนนี้</span>
+                <span class="hfm-chip">ปีนี้</span>
+                <span class="hfm-chip">ทั้งหมด</span>
+              </div>
+              <div class="hfm-expense-summary">
+                <div class="hfm-expense-total">
+                  <span class="hfm-expense-amount">฿3,397</span>
+                  <span class="hfm-expense-label">รายจ่ายเดือนมิถุนายน</span>
+                </div>
+                <div class="hp-demo-bar-list">
+                  <div class="hp-demo-bar-row"><span class="hp-demo-bar-label">สุขภาพ</span><div class="hp-demo-bar-track"><div class="hp-demo-bar-fill" style="width:100%;background:#30D158"></div></div><span class="hp-demo-bar-amt">฿800</span></div>
+                  <div class="hp-demo-bar-row"><span class="hp-demo-bar-label">อาหาร</span><div class="hp-demo-bar-track"><div class="hp-demo-bar-fill" style="width:78%;background:#FF9F0A"></div></div><span class="hp-demo-bar-amt">฿625</span></div>
+                  <div class="hp-demo-bar-row"><span class="hp-demo-bar-label">อินเทอร์เน็ต</span><div class="hp-demo-bar-track"><div class="hp-demo-bar-fill" style="width:75%;background:#0A84FF"></div></div><span class="hp-demo-bar-amt">฿599</span></div>
+                  <div class="hp-demo-bar-row"><span class="hp-demo-bar-label">ช้อปปิ้ง</span><div class="hp-demo-bar-track"><div class="hp-demo-bar-fill" style="width:74%;background:#FF453A"></div></div><span class="hp-demo-bar-amt">฿590</span></div>
+                  <div class="hp-demo-bar-row"><span class="hp-demo-bar-label">อื่นๆ</span><div class="hp-demo-bar-track"><div class="hp-demo-bar-fill" style="width:52%;background:#8E8E93"></div></div><span class="hp-demo-bar-amt">฿419</span></div>
+                </div>
+              </div>
+              <div class="hfm-expense-list">
+                <div class="hfm-expense-item">
+                  <span class="hfm-expense-icon" style="background:#30D15820;color:#30D158">🏥</span>
+                  <span class="hfm-expense-name">ตรวจสุขภาพประจำปี</span>
+                  <span class="hfm-expense-cat">สุขภาพ</span>
+                  <span class="hfm-expense-val">−฿800</span>
+                </div>
+                <div class="hfm-expense-item">
+                  <span class="hfm-expense-icon" style="background:#FF9F0A20;color:#FF9F0A">🍜</span>
+                  <span class="hfm-expense-name">ข้าวผัดกะเพรา + น้ำเต้าหู้</span>
+                  <span class="hfm-expense-cat">อาหาร</span>
+                  <span class="hfm-expense-val">−฿85</span>
+                </div>
+                <div class="hfm-expense-item">
+                  <span class="hfm-expense-icon" style="background:#0A84FF20;color:#0A84FF">📡</span>
+                  <span class="hfm-expense-name">ค่าเน็ตบ้านเดือนมิถุนายน</span>
+                  <span class="hfm-expense-cat">อินเทอร์เน็ต</span>
+                  <span class="hfm-expense-val">−฿599</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 5. Calendar ── -->
+      <section class="hp-feat-section" aria-label="Calendar feature">
+        <div class="hp-feat-inner">
+          <div class="hp-feat-header">
+            <span class="hp-badge">Calendar</span>
+            <h2 class="hp-feat-title">วางแผนล่วงหน้า รู้วันหยุดไทย</h2>
+            <p class="hp-feat-desc">ปฏิทินรายเดือน แสดงงาน กิจกรรม และวันหยุดราชการครบทุกปี</p>
+          </div>
+          <div class="hp-dash-frame" aria-hidden="true">
+            <div class="hp-dash-frame-bar">
+              <span class="hp-frame-dot"></span><span class="hp-frame-dot"></span><span class="hp-frame-dot"></span>
+              <span class="hp-frame-url">johny.siwat.me · Calendar</span>
+            </div>
+            <div class="hp-dash-frame-body">
+              <div class="hfm-cal">
+                <div class="hfm-cal-header">
+                  <span class="hfm-cal-nav">‹</span>
+                  <span class="hfm-cal-month">มิถุนายน 2026</span>
+                  <span class="hfm-cal-nav">›</span>
+                </div>
+                <div class="hfm-cal-grid">
+                  <div class="hfm-cal-dh">จ</div><div class="hfm-cal-dh">อ</div><div class="hfm-cal-dh">พ</div><div class="hfm-cal-dh">พฤ</div><div class="hfm-cal-dh">ศ</div><div class="hfm-cal-dh hfm-cal-dh--wknd">ส</div><div class="hfm-cal-dh hfm-cal-dh--wknd">อา</div>
+                  <div class="hfm-cal-day">1<div class="hfm-cal-dot" style="background:#0A84FF"></div></div>
+                  <div class="hfm-cal-day">2</div>
+                  <div class="hfm-cal-day hfm-cal-day--holiday">3<span class="hfm-cal-hol">วันราชินี</span></div>
+                  <div class="hfm-cal-day">4</div>
+                  <div class="hfm-cal-day">5<div class="hfm-cal-dot" style="background:#FF9F0A"></div></div>
+                  <div class="hfm-cal-day hfm-cal-day--wknd">6</div>
+                  <div class="hfm-cal-day hfm-cal-day--wknd">7</div>
+                  <div class="hfm-cal-day">8</div><div class="hfm-cal-day">9</div><div class="hfm-cal-day">10</div><div class="hfm-cal-day">11<div class="hfm-cal-dot" style="background:#BF5AF2"></div></div><div class="hfm-cal-day">12</div><div class="hfm-cal-day hfm-cal-day--wknd">13</div><div class="hfm-cal-day hfm-cal-day--wknd">14</div>
+                  <div class="hfm-cal-day">15</div><div class="hfm-cal-day">16</div><div class="hfm-cal-day">17<div class="hfm-cal-dot" style="background:#FF453A"></div></div><div class="hfm-cal-day">18</div><div class="hfm-cal-day">19</div><div class="hfm-cal-day hfm-cal-day--wknd">20</div><div class="hfm-cal-day hfm-cal-day--wknd">21</div>
+                  <div class="hfm-cal-day">22</div><div class="hfm-cal-day">23<div class="hfm-cal-dot" style="background:#0A84FF"></div></div>
+                  <div class="hfm-cal-day hfm-cal-day--today">24<div class="hfm-cal-dot" style="background:rgba(255,255,255,0.7)"></div></div>
+                  <div class="hfm-cal-day">25<div class="hfm-cal-dot" style="background:#FF453A"></div></div><div class="hfm-cal-day">26</div><div class="hfm-cal-day hfm-cal-day--wknd">27</div><div class="hfm-cal-day hfm-cal-day--wknd">28</div>
+                  <div class="hfm-cal-day">29</div><div class="hfm-cal-day">30</div><div class="hfm-cal-day hfm-cal-day--empty"></div><div class="hfm-cal-day hfm-cal-day--empty"></div><div class="hfm-cal-day hfm-cal-day--empty"></div><div class="hfm-cal-day hfm-cal-day--empty"></div><div class="hfm-cal-day hfm-cal-day--empty"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 6. Goals ── -->
+      <section class="hp-feat-section hp-feat-section--alt" aria-label="Goals feature">
+        <div class="hp-feat-inner">
+          <div class="hp-feat-header">
+            <span class="hp-badge">Goals</span>
+            <h2 class="hp-feat-title">ตั้งเป้า ติดตามความก้าวหน้า</h2>
+            <p class="hp-feat-desc">สร้าง Goal เชื่อมงาน โน้ต และรายจ่าย ดู Progress Bar แบบ real-time</p>
+          </div>
+          <div class="hp-dash-frame" aria-hidden="true">
+            <div class="hp-dash-frame-bar">
+              <span class="hp-frame-dot"></span><span class="hp-frame-dot"></span><span class="hp-frame-dot"></span>
+              <span class="hp-frame-url">johny.siwat.me · Goals</span>
+            </div>
+            <div class="hp-dash-frame-body">
+              <div class="hfm-goal-list">
+                <div class="hfm-goal-item">
+                  <div class="hfm-goal-top">
+                    <span class="hfm-goal-color" style="background:#0A84FF"></span>
+                    <span class="hfm-goal-name">Build Johny Memo</span>
+                    <span class="hfm-goal-pct">68%</span>
+                  </div>
+                  <div class="hfm-goal-bar-track"><div class="hfm-goal-bar-fill" style="width:68%;background:#0A84FF"></div></div>
+                  <div class="hfm-goal-meta">
+                    <span>📋 5 งานที่เชื่อมอยู่</span>
+                    <span>📝 3 โน้ต</span>
+                    <span>💰 ฿12,500</span>
+                  </div>
+                </div>
+                <div class="hfm-goal-item">
+                  <div class="hfm-goal-top">
+                    <span class="hfm-goal-color" style="background:#30D158"></span>
+                    <span class="hfm-goal-name">ออกกำลังกาย 30 วัน</span>
+                    <span class="hfm-goal-pct">40%</span>
+                  </div>
+                  <div class="hfm-goal-bar-track"><div class="hfm-goal-bar-fill" style="width:40%;background:#30D158"></div></div>
+                  <div class="hfm-goal-meta">
+                    <span>📋 2 งานที่เชื่อมอยู่</span>
+                    <span>🎯 12 / 30 วัน</span>
+                  </div>
+                </div>
+                <div class="hfm-goal-item">
+                  <div class="hfm-goal-top">
+                    <span class="hfm-goal-color" style="background:#FF9F0A"></span>
+                    <span class="hfm-goal-name">อ่านหนังสือ 12 เล่มภายในปีนี้</span>
+                    <span class="hfm-goal-pct">25%</span>
+                  </div>
+                  <div class="hfm-goal-bar-track"><div class="hfm-goal-bar-fill" style="width:25%;background:#FF9F0A"></div></div>
+                  <div class="hfm-goal-meta">
+                    <span>📋 1 งานที่เชื่อมอยู่</span>
+                    <span>📚 3 / 12 เล่ม</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 7. Review ── -->
+      <section class="hp-feat-section" aria-label="Review feature">
+        <div class="hp-feat-inner">
+          <div class="hp-feat-header">
+            <span class="hp-badge">Review</span>
+            <h2 class="hp-feat-title">ทบทวน วัดผล พัฒนาตัวเอง</h2>
+            <p class="hp-feat-desc">ดูสรุปประจำวัน สัปดาห์ และเดือน งานที่เสร็จ รายจ่าย และ Goal Progress</p>
+          </div>
+          <div class="hp-dash-frame" aria-hidden="true">
+            <div class="hp-dash-frame-bar">
+              <span class="hp-frame-dot"></span><span class="hp-frame-dot"></span><span class="hp-frame-dot"></span>
+              <span class="hp-frame-url">johny.siwat.me · Review</span>
+            </div>
+            <div class="hp-dash-frame-body">
+              <div class="hfm-chips">
+                <span class="hfm-chip">วันนี้</span>
+                <span class="hfm-chip hfm-chip--active">สัปดาห์นี้</span>
+                <span class="hfm-chip">เดือนนี้</span>
+              </div>
+              <div class="hfm-review-stats">
+                <div class="hfm-review-stat">
+                  <strong style="color:#30D158">12</strong>
+                  <span>งานเสร็จสัปดาห์นี้</span>
+                </div>
+                <div class="hfm-review-stat">
+                  <strong style="color:#0A84FF">8</strong>
+                  <span>โน้ตบันทึกใหม่</span>
+                </div>
+                <div class="hfm-review-stat">
+                  <strong style="color:#FF453A">฿4,230</strong>
+                  <span>รายจ่ายสัปดาห์นี้</span>
+                </div>
+              </div>
+              <div class="hfm-week-chart">
+                <div class="hfm-week-col"><div class="hfm-week-bar" style="height:45%"></div><span class="hfm-week-label">จ</span></div>
+                <div class="hfm-week-col"><div class="hfm-week-bar" style="height:75%"></div><span class="hfm-week-label">อ</span></div>
+                <div class="hfm-week-col"><div class="hfm-week-bar" style="height:60%"></div><span class="hfm-week-label">พ</span></div>
+                <div class="hfm-week-col"><div class="hfm-week-bar" style="height:30%"></div><span class="hfm-week-label">พฤ</span></div>
+                <div class="hfm-week-col"><div class="hfm-week-bar" style="height:90%"></div><span class="hfm-week-label">ศ</span></div>
+                <div class="hfm-week-col"><div class="hfm-week-bar" style="height:20%;opacity:0.4"></div><span class="hfm-week-label">ส</span></div>
+                <div class="hfm-week-col"><div class="hfm-week-bar" style="height:5%;opacity:0.3"></div><span class="hfm-week-label">อา</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 8. LINE Bot ── -->
+      <section class="hp-feat-section hp-feat-section--alt" aria-label="LINE Bot feature">
+        <div class="hp-feat-inner">
+          <div class="hp-feat-header">
+            <span class="hp-badge">LINE Bot</span>
+            <h2 class="hp-feat-title">บันทึกผ่าน LINE ได้ทุกที่</h2>
+            <p class="hp-feat-desc">ส่งข้อความหา Johny ใน LINE เพื่อเพิ่มงาน โน้ต หรือบันทึกรายจ่ายได้ทันที ไม่ต้องเปิดเว็บ</p>
+          </div>
+          <div class="hp-dash-frame" aria-hidden="true">
+            <div class="hp-dash-frame-bar">
+              <span class="hp-frame-dot"></span><span class="hp-frame-dot"></span><span class="hp-frame-dot"></span>
+              <span class="hp-frame-url">LINE — Johny Memo Bot</span>
+            </div>
+            <div class="hp-dash-frame-body">
+              <div class="hfm-chat">
+                <div class="hfm-chat-row">
+                  <span class="hfm-chat-avatar">J</span>
+                  <div class="hfm-chat-bubble hfm-chat-bubble--bot">สวัสดีครับ! พิมพ์ได้เลยนะครับ 👋<br><small style="opacity:.6">เพิ่มงาน · โน้ต: · จ่าย [จำนวน]</small></div>
+                </div>
+                <div class="hfm-chat-row hfm-chat-row--me">
+                  <div class="hfm-chat-bubble hfm-chat-bubble--me">จ่ายกาแฟ 80</div>
+                </div>
+                <div class="hfm-chat-row">
+                  <span class="hfm-chat-avatar">J</span>
+                  <div class="hfm-chat-bubble hfm-chat-bubble--bot"><span class="hfm-ckmark">✓</span> บันทึกแล้วครับ<br><strong>กาแฟ ฿80</strong> · หมวดเครื่องดื่ม</div>
+                </div>
+                <div class="hfm-chat-row hfm-chat-row--me">
+                  <div class="hfm-chat-bubble hfm-chat-bubble--me">เพิ่มงาน ส่งรายงานพรุ่งนี้ #Critical</div>
+                </div>
+                <div class="hfm-chat-row">
+                  <span class="hfm-chat-avatar">J</span>
+                  <div class="hfm-chat-bubble hfm-chat-bubble--bot"><span class="hfm-ckmark">✓</span> เพิ่มงานแล้วครับ<br><strong>ส่งรายงาน</strong> · Critical · ครบ พรุ่งนี้</div>
+                </div>
+                <div class="hfm-chat-row hfm-chat-row--me">
+                  <div class="hfm-chat-bubble hfm-chat-bubble--me">โน้ต: ไอเดีย Dashboard v3 ใหม่</div>
+                </div>
+                <div class="hfm-chat-row">
+                  <span class="hfm-chat-avatar">J</span>
+                  <div class="hfm-chat-bubble hfm-chat-bubble--bot"><span class="hfm-ckmark">✓</span> บันทึกโน้ตแล้วครับ<br><strong>ไอเดีย Dashboard v3 ใหม่</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 9. Quick Add ── -->
+      <section class="hp-feat-section" aria-label="Quick Add feature">
+        <div class="hp-feat-inner">
+          <div class="hp-feat-header">
+            <span class="hp-badge">Quick Add</span>
+            <h2 class="hp-feat-title">พิมพ์เร็ว บันทึกไว</h2>
+            <p class="hp-feat-desc">เพิ่มงาน โน้ต และรายจ่ายจาก input เดียวด้วยภาษาธรรมชาติ ไม่ต้องเปลี่ยนหน้า</p>
+          </div>
+          <div class="hp-dash-frame" aria-hidden="true">
+            <div class="hp-dash-frame-bar">
+              <span class="hp-frame-dot"></span><span class="hp-frame-dot"></span><span class="hp-frame-dot"></span>
+              <span class="hp-frame-url">johny.siwat.me · Dashboard</span>
+            </div>
+            <div class="hp-dash-frame-body">
+              <div class="hfm-secbar">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="color:#8E8E93;flex-shrink:0"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6h4M6 4v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                <span class="hfm-secbar-input">เพิ่มงาน ... · โน้ต: ... · จ่าย [ชื่อ] [จำนวน] · goals</span>
+                <span class="hfm-secbar-btn">ส่ง</span>
+              </div>
+              <div class="hfm-sec-examples">
+                <div class="hfm-sec-ex">
+                  <span class="hfm-sec-ex-cmd">เพิ่มงาน ส่งงานพรุ่งนี้ #High</span>
+                  <span class="hfm-sec-ex-arrow">→</span>
+                  <span class="hfm-sec-ex-result">สร้างงาน <strong>ส่งงาน</strong> ความสำคัญ High กำหนดส่งพรุ่งนี้ ทันที</span>
+                </div>
+                <div class="hfm-sec-ex">
+                  <span class="hfm-sec-ex-cmd">โน้ต: ไอเดีย redesign header</span>
+                  <span class="hfm-sec-ex-arrow">→</span>
+                  <span class="hfm-sec-ex-result">บันทึกโน้ต <strong>ไอเดีย redesign header</strong> ใน Notes ทันที</span>
+                </div>
+                <div class="hfm-sec-ex">
+                  <span class="hfm-sec-ex-cmd">จ่ายกาแฟ 80 เครื่องดื่ม</span>
+                  <span class="hfm-sec-ex-arrow">→</span>
+                  <span class="hfm-sec-ex-result">บันทึกรายจ่าย <strong>กาแฟ ฿80</strong> หมวดเครื่องดื่ม ทันที</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -214,7 +587,7 @@
             <span>Johny Memo</span>
           </div>
           <p class="hp-footer-copy">Your personal digital workspace</p>
-          <button class="hp-cta-primary hp-cta-sm" id="hpFooterGuestBtn" type="button">Demo Mode</button>
+          <button class="hp-cta-primary hp-cta-sm" id="hpFooterLoginBtn" type="button">Log in with LINE</button>
         </div>
       </footer>
 
@@ -277,7 +650,7 @@
           <div class="line-connect-block">
             <!-- Profile card: shown when logged in and LINE is linked -->
             <div class="line-profile-card" id="lineProfileCard" hidden>
-              <img class="line-profile-pic" id="lineProfilePic" alt="LINE profile" />
+              <img class="line-profile-pic" id="lineProfilePic" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="LINE profile" />
               <div class="line-profile-info">
                 <span class="line-profile-name" id="lineProfileName"></span>
                 <span class="line-tier-badge" id="lineTierBadge">Free</span>
@@ -330,7 +703,6 @@
                 <span class="auth-user-email-topbar" id="authUserEmailTopbar" hidden></span>
                 <!-- Guest state -->
                 <div class="auth-control-row" id="authGuestRow">
-                  <span class="auth-guest-label">Demo Mode</span>
                   <button class="auth-dot-btn auth-dot-btn--login" id="authLoginBtn" type="button" aria-label="Log in">
                     <span class="auth-btn-label">Log in</span>
                   </button>
@@ -742,150 +1114,47 @@
       </div>
     </div>
 
-    <!-- Auth modal — two-screen (login / signup / success / signed-in) -->
+    <!-- Auth modal — LINE Login + signed-in state -->
     <dialog class="auth-modal" id="authModal">
-      <!-- ── Screen 1: Login ── -->
+
+      <!-- ── Screen 1: Login with LINE ── -->
       <div class="auth-panel" id="authLoginPanel">
-        <button
-          class="auth-close-x"
-          id="authModalClose"
-          type="button"
-          aria-label="ปิด"
-        >
-          ×
+        <button class="auth-close-x" id="authModalClose" type="button" aria-label="ปิด">×</button>
+        <img src="./johny-cat.svg" class="auth-mascot" alt="" aria-hidden="true" />
+        <h2 class="auth-panel-title">เข้าสู่ระบบ</h2>
+        <p class="auth-modal-hint">ใช้บัญชี LINE เพื่อเข้าถึง JohnyMemo Dashboard</p>
+
+        <p class="auth-error" id="authError" aria-live="polite" hidden></p>
+
+        <button type="button" class="auth-line-btn" id="authLineLoginBtn">
+          <svg class="auth-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 2C6.48 2 2 6.06 2 11.07c0 4.49 3.66 8.25 8.6 8.93v2.77c0 .28.33.43.55.26l4.07-3.06c.07-.06.17-.09.27-.09C20.49 19.88 22 16.74 22 13.3 22 7.51 17.52 2 12 2z" fill="white"/>
+          </svg>
+          Login with LINE
         </button>
-        <div class="auth-panel-icon">☁</div>
-        <h2 class="auth-panel-title">ยินดีต้อนรับกลับ</h2>
-        <p class="auth-modal-hint">ซิงค์ข้อมูลข้ามอุปกรณ์ด้วย Supabase</p>
-        <form class="auth-form" id="authLoginForm" novalidate>
-          <label class="auth-label">
-            Email
-            <input
-              type="email"
-              id="authEmail"
-              placeholder="you@example.com"
-              autocomplete="email"
-              required
-            />
-          </label>
-          <label class="auth-label">
-            Password
-            <input
-              type="password"
-              id="authPassword"
-              placeholder="••••••••"
-              autocomplete="current-password"
-              required
-            />
-          </label>
-          <p class="auth-error" id="authError" aria-live="polite"></p>
-          <button type="submit" class="auth-submit-btn">เข้าสู่ระบบ</button>
-        </form>
-        <button type="button" class="auth-guest-btn" id="authGuestBtn">
-          ดำเนินการต่อแบบไม่ล็อคอิน (Demo Mode)
-        </button>
+
         <p class="auth-line-hint">
-          ใช้ LINE Bot อยู่? พิม <strong>เว็บ</strong> ใน LINE เพื่อรับลิงก์เข้าระบบทันทีโดยไม่ต้องใช้ email
-        </p>
-        <p class="auth-switch-text">
-          ยังไม่มีบัญชี?
-          <button type="button" class="auth-link-btn" id="authSwitchSignup">
-            สมัครใช้งาน →
-          </button>
+          ยังไม่ได้เพิ่ม LINE Bot?
+          <a href="https://lin.ee/Z7Lx7qx" target="_blank" rel="noopener" class="auth-link-btn">เพิ่มเพื่อนก่อน →</a>
         </p>
       </div>
 
-      <!-- ── Screen 2: Signup ── -->
-      <div class="auth-panel" id="authSignupPanel" hidden>
-        <button
-          class="auth-close-x"
-          data-auth-close
-          type="button"
-          aria-label="ปิด"
-        >
-          ×
-        </button>
-        <div class="auth-panel-icon">✦</div>
-        <h2 class="auth-panel-title">สมัครใช้งาน</h2>
-        <p class="auth-modal-hint">สร้างบัญชีเพื่อซิงค์ข้อมูลข้ามอุปกรณ์</p>
-        <form class="auth-form" id="authSignupForm" novalidate>
-          <label class="auth-label">
-            Email
-            <input
-              type="email"
-              id="authSignupEmail"
-              placeholder="you@example.com"
-              autocomplete="email"
-              required
-            />
-          </label>
-          <label class="auth-label">
-            Password
-            <input
-              type="password"
-              id="authSignupPassword"
-              placeholder="••••••••"
-              autocomplete="new-password"
-              required
-            />
-          </label>
-          <label class="auth-label">
-            ยืนยัน Password
-            <input
-              type="password"
-              id="authSignupConfirm"
-              placeholder="••••••••"
-              autocomplete="new-password"
-              required
-            />
-          </label>
-          <p class="auth-error" id="authSignupError" aria-live="polite"></p>
-          <button type="submit" class="auth-submit-btn">สมัครใช้งาน</button>
-        </form>
-        <p class="auth-switch-text">
-          มีบัญชีแล้ว?
-          <button type="button" class="auth-link-btn" id="authSwitchLogin">
-            ← เข้าสู่ระบบ
-          </button>
-        </p>
-      </div>
-
-      <!-- ── Screen 3: Signup success ── -->
-      <div class="auth-panel auth-success-panel" id="authSuccessPanel" hidden>
-        <div class="auth-success-icon">✓</div>
-        <h2 class="auth-panel-title">สมัครแล้ว!</h2>
-        <p class="auth-modal-hint">
-          กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชีของคุณ<br />แล้วกลับมาเข้าสู่ระบบ
-        </p>
-        <button type="button" class="auth-submit-btn" id="authSuccessBackBtn">
-          กลับหน้าเข้าสู่ระบบ
-        </button>
-      </div>
-
-      <!-- ── Screen 4: Already signed in ── -->
+      <!-- ── Screen 2: Already signed in ── -->
       <div class="auth-panel auth-signedin-panel" id="authSignedInPanel" hidden>
-        <button
-          class="auth-close-x"
-          data-auth-close
-          type="button"
-          aria-label="ปิด"
-        >
-          ×
-        </button>
-        <div class="auth-panel-icon auth-panel-icon--online">●</div>
+        <button class="auth-close-x" data-auth-close type="button" aria-label="ปิด">×</button>
+        <div class="auth-signedin-profile" id="authSignedInProfile">
+          <img class="auth-signedin-pic" id="authSignedInPic" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="" hidden />
+          <div class="auth-panel-icon auth-panel-icon--online">●</div>
+        </div>
         <h2 class="auth-panel-title">เชื่อมต่อแล้ว</h2>
-        <p class="auth-modal-hint" id="authSignedInEmail"></p>
-        <button
-          type="button"
-          class="auth-submit-btn auth-submit-btn--danger"
-          id="authLogoutModalBtn"
-        >
+        <p class="auth-modal-hint" id="authSignedInName"></p>
+        <span class="auth-plan-badge" id="authPlanBadge">Free</span>
+        <button type="button" class="auth-submit-btn auth-submit-btn--danger" id="authLogoutModalBtn">
           ออกจากระบบ
         </button>
-        <button type="button" class="auth-guest-btn" data-auth-close>
-          ปิด
-        </button>
+        <button type="button" class="auth-guest-btn" data-auth-close>ปิด</button>
       </div>
+
     </dialog>
 
     <script src="./auth.js?v=11"></script>
