@@ -476,8 +476,8 @@
         <section class="view" id="tasks" aria-label="Task management">
           <div class="task-view-toolbar">
             <div class="task-view-filters">
-              <button class="chip active" type="button" data-task-filter="all">ทั้งหมด</button>
-              <button class="chip" type="button" data-task-filter="open">ค้าง</button>
+              <button class="chip" type="button" data-task-filter="all">ทั้งหมด</button>
+              <button class="chip active" type="button" data-task-filter="open">ค้าง</button>
               <button class="chip" type="button" data-task-filter="done">เสร็จแล้ว</button>
             </div>
             <div class="task-view-actions">
@@ -567,10 +567,6 @@
           </form>
           <div class="item-list" id="noteList"></div>
 
-          <div id="lineNotesSection" style="display:none">
-            <p class="line-notes-label">จาก LINE Bot</p>
-            <div class="item-list" id="lineNoteList"></div>
-          </div>
 
         </section>
 
@@ -613,6 +609,12 @@
             <button type="submit">บันทึก</button>
           </form>
           <div id="expenseStats"></div>
+          <div class="task-view-filters" id="expensePeriodTabs" style="margin-bottom:0.5rem">
+            <button class="chip" type="button" data-expense-period="today">วันนี้</button>
+            <button class="chip active" type="button" data-expense-period="month">เดือนนี้</button>
+            <button class="chip" type="button" data-expense-period="year">ปีนี้</button>
+            <button class="chip" type="button" data-expense-period="all">ทั้งหมด</button>
+          </div>
           <div class="item-list" id="expenseList"></div>
         </section>
 

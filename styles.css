@@ -1618,6 +1618,28 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   background: var(--border);
   flex-shrink: 0;
 }
+.expense-date-group { margin-bottom: 0.25rem; }
+.expense-date-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.75rem;
+  background: var(--surface-2, var(--surface));
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.2rem;
+}
+.expense-date-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.expense-date-total {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
 .expense-edit-amount {
   width: 7rem;
   font-size: 0.85rem;

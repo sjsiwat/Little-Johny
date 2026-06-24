@@ -164,7 +164,7 @@ const Storage = (() => {
     const uid = Auth.getUser().id;
     // Strip demo items — they are display-only and must never reach the cloud
     const tasks    = state.tasks.filter(t => !t._isDemo);
-    const notes    = state.notes.filter(n => !n._isDemo);
+    const notes    = state.notes.filter(n => !n._isDemo && !n._isKVLine);
     const expenses = state.expenses.filter(e => !e._isDemo);
     const goals    = (state.goals || []).filter(g => !g._isDemo);
     try {
@@ -193,7 +193,12 @@ const Storage = (() => {
       // Guest mode is ephemeral — no persistence anywhere, no cloud sync.
       // Data is saved only for authenticated users.
       if (!Auth.isLoggedIn()) return;
-      localSave(state);
+      // Strip display-only items before persisting locally
+      const persistState = {
+        ...state,
+        notes: state.notes.filter(n => !n._isKVLine)
+      };
+      localSave(persistState);
       clearTimeout(_syncTimer);
       if (_syncChangeListener) _syncChangeListener('pending');
       _syncTimer = setTimeout(() => pushToCloud(state), 1500);
