@@ -271,10 +271,24 @@
           </a>
         </nav>
 
-        <!-- LINE Connect -->
-        <div class="sidebar-section" aria-label="LINE connection">
+        <!-- LINE Bot -->
+        <div class="sidebar-section" aria-label="LINE Bot status">
           <p class="sidebar-section-title">LINE Bot</p>
           <div class="line-connect-block">
+            <!-- Profile card: shown when logged in and LINE is linked -->
+            <div class="line-profile-card" id="lineProfileCard" hidden>
+              <img class="line-profile-pic" id="lineProfilePic" alt="LINE profile" />
+              <div class="line-profile-info">
+                <span class="line-profile-name" id="lineProfileName"></span>
+                <span class="line-tier-badge" id="lineTierBadge">Free</span>
+              </div>
+            </div>
+            <!-- Status indicator -->
+            <div class="line-connect-status" id="lineConnectStatus">
+              <span class="line-status-dot" id="lineStatusDot"></span>
+              <span class="line-status-text" id="lineStatusText">ไม่ได้ Log in</span>
+            </div>
+            <!-- Add friend button (always shown) -->
             <a class="line-add-friend-btn" href="https://lin.ee/Z7Lx7qx" target="_blank" rel="noopener" aria-label="เพิ่ม Johny เป็นเพื่อนใน LINE">
               <svg class="line-add-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M12 2C6.48 2 2 6.06 2 11.07c0 4.49 3.66 8.25 8.6 8.93v2.77c0 .28.33.43.55.26l4.07-3.06c.07-.06.17-.09.27-.09C20.49 19.88 22 16.74 22 13.3 22 7.51 17.52 2 12 2z" fill="currentColor"/>
@@ -282,14 +296,6 @@
               </svg>
               <span>เพิ่มเพื่อนใน LINE</span>
             </a>
-            <div class="line-divider">
-              <span>จากนั้นเชื่อมบัญชี</span>
-            </div>
-            <div class="line-connect-status" id="lineConnectStatus">
-              <span class="line-status-dot" id="lineStatusDot"></span>
-              <span class="line-status-text" id="lineStatusText">ยังไม่ได้เชื่อม</span>
-            </div>
-            <button class="line-connect-btn" id="lineConnectBtn" type="button">เชื่อมบัญชี LINE</button>
           </div>
         </div>
 
@@ -300,25 +306,6 @@
         </div>
 
       </aside>
-
-      <!-- LINE Connect Modal -->
-      <div class="modal-backdrop" id="lineModalBackdrop" hidden>
-        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lineModalTitle">
-          <div class="modal-header">
-            <h3 class="modal-title" id="lineModalTitle">เชื่อมบัญชี LINE</h3>
-            <button class="modal-close" id="lineModalClose" type="button" aria-label="ปิด">×</button>
-          </div>
-          <div class="modal-body">
-            <p class="modal-hint">พิม <strong>เชื่อมบัญชี</strong> ใน LINE Bot แล้วนำรหัส 6 หลักมากรอกด้านล่าง</p>
-            <input class="modal-code-input" id="lineModalCode" type="text" inputmode="numeric" maxlength="6" placeholder="_ _ _ _ _ _" autocomplete="off" />
-            <p class="modal-error" id="lineModalError" hidden></p>
-          </div>
-          <div class="modal-footer">
-            <button class="modal-cancel" id="lineModalCancel" type="button">ยกเลิก</button>
-            <button class="modal-confirm" id="lineModalConfirm" type="button">ยืนยัน</button>
-          </div>
-        </div>
-      </div>
 
       <!-- ── Workspace ── -->
       <main class="workspace">
@@ -797,6 +784,9 @@
         <button type="button" class="auth-guest-btn" id="authGuestBtn">
           ดำเนินการต่อแบบไม่ล็อคอิน (Demo Mode)
         </button>
+        <p class="auth-line-hint">
+          ใช้ LINE Bot อยู่? พิม <strong>เว็บ</strong> ใน LINE เพื่อรับลิงก์เข้าระบบทันทีโดยไม่ต้องใช้ email
+        </p>
         <p class="auth-switch-text">
           ยังไม่มีบัญชี?
           <button type="button" class="auth-link-btn" id="authSwitchSignup">

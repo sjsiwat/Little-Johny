@@ -2252,6 +2252,22 @@ body::before {
   border-color: var(--line-soft);
 }
 
+.auth-line-hint {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  text-align: center;
+  padding: 0.5rem 0.75rem;
+  background: rgba(6, 199, 85, 0.06);
+  border: 1px solid rgba(6, 199, 85, 0.18);
+  border-radius: var(--radius-sm);
+  line-height: 1.5;
+}
+.auth-line-hint strong {
+  color: #06C755;
+  font-weight: 600;
+}
+
 .auth-switch-text {
   font-family: var(--font-body);
   font-size: 0.79rem;
@@ -4860,6 +4876,48 @@ body::before {
   transition: opacity 0.15s;
 }
 .modal-confirm:disabled { opacity: 0.5; cursor: default; }
+
+/* ── LINE Profile Card (sidebar) ── */
+.line-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+}
+.line-profile-pic {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--line);
+}
+.line-profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.line-profile-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.line-tier-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+  letter-spacing: 0.02em;
+}
+.line-tier-badge--premium {
+  color: #f59e0b;
+}
 
 /* ── LINE Add Friend button ── */
 .line-add-friend-btn {

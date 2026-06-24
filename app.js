@@ -2802,123 +2802,66 @@ if ("serviceWorker" in navigator) {
 // LINE Bot
 const LINE_WORKER_URL = 'https://johny-line-bot.sj-siwat.workers.dev'
 
-function initLineConnect() {
-  const backdrop = document.getElementById('lineModalBackdrop')
-  const connectBtn = document.getElementById('lineConnectBtn')
-  const closeBtn = document.getElementById('lineModalClose')
-  const cancelBtn = document.getElementById('lineModalCancel')
-  const confirmBtn = document.getElementById('lineModalConfirm')
-  const codeInput = document.getElementById('lineModalCode')
-  const errorEl = document.getElementById('lineModalError')
+// ── Render sidebar based on LINE info from Supabase ──────────────────────────
 
-  const isLoggedIn = () => !!Auth.getUser()
+function renderLineSidebar(lineInfo) {
+  const dot      = document.getElementById('lineStatusDot')
+  const text     = document.getElementById('lineStatusText')
+  const card     = document.getElementById('lineProfileCard')
+  const pic      = document.getElementById('lineProfilePic')
+  const name     = document.getElementById('lineProfileName')
+  const badge    = document.getElementById('lineTierBadge')
 
-  const stored = localStorage.getItem('lineUserId')
-  if (stored && isLoggedIn()) {
-    setConnectedUI(true)
-    loadLineNotes(stored).catch(() => {})
+  if (!dot || !text) return
+
+  if (!Auth.isLoggedIn()) {
+    dot.classList.remove('line-status-dot--connected')
+    text.textContent = 'ไม่ได้ Log in'
+    if (card) card.hidden = true
+    return
   }
 
-  updateLineConnectAccess()
-
-  Auth.onChange(() => updateLineConnectAccess())
-
-  connectBtn?.addEventListener('click', () => {
-    if (!isLoggedIn()) return
-
-    const linked = !!localStorage.getItem('lineUserId')
-    if (linked) {
-      localStorage.removeItem('lineUserId')
-      setConnectedUI(false)
-      state.notes = state.notes.filter(n => !n._isKVLine)
-      renderNotes()
-      showToast('ยกเลิกการเชื่อม LINE แล้ว')
-      return
-    }
-    codeInput.value = ''
-    errorEl.hidden = true
-    backdrop.hidden = false
-    codeInput.focus()
-  })
-
-  const closeModal = () => { backdrop.hidden = true }
-  closeBtn?.addEventListener('click', closeModal)
-  cancelBtn?.addEventListener('click', closeModal)
-  backdrop?.addEventListener('click', (e) => { if (e.target === backdrop) closeModal() })
-
-  codeInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') confirmBtn.click() })
-
-  confirmBtn?.addEventListener('click', async () => {
-    const code = codeInput.value.trim()
-    if (code.length !== 6) {
-      errorEl.textContent = 'กรอกรหัส 6 หลัก'
-      errorEl.hidden = false
-      return
-    }
-    confirmBtn.disabled = true
-    confirmBtn.textContent = 'กำลังตรวจสอบ...'
-    errorEl.hidden = true
-    try {
-      const res = await fetch(`${LINE_WORKER_URL}/link/verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          code,
-          supabaseUserId: Auth.isLoggedIn() ? Auth.getUser().id : null
-        })
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
-
-      localStorage.setItem('lineUserId', data.lineUserId)
-      backdrop.hidden = true
-      setConnectedUI(true)
-      showToast('เชื่อมบัญชี LINE สำเร็จ!')
-      loadLineNotes(data.lineUserId)
-    } catch (err) {
-      errorEl.textContent = err.message || 'รหัสไม่ถูกต้อง กรุณาลองใหม่'
-      errorEl.hidden = false
-    } finally {
-      confirmBtn.disabled = false
-      confirmBtn.textContent = 'ยืนยัน'
-    }
-  })
-}
-
-function updateLineConnectAccess() {
-  const btn = document.getElementById('lineConnectBtn')
-  const text = document.getElementById('lineStatusText')
-  if (!btn) return
-  const loggedIn = !!Auth.getUser()
-  btn.disabled = !loggedIn
-  btn.title = loggedIn ? '' : 'ต้อง Log in ก่อนถึงจะเชื่อม LINE ได้'
-  if (!loggedIn) {
-    btn.classList.remove('line-connect-btn--disconnect')
-    if (text) text.textContent = 'ต้อง Log in ก่อน'
-  } else {
-    const linked = !!localStorage.getItem('lineUserId')
-    setConnectedUI(linked)
-    if (linked) loadLineNotes(localStorage.getItem('lineUserId')).catch(() => {})
-  }
-}
-
-function setConnectedUI(connected) {
-  const dot = document.getElementById('lineStatusDot')
-  const text = document.getElementById('lineStatusText')
-  const btn = document.getElementById('lineConnectBtn')
-  if (!dot || !text || !btn) return
-  if (connected) {
+  if (lineInfo) {
+    // Logged in + LINE linked
     dot.classList.add('line-status-dot--connected')
     text.textContent = 'เชื่อมต่อแล้ว'
-    btn.textContent = 'ยกเลิกการเชื่อม'
-    btn.classList.add('line-connect-btn--disconnect')
+
+    if (card) {
+      if (pic && lineInfo.pictureUrl) {
+        pic.src = lineInfo.pictureUrl
+        pic.hidden = false
+      } else if (pic) {
+        pic.hidden = true
+      }
+      if (name) name.textContent = lineInfo.displayName || 'LINE User'
+      if (badge) {
+        badge.textContent = lineInfo.tier === 'premium' ? '⭐ Premium' : 'Free'
+        badge.className = 'line-tier-badge' + (lineInfo.tier === 'premium' ? ' line-tier-badge--premium' : '')
+      }
+      card.hidden = false
+    }
   } else {
+    // Logged in but not a LINE user (email-only account)
     dot.classList.remove('line-status-dot--connected')
     text.textContent = 'ยังไม่ได้เชื่อม'
-    btn.textContent = 'เชื่อมบัญชี LINE'
-    btn.classList.remove('line-connect-btn--disconnect')
+    if (card) card.hidden = true
   }
 }
+
+// Fetch LINE info then update sidebar. Called after login and on auth change.
+async function updateLineSidebar() {
+  const lineInfo = Auth.isLoggedIn()
+    ? await Auth.fetchLineInfo()
+    : null
+  renderLineSidebar(lineInfo)
+
+  // Load legacy KV notes for LINE users who joined before auto-create
+  if (lineInfo?.lineUserId) {
+    loadLineNotes(lineInfo.lineUserId).catch(() => {})
+  }
+}
+
+// ── Legacy: load KV notes (for users who used bot before Supabase auto-create) ─
 
 async function loadLineNotes(userId) {
   try {
@@ -2927,7 +2870,6 @@ async function loadLineNotes(userId) {
     const { notes } = await res.json()
     if (!notes.length) return
 
-    // Convert KV notes into the same format as regular notes and merge into state.notes
     const kvNotes = [...notes].reverse().map(n => ({
       id: `kv-line-${userId}-${new Date(n.createdAt).getTime()}`,
       title: n.text,
@@ -2938,10 +2880,22 @@ async function loadLineNotes(userId) {
       _isKVLine: true
     }))
 
-    // Replace old KV notes, keep all other notes
     state.notes = [...state.notes.filter(n => !n._isKVLine), ...kvNotes]
     renderNotes()
   } catch (_) {}
 }
 
-initLineConnect()
+// ── Init ──────────────────────────────────────────────────────────────────────
+
+function initLineSidebar() {
+  // Remove legacy localStorage key — no longer used
+  localStorage.removeItem('lineUserId')
+
+  // Initial render (may be logged in already on page load)
+  updateLineSidebar()
+
+  // Re-render on every auth state change (login / logout)
+  Auth.onChange(() => updateLineSidebar())
+}
+
+initLineSidebar()
