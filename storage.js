@@ -35,6 +35,9 @@ const Storage = (() => {
       status: row.status,
       labels: Array.isArray(row.labels) ? row.labels : [],
       goal_id: row.goal_id || null,
+      target_value: row.target_value != null ? Number(row.target_value) : null,
+      target_unit: row.target_unit || '',
+      progress_value: Number(row.progress_value) || 0,
       createdAt: new Date(row.created_at).getTime()
     };
   }
@@ -82,6 +85,9 @@ const Storage = (() => {
       status: task.status,
       labels: task.labels || [],
       goal_id: task.goal_id || null,
+      target_value: task.target_value != null ? Number(task.target_value) : null,
+      target_unit: task.target_unit || null,
+      progress_value: Number(task.progress_value) || 0,
       created_at: new Date(task.createdAt).toISOString()
     };
   }
