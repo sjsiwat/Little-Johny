@@ -141,10 +141,13 @@ const Storage = (() => {
 
   /* ── Cloud sync: upsert current items, delete orphans ── */
   async function syncTable(table, items, toRow, uid) {
+    // Safety: never touch cloud when local is empty — prevents accidental wipe from bad merges
+    if (items.length === 0) return;
     const db = Auth.db;
-    if (items.length > 0) {
-      const { error } = await db.from(table).upsert(items.map(i => toRow(i, uid)));
-      if (error) console.error(`[storage] upsert ${table}:`, error.message);
+    const { error: upsertErr } = await db.from(table).upsert(items.map(i => toRow(i, uid)));
+    if (upsertErr) {
+      console.error(`[storage] upsert ${table}:`, upsertErr.message);
+      return; // Don't delete if upsert failed
     }
     const currentIds = items.map(i => i.id);
     const { data: existing } = await db.from(table).select('id').eq('user_id', uid);

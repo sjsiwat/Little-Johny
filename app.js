@@ -2540,8 +2540,23 @@ async function onSignedIn(user) {
   const cloud = await Storage.loadCloud();
 
   if (cloud) {
-    state = { ...state, tasks: cloud.tasks, notes: cloud.notes, expenses: cloud.expenses, goals: cloud.goals };
-    showToast(cloud.tasks.length > 0 ? `โหลดข้อมูลจาก cloud (${cloud.tasks.length} งาน)` : "เชื่อมต่อแล้ว ✓");
+    // Merge: union of local + cloud, cloud items win on conflict.
+    // Never wipe local data with an empty cloud (cloud may not have synced yet).
+    function mergeItems(local, remote) {
+      if (!remote || remote.length === 0) return local;
+      const map = new Map((local || []).map(i => [i.id, i]));
+      for (const item of remote) map.set(item.id, item);
+      return [...map.values()];
+    }
+    const merged = {
+      tasks:    mergeItems(state.tasks,    cloud.tasks),
+      notes:    mergeItems(state.notes,    cloud.notes),
+      expenses: mergeItems(state.expenses, cloud.expenses),
+      goals:    mergeItems(state.goals,    cloud.goals),
+    };
+    state = { ...state, ...merged };
+    showToast(merged.tasks.length > 0 ? `โหลดข้อมูลจาก cloud (${merged.tasks.length} งาน)` : "เชื่อมต่อแล้ว ✓");
+    saveState();
     render();
   }
   // loadCloud failure is non-critical — local data still intact, next save will retry
