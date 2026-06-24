@@ -14,6 +14,7 @@ let _taskModalEditId  = null;
 let _taskView         = "list"; // "list" | "kanban"
 const _taskProgressMode = new Map(); // taskId → 'value' | 'pct'
 let _dragTaskId       = null;
+let _expensePeriod    = 'month'; // 'today' | 'month' | 'year' | 'all'
 
 /* ── Task / priority ── */
 const PRIORITY_RANK = { Critical: 0, High: 1, Medium: 2, Low: 3 };
@@ -339,7 +340,7 @@ function createDemoState() {
 
 const defaultState = {
   theme: "dark",
-  taskFilter: "all",
+  taskFilter: "open",
   ...createDemoState()
 };
 
@@ -452,6 +453,10 @@ function setView(viewName) {
 function render() {
   document.documentElement.dataset.theme = state.theme;
   populateGoalSelects("noteGoal", "expenseGoal");
+  // Sync task filter chip active state with current state
+  document.querySelectorAll("[data-task-filter]").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.taskFilter === state.taskFilter);
+  });
   renderShell();
   renderDashboard();
   renderTasks();
@@ -1290,6 +1295,16 @@ function renderNotes() {
         .map((note) => {
           if (note.id === _editingNoteId) return renderNoteEditForm(note);
           const noteGoal = note.goal_id ? state.goals.find(g => g.id === note.goal_id) : null;
+          const actions = note._isKVLine
+            ? `<div class="item-actions">
+                <button class="icon-button" type="button" data-delete-note="${note.id}" title="ลบโน้ต">×</button>
+               </div>`
+            : `<div class="item-actions">
+                <button class="icon-button icon-button--edit" type="button" data-edit-note="${note.id}" title="แก้ไขโน้ต" aria-label="แก้ไขโน้ต">
+                  ${ICON_EDIT}
+                </button>
+                <button class="icon-button" type="button" data-delete-note="${note.id}" title="ลบโน้ต">×</button>
+               </div>`;
           return `
             <article class="list-item">
               <div>
@@ -1298,12 +1313,7 @@ function renderNotes() {
                 ${noteGoal ? `<span class="item-goal-badge" style="--gc:${noteGoal.color}">${escapeHtml(noteGoal.title)}</span>` : ""}
                 ${note.body ? `<p class="muted">${escapeHtml(note.body)}</p>` : ""}
               </div>
-              <div class="item-actions">
-                <button class="icon-button icon-button--edit" type="button" data-edit-note="${note.id}" title="แก้ไขโน้ต" aria-label="แก้ไขโน้ต">
-                  ${ICON_EDIT}
-                </button>
-                <button class="icon-button" type="button" data-delete-note="${note.id}" title="ลบโน้ต">×</button>
-              </div>
+              ${actions}
             </article>
           `;
         })
@@ -1338,9 +1348,30 @@ function renderNoteEditForm(note) {
   `;
 }
 
+function renderExpenseItem(expense) {
+  const expGoal = expense.goal_id ? state.goals.find(g => g.id === expense.goal_id) : null;
+  return `
+    <article class="list-item">
+      <div>
+        <span class="item-title">${escapeHtml(expense.title)} · ${formatMoney(expense.amount)}</span>
+        <span class="item-meta">${escapeHtml(expense.category)}</span>
+        ${expGoal ? `<span class="item-goal-badge" style="--gc:${expGoal.color}">${escapeHtml(expGoal.title)}</span>` : ""}
+      </div>
+      <div class="item-actions">
+        <button class="icon-button icon-button--edit" type="button" data-edit-expense="${expense.id}" title="แก้ไขรายจ่าย" aria-label="แก้ไขรายจ่าย">
+          ${ICON_EDIT}
+        </button>
+        <button class="icon-button" type="button" data-delete-expense="${expense.id}" title="ลบรายจ่าย">×</button>
+      </div>
+    </article>
+  `;
+}
+
 function renderExpenses() {
-  const todayKey  = getTodayKey();
-  const monthKey  = getMonthKey();
+  const todayKey = getTodayKey();
+  const monthKey = getMonthKey();
+  const yearKey  = new Date().getFullYear().toString();
+
   const todayExps = state.expenses.filter(e => e.date === todayKey);
   const monthExps = state.expenses.filter(e => e.date?.startsWith(monthKey));
   const todayTotal = todayExps.reduce((s, e) => s + Number(e.amount), 0);
@@ -1365,30 +1396,52 @@ function renderExpenses() {
     ` : "";
   }
 
-  document.getElementById("expenseList").innerHTML = state.expenses.length
-    ? [...state.expenses]
-        .sort((a, b) => b.createdAt - a.createdAt)
-        .map((expense) => {
-          if (expense.id === _editingExpenseId) return renderExpenseEditForm(expense);
-          const expGoal = expense.goal_id ? state.goals.find(g => g.id === expense.goal_id) : null;
-          return `
-            <article class="list-item">
-              <div>
-                <span class="item-title">${escapeHtml(expense.title)} · ${formatMoney(expense.amount)}</span>
-                <span class="item-meta">${escapeHtml(expense.category)} · ${formatDate(expense.date)}</span>
-                ${expGoal ? `<span class="item-goal-badge" style="--gc:${expGoal.color}">${escapeHtml(expGoal.title)}</span>` : ""}
-              </div>
-              <div class="item-actions">
-                <button class="icon-button icon-button--edit" type="button" data-edit-expense="${expense.id}" title="แก้ไขรายจ่าย" aria-label="แก้ไขรายจ่าย">
-                  ${ICON_EDIT}
-                </button>
-                <button class="icon-button" type="button" data-delete-expense="${expense.id}" title="ลบรายจ่าย">×</button>
-              </div>
-            </article>
-          `;
-        })
-        .join("")
-    : emptyState("ยังไม่มีรายจ่าย เริ่มบันทึกได้เลย", "expenses", "บันทึกรายจ่าย");
+  // Filter by selected period
+  let filtered = [...state.expenses];
+  if (_expensePeriod === 'today') {
+    filtered = filtered.filter(e => e.date === todayKey);
+  } else if (_expensePeriod === 'month') {
+    filtered = filtered.filter(e => e.date?.startsWith(monthKey));
+  } else if (_expensePeriod === 'year') {
+    filtered = filtered.filter(e => e.date?.startsWith(yearKey));
+  }
+  filtered.sort((a, b) => (b.date || '').localeCompare(a.date || '') || b.createdAt - a.createdAt);
+
+  const listEl = document.getElementById("expenseList");
+  if (!filtered.length) {
+    listEl.innerHTML = emptyState("ยังไม่มีรายจ่ายในช่วงนี้", "expenses", "บันทึกรายจ่าย");
+    return;
+  }
+
+  if (_expensePeriod === 'today') {
+    listEl.innerHTML = filtered.map(e =>
+      e.id === _editingExpenseId ? renderExpenseEditForm(e) : renderExpenseItem(e)
+    ).join("");
+    return;
+  }
+
+  // Group by date for month/year/all views
+  const groups = new Map();
+  filtered.forEach(e => {
+    const key = e.date || 'unknown';
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(e);
+  });
+
+  listEl.innerHTML = [...groups.entries()].map(([date, exps]) => {
+    const dayTotal = exps.reduce((s, e) => s + Number(e.amount), 0);
+    const rows = exps.map(e =>
+      e.id === _editingExpenseId ? renderExpenseEditForm(e) : renderExpenseItem(e)
+    ).join("");
+    return `
+      <div class="expense-date-group">
+        <div class="expense-date-header">
+          <span class="expense-date-label">${formatDate(date)}</span>
+          <span class="expense-date-total">${formatMoney(dayTotal)}</span>
+        </div>
+        ${rows}
+      </div>`;
+  }).join("");
 }
 
 function renderExpenseEditForm(expense) {
@@ -1633,7 +1686,7 @@ function showHomepage() {
 }
 
 function freshDemoState() {
-  return { theme: state.theme || "dark", taskFilter: "all", goals: [], ...createDemoState() };
+  return { theme: state.theme || "dark", taskFilter: "open", goals: [], ...createDemoState() };
 }
 
 function enterGuestMode() {
@@ -1986,6 +2039,17 @@ document.getElementById("goalForm")?.addEventListener("submit", (e) => {
   renderGoalProgressDash();
   saveState();
   showToast(`เพิ่ม Goal "${title}" แล้ว`);
+});
+
+/* ── Expense period tabs ── */
+document.querySelectorAll("[data-expense-period]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    _expensePeriod = btn.dataset.expensePeriod;
+    document.querySelectorAll("[data-expense-period]").forEach(b =>
+      b.classList.toggle("active", b === btn)
+    );
+    renderExpenses();
+  });
 });
 
 /* ── Review tabs ── */
@@ -2540,11 +2604,12 @@ async function onSignedIn(user) {
   const cloud = await Storage.loadCloud();
 
   if (cloud) {
-    // Merge: union of local + cloud, cloud items win on conflict.
-    // Never wipe local data with an empty cloud (cloud may not have synced yet).
+    // Merge: union of real-local + cloud, cloud items win on conflict.
+    // Demo items are stripped — they exist only in guest/unauthed mode.
     function mergeItems(local, remote) {
-      if (!remote || remote.length === 0) return local;
-      const map = new Map((local || []).map(i => [i.id, i]));
+      const realLocal = (local || []).filter(i => !i._isDemo);
+      if (!remote || remote.length === 0) return realLocal;
+      const map = new Map(realLocal.map(i => [i.id, i]));
       for (const item of remote) map.set(item.id, item);
       return [...map.values()];
     }
@@ -2751,7 +2816,7 @@ function initLineConnect() {
   const stored = localStorage.getItem('lineUserId')
   if (stored && isLoggedIn()) {
     setConnectedUI(true)
-    loadLineNotes(stored)
+    loadLineNotes(stored).catch(() => {})
   }
 
   updateLineConnectAccess()
@@ -2765,7 +2830,8 @@ function initLineConnect() {
     if (linked) {
       localStorage.removeItem('lineUserId')
       setConnectedUI(false)
-      document.getElementById('lineNotesSection').style.display = 'none'
+      state.notes = state.notes.filter(n => !n._isKVLine)
+      renderNotes()
       showToast('ยกเลิกการเชื่อม LINE แล้ว')
       return
     }
@@ -2832,7 +2898,7 @@ function updateLineConnectAccess() {
   } else {
     const linked = !!localStorage.getItem('lineUserId')
     setConnectedUI(linked)
-    if (linked) loadLineNotes(localStorage.getItem('lineUserId'))
+    if (linked) loadLineNotes(localStorage.getItem('lineUserId')).catch(() => {})
   }
 }
 
@@ -2855,27 +2921,27 @@ function setConnectedUI(connected) {
 }
 
 async function loadLineNotes(userId) {
-  const section = document.getElementById('lineNotesSection')
-  const container = document.getElementById('lineNoteList')
-  if (!section || !container) return
+  try {
+    const res = await fetch(`${LINE_WORKER_URL}/notes/${userId}`)
+    if (!res.ok) return
+    const { notes } = await res.json()
+    if (!notes.length) return
 
-  const res = await fetch(`${LINE_WORKER_URL}/notes/${userId}`)
-  const { notes } = await res.json()
+    // Convert KV notes into the same format as regular notes and merge into state.notes
+    const kvNotes = [...notes].reverse().map(n => ({
+      id: `kv-line-${userId}-${new Date(n.createdAt).getTime()}`,
+      title: n.text,
+      body: '',
+      tags: 'LINE',
+      goal_id: null,
+      createdAt: new Date(n.createdAt).getTime(),
+      _isKVLine: true
+    }))
 
-  if (notes.length === 0) {
-    section.style.display = 'none'
-    return
-  }
-
-  section.style.display = 'block'
-  container.innerHTML = [...notes].reverse().map(n => `
-    <article class="list-item">
-      <div>
-        <span class="item-title">${escapeHtml(n.text)}</span>
-        <span class="item-meta">LINE · ${new Date(n.createdAt).toLocaleDateString('th-TH')}</span>
-      </div>
-    </article>
-  `).join('')
+    // Replace old KV notes, keep all other notes
+    state.notes = [...state.notes.filter(n => !n._isKVLine), ...kvNotes]
+    renderNotes()
+  } catch (_) {}
 }
 
 initLineConnect()
