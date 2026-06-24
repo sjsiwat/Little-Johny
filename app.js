@@ -2781,18 +2781,13 @@ function initLineConnect() {
       const res = await fetch(`${LINE_WORKER_URL}/link/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code })
+        body: JSON.stringify({
+          code,
+          supabaseUserId: Auth.isLoggedIn() ? Auth.getUser().id : null
+        })
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
-
-      // Save LINE userId ↔ Supabase userId link to database
-      if (Auth.isLoggedIn()) {
-        await Auth.db.from('line_users').upsert({
-          line_user_id: data.lineUserId,
-          user_id: Auth.getUser().id
-        })
-      }
 
       localStorage.setItem('lineUserId', data.lineUserId)
       backdrop.hidden = true
