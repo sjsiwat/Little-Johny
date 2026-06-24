@@ -9,7 +9,7 @@ const Auth = (() => {
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtY3V0aWJvcG5mYXN4cmZleGRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNDM2OTMsImV4cCI6MjA5NzYxOTY5M30.Re8H1by-m7xjoP3skdAWI5th-DqzpF04SCuBnm-PFkc';
 
   // LINE Login channel ID (public — channel secret stays in Pages Function env vars)
-  const LINE_CHANNEL_ID = 'REPLACE_WITH_LINE_CHANNEL_ID';
+  const LINE_CHANNEL_ID = '2010489984';
   const LINE_REDIRECT_URI = `${location.origin}/api/auth/line-callback`;
 
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
