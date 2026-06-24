@@ -3960,6 +3960,91 @@ body::before {
   transition: opacity 0.15s;
 }
 .task-list-item:hover .task-list-actions { opacity: 1; }
+.task-list-item.has-target .task-list-actions { opacity: 1; }
+
+/* ── Task numeric progress ── */
+.task-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.45rem;
+}
+.task-progress-track {
+  flex: 1;
+  height: 5px;
+  background: var(--line-soft);
+  border-radius: 99px;
+  overflow: hidden;
+  min-width: 60px;
+}
+.task-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 99px;
+  transition: width 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.task-progress-label {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+.task-log-btn {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  border-radius: 6px;
+  padding: 0.15rem 0.5rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.task-log-btn:hover { background: color-mix(in srgb, var(--accent) 20%, transparent); }
+.task-log-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--surface-2);
+  border-radius: 8px;
+  border: 1px solid var(--line-soft);
+}
+.task-log-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.82rem;
+  color: var(--ink);
+  font-family: inherit;
+  min-width: 0;
+}
+.task-log-unit { font-size: 0.75rem; color: var(--ink-muted); white-space: nowrap; }
+.task-log-confirm {
+  font-size: 0.72rem; font-weight: 600;
+  color: #fff; background: var(--accent);
+  border: none; border-radius: 6px;
+  padding: 0.2rem 0.55rem; cursor: pointer;
+}
+.task-log-cancel {
+  font-size: 0.72rem; color: var(--ink-muted);
+  background: transparent; border: none; cursor: pointer; padding: 0.2rem 0.3rem;
+}
+
+/* ── Task modal target fields ── */
+.task-target-toggle-label {
+  display: flex; align-items: center; gap: 0.4rem;
+  cursor: pointer; user-select: none;
+}
+.task-target-checkbox { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
+.task-target-inputs {
+  display: grid; grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+}
+.task-target-num  { min-width: 0; }
+.task-target-unit { width: 100px; }
 
 /* ── Priority dot ── */
 .task-priority-dot {
@@ -4824,6 +4909,38 @@ body::before {
   color: var(--ink-muted);
   margin-top: 0.25rem;
   display: block;
+}
+.goal-progress-numeric {
+  display: flex;
+  align-items: baseline;
+  gap: 0.15rem;
+  margin: 0.35rem 0 0.2rem;
+}
+.goal-numeric-current {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.goal-numeric-sep {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+.goal-progress-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.25rem;
+}
+.goal-pct-small {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+.goal-dash-name {
+  font-size: 0.83rem;
+  color: var(--ink);
+  margin-bottom: 0.2rem;
+  font-weight: 500;
 }
 
 /* Goal item — clickable header */

@@ -348,6 +348,9 @@ let state = (() => {
     description: "",
     labels: [],
     goal_id: null,
+    target_value: null,
+    target_unit: "",
+    progress_value: 0,
     ...t,
     status: normalizeStatus(t.status),
   }));
@@ -358,10 +361,25 @@ let state = (() => {
   return s;
 })();
 
-function calcGoalProgress(goalId) {
+function calcGoalProgressInfo(goalId) {
   const linked = state.tasks.filter(t => t.goal_id === goalId);
-  if (!linked.length) return 0;
-  return Math.round(linked.filter(t => isTaskDone(t)).length / linked.length * 100);
+  if (!linked.length) return { pct: 0, mode: 'binary', current: 0, target: 0, unit: '' };
+
+  const numericTasks = linked.filter(t => t.target_value != null && Number(t.target_value) > 0);
+  if (numericTasks.length > 0) {
+    const current = numericTasks.reduce((s, t) => s + (Number(t.progress_value) || 0), 0);
+    const target  = numericTasks.reduce((s, t) => s + Number(t.target_value), 0);
+    const unit    = numericTasks[0].target_unit || '';
+    const pct     = target > 0 ? Math.min(Math.round(current / target * 100), 100) : 0;
+    return { pct, mode: 'numeric', current, target, unit };
+  }
+
+  const pct = Math.round(linked.filter(t => isTaskDone(t)).length / linked.length * 100);
+  return { pct, mode: 'binary', current: 0, target: 0, unit: '' };
+}
+
+function calcGoalProgress(goalId) {
+  return calcGoalProgressInfo(goalId).pct;
 }
 
 function populateGoalSelects(...ids) {
@@ -753,24 +771,39 @@ function renderGoals() {
     return;
   }
   list.innerHTML = state.goals.map(goal => {
-    const pct     = calcGoalProgress(goal.id);
+    const info    = calcGoalProgressInfo(goal.id);
     const color   = goal.color || "#0A84FF";
     const linked  = state.tasks.filter(t => t.goal_id === goal.id);
     const done    = linked.filter(t => isTaskDone(t)).length;
     const taskLabel = linked.length ? `${done}/${linked.length} งาน` : "ยังไม่มีงาน";
     const expanded  = _expandedGoalId === goal.id;
+
+    const progressDisplay = info.mode === 'numeric' && info.target > 0
+      ? `<div class="goal-progress-numeric">
+           <span class="goal-numeric-current" style="color:${color}">${formatNum(info.current)}</span>
+           <span class="goal-numeric-sep"> / ${formatNum(info.target)}${info.unit ? " " + escapeHtml(info.unit) : ""}</span>
+         </div>
+         <div class="goal-bar-track">
+           <div class="goal-bar-fill" style="width:${info.pct}%; background:${color}"></div>
+         </div>
+         <div class="goal-progress-foot">
+           <span class="goal-task-count">${taskLabel}</span>
+           <span class="goal-pct-small">${info.pct}%</span>
+         </div>`
+      : `<div class="goal-bar-track">
+           <div class="goal-bar-fill" style="width:${info.pct}%; background:${color}"></div>
+         </div>
+         <span class="goal-task-count">${taskLabel}</span>`;
+
     return `
       <article class="list-item goal-item${expanded ? " goal-item--expanded" : ""}" data-goal-id="${goal.id}">
         <div class="goal-item-header" data-toggle-goal="${goal.id}" role="button" tabindex="0" aria-expanded="${expanded}">
           <div class="goal-item-body">
             <div class="goal-item-top">
               <span class="goal-item-title">${escapeHtml(goal.title)}</span>
-              <span class="goal-pct">${pct}%</span>
+              <span class="goal-pct">${info.pct}%</span>
             </div>
-            <div class="goal-bar-track">
-              <div class="goal-bar-fill" style="width:${pct}%; background:${color}"></div>
-            </div>
-            <span class="goal-task-count">${taskLabel}</span>
+            ${progressDisplay}
           </div>
           <div class="goal-item-chevron" aria-hidden="true">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -799,6 +832,27 @@ function renderGoals() {
   });
 }
 
+function renderGoalProgressLabel(info, color) {
+  if (info.mode === 'numeric' && info.target > 0) {
+    return `
+      <div class="goal-dash-label">
+        <span style="color:${color}">${formatNum(info.current)}<small> / ${formatNum(info.target)}${info.unit ? " " + info.unit : ""}</small></span>
+        <strong>${info.pct}%</strong>
+      </div>
+      <div class="goal-bar-track">
+        <div class="goal-bar-fill" style="width:${info.pct}%; background:${color}"></div>
+      </div>`;
+  }
+  return `
+    <div class="goal-dash-label">
+      <span></span>
+      <strong>${info.pct}%</strong>
+    </div>
+    <div class="goal-bar-track">
+      <div class="goal-bar-fill" style="width:${info.pct}%; background:${color}"></div>
+    </div>`;
+}
+
 function renderGoalProgressDash() {
   const el = document.getElementById("dashGoalBars");
   if (!el) return;
@@ -807,17 +861,12 @@ function renderGoalProgressDash() {
     return;
   }
   el.innerHTML = state.goals.slice(0, 4).map(goal => {
-    const pct = calcGoalProgress(goal.id);
+    const info  = calcGoalProgressInfo(goal.id);
     const color = goal.color || "#0A84FF";
     return `
       <div class="goal-dash-row">
-        <div class="goal-dash-label">
-          <span>${escapeHtml(goal.title)}</span>
-          <strong>${pct}%</strong>
-        </div>
-        <div class="goal-bar-track">
-          <div class="goal-bar-fill" style="width:${pct}%; background:${color}"></div>
-        </div>
+        <div class="goal-dash-name">${escapeHtml(goal.title)}</div>
+        ${renderGoalProgressLabel(info, color)}
       </div>`;
   }).join("");
 }
@@ -982,6 +1031,66 @@ function renderReview() {
   }
 }
 
+function renderTaskListItem(task) {
+  const done          = isTaskDone(task);
+  const sm            = STATUS_META[task.status] || STATUS_META.todo;
+  const deadlineBadge = renderDeadlineBadge(task.due, done);
+  const labelChips    = renderTaskLabelChips(task.labels);
+  const hasTarget     = task.target_value != null && Number(task.target_value) > 0;
+  const prog          = hasTarget ? Math.min(Math.round((Number(task.progress_value) || 0) / Number(task.target_value) * 100), 100) : 0;
+  const goalBadge     = (() => {
+    if (!task.goal_id) return "";
+    const g = state.goals.find(g => g.id === task.goal_id);
+    return g ? `<span class="item-goal-badge" style="--gc:${g.color}">${escapeHtml(g.title)}</span>` : "";
+  })();
+
+  return `
+    <article class="task-list-item${done ? " is-done" : ""}${hasTarget ? " has-target" : ""}" data-task-id="${task.id}">
+      <button class="task-check-btn" type="button" data-toggle-task="${task.id}"
+        aria-pressed="${done}" title="${done ? "เปิดงานอีกครั้ง" : "ทำเครื่องหมายเสร็จ"}">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          ${done ? '<path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' : '<rect x="1" y="1" width="10" height="10" rx="2.5" stroke="currentColor" stroke-width="1.5"/>'}
+        </svg>
+      </button>
+      <div class="task-list-body">
+        <div class="task-list-top">
+          <span class="task-list-title">${escapeHtml(task.title)}</span>
+          <span class="task-priority-dot task-priority-dot--${task.priority.toLowerCase()}" title="${task.priority}"></span>
+        </div>
+        ${task.description ? `<p class="task-list-desc">${escapeHtml(task.description)}</p>` : ""}
+        <div class="task-list-meta">
+          <span class="task-status-pill" style="--sc:${sm.color}">${sm.label}</span>
+          ${deadlineBadge}
+          ${labelChips}
+          ${goalBadge}
+        </div>
+        ${hasTarget ? `
+        <div class="task-progress-row">
+          <div class="task-progress-track">
+            <div class="task-progress-fill" style="width:${prog}%"></div>
+          </div>
+          <span class="task-progress-label">${formatNum(task.progress_value)} / ${formatNum(task.target_value)}${task.target_unit ? " " + escapeHtml(task.target_unit) : ""}</span>
+          ${!done ? `<button class="task-log-btn" type="button" data-log-task="${task.id}">+ บันทึก</button>` : ""}
+        </div>
+        <div class="task-log-input-row" id="logRow-${task.id}" hidden>
+          <input class="task-log-input" type="number" placeholder="เพิ่ม เช่น 500" min="0" step="any" data-log-input="${task.id}" />
+          <span class="task-log-unit">${escapeHtml(task.target_unit || "")}</span>
+          <button class="task-log-confirm" type="button" data-log-confirm="${task.id}">บันทึก</button>
+          <button class="task-log-cancel" type="button" data-log-cancel="${task.id}">ยกเลิก</button>
+        </div>` : ""}
+      </div>
+      <div class="task-list-actions">
+        ${!done ? `<button class="icon-button icon-button--focus${_focusTaskId === task.id ? " is-focusing" : ""}" type="button" data-focus-task="${task.id}" title="Focus" aria-label="Focus">
+          <svg width="10" height="11" viewBox="0 0 10 11" fill="none" aria-hidden="true"><path d="M2 1l7 4.5-7 4.5V1z" fill="currentColor"/></svg>
+        </button>` : ""}
+        <button class="icon-button icon-button--edit" type="button" data-edit-task="${task.id}" title="แก้ไขงาน" aria-label="แก้ไขงาน">
+          ${ICON_EDIT}
+        </button>
+        <button class="icon-button" type="button" data-delete-task="${task.id}" title="ลบงาน">×</button>
+      </div>
+    </article>`;
+}
+
 function renderTasks() {
   if (_taskView === "kanban") { renderKanban(); return; }
 
@@ -1003,35 +1112,7 @@ function renderTasks() {
         const deadlineBadge = renderDeadlineBadge(task.due, done);
         const labelChips    = renderTaskLabelChips(task.labels);
         return `
-          <article class="task-list-item${done ? " is-done" : ""}" data-task-id="${task.id}">
-            <button class="task-check-btn" type="button" data-toggle-task="${task.id}"
-              aria-pressed="${done}" title="${done ? "เปิดงานอีกครั้ง" : "ทำเครื่องหมายเสร็จ"}">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                ${done ? '<path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' : '<rect x="1" y="1" width="10" height="10" rx="2.5" stroke="currentColor" stroke-width="1.5"/>'}
-              </svg>
-            </button>
-            <div class="task-list-body">
-              <div class="task-list-top">
-                <span class="task-list-title">${escapeHtml(task.title)}</span>
-                <span class="task-priority-dot task-priority-dot--${task.priority.toLowerCase()}" title="${task.priority}"></span>
-              </div>
-              ${task.description ? `<p class="task-list-desc">${escapeHtml(task.description)}</p>` : ""}
-              <div class="task-list-meta">
-                <span class="task-status-pill" style="--sc:${sm.color}">${sm.label}</span>
-                ${deadlineBadge}
-                ${labelChips}
-              </div>
-            </div>
-            <div class="task-list-actions">
-              ${!done ? `<button class="icon-button icon-button--focus${_focusTaskId === task.id ? " is-focusing" : ""}" type="button" data-focus-task="${task.id}" title="Focus" aria-label="Focus">
-                <svg width="10" height="11" viewBox="0 0 10 11" fill="none" aria-hidden="true"><path d="M2 1l7 4.5-7 4.5V1z" fill="currentColor"/></svg>
-              </button>` : ""}
-              <button class="icon-button icon-button--edit" type="button" data-edit-task="${task.id}" title="แก้ไขงาน" aria-label="แก้ไขงาน">
-                ${ICON_EDIT}
-              </button>
-              <button class="icon-button" type="button" data-delete-task="${task.id}" title="ลบงาน">×</button>
-            </div>
-          </article>`;
+          ${renderTaskListItem(task)}`;
       }).join("")
     : emptyState("ยังไม่มีงานในมุมมองนี้", "tasks", "เพิ่มงาน");
 }
@@ -1133,6 +1214,18 @@ function openTaskModal(taskId = null, defaultStatus = "todo") {
         `<option value="${g.id}"${task?.goal_id === g.id ? " selected" : ""}>${escapeHtml(g.title)}</option>`
       ).join("");
   }
+
+  const targetToggle = document.getElementById("taskTargetToggle");
+  const targetFields = document.getElementById("taskTargetFields");
+  const hasTarget = task?.target_value != null && task.target_value > 0;
+  if (targetToggle) targetToggle.checked = hasTarget;
+  if (targetFields) targetFields.hidden = !hasTarget;
+  const tvEl = document.getElementById("modalTaskTargetValue");
+  const tuEl = document.getElementById("modalTaskTargetUnit");
+  const pvEl = document.getElementById("modalTaskProgressValue");
+  if (tvEl) tvEl.value = hasTarget ? task.target_value : "";
+  if (tuEl) tuEl.value = task?.target_unit || "";
+  if (pvEl) pvEl.value = task?.progress_value > 0 ? task.progress_value : "";
 
   renderModalLabelPicker(task?.labels || []);
   modal.showModal();
@@ -1520,7 +1613,7 @@ function enterGuestMode() {
   setView("dashboard");
 }
 
-function addTask(title, priority = "Medium", due = "", status = "todo", description = "", labels = [], goalId = null) {
+function addTask(title, priority = "Medium", due = "", status = "todo", description = "", labels = [], goalId = null, targetValue = null, targetUnit = "") {
   state.tasks.unshift({
     id: crypto.randomUUID(),
     title,
@@ -1530,8 +1623,18 @@ function addTask(title, priority = "Medium", due = "", status = "todo", descript
     status,
     labels,
     goal_id: goalId || null,
+    target_value: targetValue ? Number(targetValue) : null,
+    target_unit: targetUnit || "",
+    progress_value: 0,
     createdAt: Date.now()
   });
+}
+
+function formatNum(n) {
+  const num = Number(n || 0);
+  return num % 1 === 0
+    ? num.toLocaleString('th-TH')
+    : num.toLocaleString('th-TH', { maximumFractionDigits: 2 });
 }
 
 function addNote(title, body = "", tags = "", goalId = null) {
@@ -1753,14 +1856,24 @@ document.getElementById("taskModalForm")?.addEventListener("submit", (e) => {
   const description = document.getElementById("modalTaskDesc").value.trim();
   const labels      = getSelectedModalLabels();
   const goalId      = document.getElementById("modalTaskGoal")?.value || null;
+  const hasTarget   = document.getElementById("taskTargetToggle")?.checked;
+  const targetValue = hasTarget ? (Number(document.getElementById("modalTaskTargetValue")?.value) || null) : null;
+  const targetUnit  = hasTarget ? (document.getElementById("modalTaskTargetUnit")?.value.trim() || "") : "";
+  const progRaw     = document.getElementById("modalTaskProgressValue")?.value;
+  const progressVal = progRaw !== "" ? Number(progRaw) : null; // null = keep existing
 
   if (_taskModalEditId) {
+    const existing = state.tasks.find(t => t.id === _taskModalEditId);
     state.tasks = state.tasks.map(t =>
-      t.id === _taskModalEditId ? { ...t, title, description, status, priority, due, labels, goal_id: goalId || null } : t
+      t.id === _taskModalEditId
+        ? { ...t, title, description, status, priority, due, labels, goal_id: goalId || null,
+            target_value: targetValue, target_unit: targetUnit,
+            progress_value: progressVal !== null ? progressVal : (existing?.progress_value || 0) }
+        : t
     );
     showToast(`อัปเดตงาน "${title}" แล้ว`);
   } else {
-    addTask(title, priority, due, status, description, labels, goalId);
+    addTask(title, priority, due, status, description, labels, goalId, targetValue, targetUnit);
     showToast(`เพิ่มงาน "${title}" แล้ว`);
   }
   closeTaskModal();
@@ -1768,6 +1881,12 @@ document.getElementById("taskModalForm")?.addEventListener("submit", (e) => {
 });
 
 /* ── Task modal cancel & close ── */
+document.getElementById("taskTargetToggle")?.addEventListener("change", e => {
+  const fields = document.getElementById("taskTargetFields");
+  if (fields) fields.hidden = !e.target.checked;
+  if (e.target.checked) document.getElementById("modalTaskTargetValue")?.focus();
+});
+
 document.getElementById("taskModalCancel")?.addEventListener("click", closeTaskModal);
 document.getElementById("taskModalClose")?.addEventListener("click", closeTaskModal);
 document.getElementById("taskModal")?.addEventListener("click", e => {
@@ -1980,6 +2099,42 @@ document.addEventListener("click", (event) => {
 
   if (editTaskId) {
     openTaskModal(editTaskId);
+    return;
+  }
+
+  // Progress log: toggle input row
+  const logTaskId = target.closest("[data-log-task]")?.dataset.logTask;
+  if (logTaskId) {
+    const row = document.getElementById(`logRow-${logTaskId}`);
+    if (row) {
+      row.hidden = !row.hidden;
+      if (!row.hidden) row.querySelector(`[data-log-input]`)?.focus();
+    }
+    return;
+  }
+  const logCancelId = target.closest("[data-log-cancel]")?.dataset.logCancel;
+  if (logCancelId) {
+    const row = document.getElementById(`logRow-${logCancelId}`);
+    if (row) { row.hidden = true; row.querySelector(`[data-log-input]`).value = ""; }
+    return;
+  }
+  const logConfirmId = target.closest("[data-log-confirm]")?.dataset.logConfirm;
+  if (logConfirmId) {
+    const row   = document.getElementById(`logRow-${logConfirmId}`);
+    const input = row?.querySelector(`[data-log-input]`);
+    const amount = Number(input?.value);
+    if (!amount || amount <= 0) return;
+    state.tasks = state.tasks.map(t =>
+      t.id === logConfirmId
+        ? { ...t, progress_value: (Number(t.progress_value) || 0) + amount }
+        : t
+    );
+    const task = state.tasks.find(t => t.id === logConfirmId);
+    showToast(`บันทึก +${formatNum(amount)} ${task?.target_unit || ""} แล้ว`);
+    saveState();
+    renderTasks();
+    renderGoals();
+    renderGoalProgressDash();
     return;
   }
 

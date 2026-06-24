@@ -695,6 +695,21 @@
             </select>
           </div>
           <div class="task-modal-field">
+            <label class="task-modal-label task-target-toggle-label">
+              <input type="checkbox" id="taskTargetToggle" class="task-target-checkbox" />
+              ตั้งเป้าหมายตัวเลข
+            </label>
+          </div>
+          <div class="task-modal-field task-target-fields" id="taskTargetFields" hidden>
+            <label class="task-modal-label">เป้าหมาย</label>
+            <div class="task-target-inputs">
+              <input id="modalTaskTargetValue" type="number" class="task-modal-input task-target-num" placeholder="เช่น 100000" min="0" step="any" />
+              <input id="modalTaskTargetUnit" type="text" class="task-modal-input task-target-unit" placeholder="หน่วย เช่น บาท กม." maxlength="20" />
+            </div>
+            <label class="task-modal-label" style="margin-top:0.5rem">ความคืบหน้าปัจจุบัน</label>
+            <input id="modalTaskProgressValue" type="number" class="task-modal-input" placeholder="เช่น 5000 (ถ้ามีแล้ว)" min="0" step="any" />
+          </div>
+          <div class="task-modal-field">
             <label class="task-modal-label">ป้ายกำกับ</label>
             <div class="modal-label-picker" id="modalLabelPicker"></div>
           </div>
