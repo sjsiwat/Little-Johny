@@ -4001,7 +4001,36 @@ body::before {
   transition: background 0.15s;
 }
 .task-log-btn:hover { background: color-mix(in srgb, var(--accent) 20%, transparent); }
-.task-log-input-row {
+.task-progress-mode-btn {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+  background: transparent;
+  border: 1px solid var(--line-soft);
+  border-radius: 5px;
+  padding: 0.1rem 0.35rem;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1.4;
+  transition: color 0.15s, border-color 0.15s;
+}
+.task-progress-mode-btn:hover { color: var(--accent); border-color: var(--accent); }
+.task-progress-remove-btn {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0 0.2rem;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+}
+.task-list-item:hover .task-progress-remove-btn,
+.task-list-item.has-target .task-progress-remove-btn { opacity: 1; }
+.task-progress-remove-btn:hover { color: #FF453A; }
+.task-log-input-row,
+.task-add-progress-inline {
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -4021,7 +4050,14 @@ body::before {
   font-family: inherit;
   min-width: 0;
 }
-.task-log-unit { font-size: 0.75rem; color: var(--ink-muted); white-space: nowrap; }
+.task-quick-target { flex: 1.2; }
+.task-quick-unit   { flex: 1; }
+.task-log-unit-prefix {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  font-weight: 600;
+}
 .task-log-confirm {
   font-size: 0.72rem; font-weight: 600;
   color: #fff; background: var(--accent);
@@ -4032,6 +4068,10 @@ body::before {
   font-size: 0.72rem; color: var(--ink-muted);
   background: transparent; border: none; cursor: pointer; padding: 0.2rem 0.3rem;
 }
+.icon-button--progress {
+  color: var(--ink-muted);
+}
+.icon-button--progress:hover { color: var(--accent); }
 
 /* ── Task modal target fields ── */
 .task-target-toggle-label {
