@@ -12,6 +12,7 @@ let _editingExpenseId = null;
 let _focusTaskId      = null;
 let _taskModalEditId  = null;
 let _taskView         = "list"; // "list" | "kanban"
+const _taskProgressMode = new Map(); // taskId → 'value' | 'pct'
 let _dragTaskId       = null;
 
 /* ── Task / priority ── */
@@ -1038,11 +1039,16 @@ function renderTaskListItem(task) {
   const labelChips    = renderTaskLabelChips(task.labels);
   const hasTarget     = task.target_value != null && Number(task.target_value) > 0;
   const prog          = hasTarget ? Math.min(Math.round((Number(task.progress_value) || 0) / Number(task.target_value) * 100), 100) : 0;
+  const progMode      = _taskProgressMode.get(task.id) || 'value';
   const goalBadge     = (() => {
     if (!task.goal_id) return "";
     const g = state.goals.find(g => g.id === task.goal_id);
     return g ? `<span class="item-goal-badge" style="--gc:${g.color}">${escapeHtml(g.title)}</span>` : "";
   })();
+
+  const progressLabel = progMode === 'pct'
+    ? `${prog}%`
+    : `${formatNum(task.progress_value)} / ${formatNum(task.target_value)}${task.target_unit ? " " + escapeHtml(task.target_unit) : ""}`;
 
   return `
     <article class="task-list-item${done ? " is-done" : ""}${hasTarget ? " has-target" : ""}" data-task-id="${task.id}">
@@ -1064,22 +1070,46 @@ function renderTaskListItem(task) {
           ${labelChips}
           ${goalBadge}
         </div>
+
         ${hasTarget ? `
         <div class="task-progress-row">
           <div class="task-progress-track">
             <div class="task-progress-fill" style="width:${prog}%"></div>
           </div>
-          <span class="task-progress-label">${formatNum(task.progress_value)} / ${formatNum(task.target_value)}${task.target_unit ? " " + escapeHtml(task.target_unit) : ""}</span>
+          <span class="task-progress-label">${progressLabel}</span>
+          <button class="task-progress-mode-btn" type="button" data-toggle-progress-mode="${task.id}"
+            title="${progMode === 'pct' ? 'แสดงค่าจริง' : 'แสดงเป็น %'}">
+            ${progMode === 'pct' ? '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M3 2.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM10 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>' : '%'}
+          </button>
           ${!done ? `<button class="task-log-btn" type="button" data-log-task="${task.id}">+ บันทึก</button>` : ""}
+          <button class="task-progress-remove-btn" type="button" data-remove-progress="${task.id}" title="ลบ Progress Bar">×</button>
         </div>
         <div class="task-log-input-row" id="logRow-${task.id}" hidden>
+          <span class="task-log-unit-prefix">${escapeHtml(task.target_unit || "")}</span>
           <input class="task-log-input" type="number" placeholder="เพิ่ม เช่น 500" min="0" step="any" data-log-input="${task.id}" />
-          <span class="task-log-unit">${escapeHtml(task.target_unit || "")}</span>
           <button class="task-log-confirm" type="button" data-log-confirm="${task.id}">บันทึก</button>
           <button class="task-log-cancel" type="button" data-log-cancel="${task.id}">ยกเลิก</button>
         </div>` : ""}
+
+        ${!hasTarget && !done ? `
+        <div class="task-add-progress-inline" id="addProgRow-${task.id}" hidden>
+          <input class="task-log-input task-quick-target" type="number" placeholder="เป้าหมาย เช่น 10000" min="0" step="any" data-quick-target="${task.id}" />
+          <input class="task-log-input task-quick-unit" type="text" placeholder="หน่วย เช่น บาท วัน ครั้ง" maxlength="20" data-quick-unit="${task.id}" />
+          <button class="task-log-confirm" type="button" data-quick-confirm="${task.id}">เพิ่ม</button>
+          <button class="task-log-cancel" type="button" data-quick-cancel="${task.id}">ยกเลิก</button>
+        </div>` : ""}
       </div>
+
       <div class="task-list-actions">
+        ${!done && !hasTarget ? `
+        <button class="icon-button icon-button--progress" type="button" data-add-progress="${task.id}" title="เพิ่ม Progress Bar" aria-label="เพิ่ม Progress Bar">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <rect x="1" y="7" width="2" height="4" rx="0.5" fill="currentColor" opacity="0.4"/>
+            <rect x="4.5" y="4" width="2" height="7" rx="0.5" fill="currentColor" opacity="0.65"/>
+            <rect x="8" y="1" width="2" height="10" rx="0.5" fill="currentColor"/>
+            <path d="M10.5 2.5L9 1l-1.5 1.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>` : ""}
         ${!done ? `<button class="icon-button icon-button--focus${_focusTaskId === task.id ? " is-focusing" : ""}" type="button" data-focus-task="${task.id}" title="Focus" aria-label="Focus">
           <svg width="10" height="11" viewBox="0 0 10 11" fill="none" aria-hidden="true"><path d="M2 1l7 4.5-7 4.5V1z" fill="currentColor"/></svg>
         </button>` : ""}
@@ -2115,7 +2145,7 @@ document.addEventListener("click", (event) => {
   const logCancelId = target.closest("[data-log-cancel]")?.dataset.logCancel;
   if (logCancelId) {
     const row = document.getElementById(`logRow-${logCancelId}`);
-    if (row) { row.hidden = true; row.querySelector(`[data-log-input]`).value = ""; }
+    if (row) { row.hidden = true; const inp = row.querySelector(`[data-log-input]`); if (inp) inp.value = ""; }
     return;
   }
   const logConfirmId = target.closest("[data-log-confirm]")?.dataset.logConfirm;
@@ -2131,10 +2161,60 @@ document.addEventListener("click", (event) => {
     );
     const task = state.tasks.find(t => t.id === logConfirmId);
     showToast(`บันทึก +${formatNum(amount)} ${task?.target_unit || ""} แล้ว`);
-    saveState();
+    saveState(); renderTasks(); renderGoals(); renderGoalProgressDash();
+    return;
+  }
+
+  // Toggle % / value display
+  const toggleModeId = target.closest("[data-toggle-progress-mode]")?.dataset.toggleProgressMode;
+  if (toggleModeId) {
+    const cur = _taskProgressMode.get(toggleModeId) || 'value';
+    _taskProgressMode.set(toggleModeId, cur === 'value' ? 'pct' : 'value');
     renderTasks();
-    renderGoals();
-    renderGoalProgressDash();
+    return;
+  }
+
+  // Remove progress bar
+  const removeProg = target.closest("[data-remove-progress]")?.dataset.removeProgress;
+  if (removeProg) {
+    state.tasks = state.tasks.map(t =>
+      t.id === removeProg ? { ...t, target_value: null, target_unit: "", progress_value: 0 } : t
+    );
+    _taskProgressMode.delete(removeProg);
+    showToast("ลบ Progress Bar แล้ว");
+    saveState(); renderTasks(); renderGoals(); renderGoalProgressDash();
+    return;
+  }
+
+  // Add progress bar quick-add: show inline form
+  const addProgId = target.closest("[data-add-progress]")?.dataset.addProgress;
+  if (addProgId) {
+    const row = document.getElementById(`addProgRow-${addProgId}`);
+    if (row) {
+      row.hidden = !row.hidden;
+      if (!row.hidden) row.querySelector(`[data-quick-target]`)?.focus();
+    }
+    return;
+  }
+  // Quick-add cancel
+  const quickCancelId = target.closest("[data-quick-cancel]")?.dataset.quickCancel;
+  if (quickCancelId) {
+    const row = document.getElementById(`addProgRow-${quickCancelId}`);
+    if (row) row.hidden = true;
+    return;
+  }
+  // Quick-add confirm
+  const quickConfirmId = target.closest("[data-quick-confirm]")?.dataset.quickConfirm;
+  if (quickConfirmId) {
+    const row        = document.getElementById(`addProgRow-${quickConfirmId}`);
+    const targetVal  = Number(row?.querySelector(`[data-quick-target]`)?.value);
+    const targetUnit = row?.querySelector(`[data-quick-unit]`)?.value.trim() || "";
+    if (!targetVal || targetVal <= 0) { showToast("กรุณาใส่เป้าหมายที่มากกว่า 0"); return; }
+    state.tasks = state.tasks.map(t =>
+      t.id === quickConfirmId ? { ...t, target_value: targetVal, target_unit: targetUnit, progress_value: 0 } : t
+    );
+    showToast(`เพิ่ม Progress Bar แล้ว (เป้าหมาย ${formatNum(targetVal)} ${targetUnit})`);
+    saveState(); renderTasks(); renderGoals(); renderGoalProgressDash();
     return;
   }
 
