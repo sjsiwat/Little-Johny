@@ -11,6 +11,7 @@ const Auth = (() => {
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let _user = null;
+  let _lineInfo = null; // { lineUserId, tier, displayName, pictureUrl }
 
   return {
     db,
@@ -45,13 +46,49 @@ const Auth = (() => {
     async signOut() {
       await db.auth.signOut();
       _user = null;
+      _lineInfo = null;
     },
 
     onChange(callback) {
       db.auth.onAuthStateChange((event, session) => {
         _user = session?.user ?? null;
+        if (!_user) _lineInfo = null;
         callback(event, _user);
       });
-    }
+    },
+
+    /* ── LINE info ──────────────────────────────────────────────────────── */
+
+    // Look up line_users table for the current logged-in user.
+    // Returns { lineUserId, tier, displayName, pictureUrl } or null.
+    async fetchLineInfo() {
+      if (!_user) return null;
+      try {
+        const { data, error } = await db
+          .from('line_users')
+          .select('line_user_id, tier, display_name, picture_url')
+          .eq('user_id', _user.id)
+          .maybeSingle();
+        if (error || !data) return null;
+        _lineInfo = {
+          lineUserId:  data.line_user_id,
+          tier:        data.tier ?? 'free',
+          displayName: data.display_name ?? null,
+          pictureUrl:  data.picture_url ?? null,
+        };
+        return _lineInfo;
+      } catch {
+        return null;
+      }
+    },
+
+    // Returns cached LINE info (call fetchLineInfo() first).
+    getLineInfo() {
+      return _lineInfo;
+    },
+
+    isPremium() {
+      return _lineInfo?.tier === 'premium';
+    },
   };
 })();
