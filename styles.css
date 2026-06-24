@@ -1423,6 +1423,29 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   line-height: 1.5;
 }
 
+.item-goal-badge {
+  display: inline-block;
+  margin-top: 0.25rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 99px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--gc) 15%, transparent);
+  color: var(--gc);
+  border: 1px solid color-mix(in srgb, var(--gc) 30%, transparent);
+}
+
+.note-goal-select,
+.expense-goal-select {
+  font-size: 0.8rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  min-width: 120px;
+}
+
 .item-actions {
   display: flex;
   flex-wrap: wrap;
@@ -3117,6 +3140,62 @@ body::before {
 }
 .tc-mascot-img:hover { transform: scale(1.05) rotate(2deg); }
 
+/* ── Secretary command bar ── */
+.secretary-bar {
+  margin: 0 0 1.5rem;
+}
+.sec-bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface-2);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  padding: 0.55rem 0.75rem;
+  transition: border-color 0.15s;
+}
+.sec-bar-inner:focus-within {
+  border-color: var(--accent);
+}
+.sec-bar-icon {
+  color: var(--ink-muted);
+  flex-shrink: 0;
+}
+.sec-bar-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.84rem;
+  color: var(--ink);
+  font-family: inherit;
+}
+.sec-bar-input::placeholder { color: var(--ink-muted); }
+.sec-bar-btn {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: none;
+  border-radius: 8px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.sec-bar-btn:hover { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+.sec-bar-output {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface-2));
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: var(--ink);
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
 /* ── 7. QUICK TILES — macOS widget style ── */
 .quick-tiles {
   gap: 0.75rem;
@@ -4705,8 +4784,7 @@ body::before {
 }
 .goal-item {
   display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
+  flex-direction: column;
 }
 .goal-item-body {
   flex: 1;
@@ -4741,36 +4819,102 @@ body::before {
   height: 100%;
   border-radius: 99px;
 }
-.goal-slider-row {
-  padding: 0.1rem 0;
+.goal-task-count {
+  font-size: 0.73rem;
+  color: var(--ink-muted);
+  margin-top: 0.25rem;
+  display: block;
 }
-.goal-slider {
+
+/* Goal item — clickable header */
+.goal-item-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
   width: 100%;
-  appearance: none;
-  -webkit-appearance: none;
-  height: 3px;
-  background: var(--line);
-  border-radius: 99px;
-  outline: none;
-  cursor: pointer;
 }
-.goal-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--primary);
-  border: 2px solid var(--surface-raised);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-  cursor: pointer;
+.goal-item-header:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
-.goal-slider::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
+.goal-item-chevron {
+  color: var(--ink-muted);
+  margin-top: 0.2rem;
+  transition: transform 0.18s ease;
+  flex-shrink: 0;
+}
+.goal-item--expanded .goal-item-chevron {
+  transform: rotate(180deg);
+}
+.goal-item-actions {
+  margin-top: 0.5rem;
+  justify-content: flex-end;
+}
+
+/* Goal detail panel */
+.goal-detail {
+  margin: 0.75rem 0 0.25rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.75rem;
+}
+.gd-section {
+  margin-bottom: 0.75rem;
+}
+.gd-section:last-child { margin-bottom: 0; }
+.gd-section-head {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--gc, var(--primary));
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.4rem;
+}
+.gd-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.82rem;
+}
+.gd-row:last-child { border-bottom: none; }
+.gd-status-dot {
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: var(--primary);
-  border: 2px solid var(--surface-raised);
+  flex-shrink: 0;
+}
+.gd-row-text {
+  flex: 1;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gd-row-meta {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+.gd-empty {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  margin: 0.2rem 0;
+}
+.gd-link {
+  background: none;
+  border: none;
+  color: var(--primary);
   cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+  text-decoration: underline;
 }
 
 /* Dashboard goal widget */
@@ -4855,6 +4999,10 @@ body::before {
   margin-bottom: 0.65rem;
 }
 .review-task-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
   font-size: 0.84rem;
   color: var(--ink);
   padding: 0.3rem 0;
@@ -4862,6 +5010,16 @@ body::before {
 }
 .review-task-row:last-child { border-bottom: none; }
 .review-task-row--overdue { color: #FF453A; }
+.review-goal-tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.1rem 0.4rem;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--gc) 15%, transparent);
+  color: var(--gc);
+  border: 1px solid color-mix(in srgb, var(--gc) 25%, transparent);
+  white-space: nowrap;
+}
 .review-top-cat {
   font-size: 0.9rem;
   font-weight: 600;

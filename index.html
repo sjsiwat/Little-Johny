@@ -406,6 +406,15 @@
             </div>
           </div>
 
+          <div class="secretary-bar">
+            <div class="sec-bar-inner">
+              <svg class="sec-bar-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 7h4M7 5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <input id="secInput" class="sec-bar-input" type="text" placeholder='เพิ่มงาน ... · โน้ต: ... · จ่าย ... 200 · goals · ใช้ #ชื่อgoal ระบุ Goal' autocomplete="off" />
+              <button class="sec-bar-btn" id="secBtn" type="button">ส่ง</button>
+            </div>
+            <div class="sec-bar-output" id="secOutput" hidden></div>
+          </div>
+
           <div class="dashboard-grid">
             <!-- Row 1: Priority Queue | Today Calendar | Money Snapshot -->
             <section class="panel focus-panel">
@@ -550,6 +559,9 @@
                 type="text"
                 placeholder="tags เช่น work, idea"
               />
+              <select id="noteGoal" class="note-goal-select" aria-label="Goal">
+                <option value="">ไม่ระบุ Goal</option>
+              </select>
               <button type="submit">บันทึกโน้ต</button>
             </div>
           </form>
@@ -595,6 +607,9 @@
               <option>อื่นๆ</option>
             </select>
             <input id="expenseDate" type="date" aria-label="Expense date" />
+            <select id="expenseGoal" class="expense-goal-select" aria-label="Goal">
+              <option value="">ไม่ระบุ Goal</option>
+            </select>
             <button type="submit">บันทึก</button>
           </form>
           <div id="expenseStats"></div>
@@ -616,12 +631,7 @@
               maxlength="120"
               required
             />
-            <div class="goal-form-meta">
-              <label class="goal-form-label">เริ่มต้นที่
-                <input id="goalInitProgress" type="number" min="0" max="100" value="0" class="goal-progress-input" /> %
-              </label>
-              <button type="submit">เพิ่ม Goal</button>
-            </div>
+            <button type="submit">เพิ่ม Goal</button>
           </form>
           <div class="item-list" id="goalList"></div>
         </section>
@@ -677,6 +687,12 @@
               <label class="task-modal-label" for="modalTaskDue">วันครบกำหนด</label>
               <input id="modalTaskDue" type="date" class="task-modal-select" />
             </div>
+          </div>
+          <div class="task-modal-field">
+            <label class="task-modal-label" for="modalTaskGoal">Goal (ถ้ามี)</label>
+            <select id="modalTaskGoal" class="task-modal-select">
+              <option value="">ไม่ระบุ Goal</option>
+            </select>
           </div>
           <div class="task-modal-field">
             <label class="task-modal-label">ป้ายกำกับ</label>
