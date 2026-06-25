@@ -298,6 +298,7 @@ body {
   color: var(--teal);
   outline: none;
   -moz-appearance: textfield;
+  appearance: textfield;
   padding: 0;
   border-radius: 50%;
 }
@@ -4240,6 +4241,7 @@ body::before {
   white-space: pre-wrap;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -4632,6 +4634,7 @@ body::before {
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -5850,6 +5853,7 @@ body::before {
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   flex: 1;
@@ -6464,7 +6468,7 @@ body::before {
 .note-card-body {
   font-size: 0.78rem; color: var(--ink-muted,#7a7066);
   line-height: 1.5; margin: 0; flex: 1;
-  display: -webkit-box; -webkit-line-clamp: 3;
+  display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3;
   -webkit-box-orient: vertical; overflow: hidden;
 }
 .note-card-foot {
@@ -7379,9 +7383,6 @@ button[type="submit"]:hover,
    GOAL BARS — Gold accent for achievements
 ═══════════════════════════════════════════════════════════ */
 
-.dash-goals-panel .panel-head h2 {
-  /* Keep existing heading style */
-}
 
 /* Goals progress bar — use gold for milestones */
 #dashGoalBars .hfm-goal-bar-track {
