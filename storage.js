@@ -82,7 +82,6 @@ const Storage = (() => {
       priority: task.priority,
       due: task.due || null,
       status: task.status,
-      labels: task.labels || [],
       goal_id: task.goal_id || null,
       target_value: task.target_value != null ? Number(task.target_value) : null,
       target_unit: task.target_unit || null,
