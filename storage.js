@@ -147,7 +147,7 @@ const Storage = (() => {
     const { error: upsertErr } = await db.from(table).upsert(items.map(i => toRow(i, uid)));
     if (upsertErr) {
       console.error(`[storage] upsert ${table}:`, upsertErr.message);
-      return; // Don't delete if upsert failed
+      throw new Error(`upsert ${table}: ${upsertErr.message}`);
     }
     const currentIds = items.map(i => i.id);
     const { data: existing } = await db.from(table).select('id').eq('user_id', uid);
