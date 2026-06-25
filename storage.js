@@ -83,9 +83,6 @@ const Storage = (() => {
       due: task.due || null,
       status: task.status,
       goal_id: task.goal_id || null,
-      target_value: task.target_value != null ? Number(task.target_value) : null,
-      target_unit: task.target_unit || null,
-      progress_value: Number(task.progress_value) || 0,
       created_at: new Date(task.createdAt).toISOString()
     };
   }
