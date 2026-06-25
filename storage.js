@@ -178,7 +178,7 @@ const Storage = (() => {
       if (_syncChangeListener) _syncChangeListener('synced');
     } catch (err) {
       console.error('[storage] cloud sync failed:', err);
-      if (_syncChangeListener) _syncChangeListener('error');
+      if (_syncChangeListener) _syncChangeListener('error', err.message);
     }
   }
 
