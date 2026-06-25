@@ -17,7 +17,8 @@ let _dragTaskId       = null;
 let _expensePeriod    = 'month'; // 'today' | 'month' | 'year' | 'all'
 
 /* ── Task / priority ── */
-const PRIORITY_RANK = { Critical: 0, High: 1, Medium: 2, Low: 3 };
+const PRIORITY_RANK   = { Critical: 0, High: 1, Medium: 2, Low: 3 };
+const PRIORITY_COLORS = { Critical: '#FF453A', High: '#FF9F0A', Medium: '#0A84FF', Low: '#8E8E93' };
 
 const TASK_LABELS = [
   { id: "urgent",   name: "ด่วน",     color: "#FF453A" },
@@ -126,23 +127,6 @@ function getDeadlineInfo(due, done) {
   return null;
 }
 
-function renderDeadlineBadge(due, done) {
-  const info = getDeadlineInfo(due, done);
-  if (!info && due)  return `<span class="task-due-chip">${formatDate(due)}</span>`;
-  if (!info)         return "";
-  if (info.type === "overdue") return `<span class="deadline-badge deadline-badge--overdue">เกิน ${info.days} วัน</span>`;
-  if (info.type === "today")   return `<span class="deadline-badge deadline-badge--today">ครบกำหนดวันนี้</span>`;
-  if (info.type === "soon")    return `<span class="deadline-badge deadline-badge--soon">อีก ${info.days} วัน</span>`;
-  return "";
-}
-
-function renderTaskLabelChips(labels) {
-  if (!labels?.length) return "";
-  return labels.map(id => {
-    const l = TASK_LABELS.find(x => x.id === id);
-    return l ? `<span class="task-label-chip" style="--lc:${l.color}">${escapeHtml(l.name)}</span>` : "";
-  }).join("");
-}
 
 let _calYear  = new Date().getFullYear();
 let _calMonth = new Date().getMonth();
@@ -1045,8 +1029,7 @@ function renderReview() {
 
 function renderTaskListItem(task) {
   const done     = isTaskDone(task);
-  const PC       = { Critical:'#FF453A', High:'#FF9F0A', Medium:'#0A84FF', Low:'#8E8E93' };
-  const pColor   = PC[task.priority] || '#8E8E93';
+  const pColor   = PRIORITY_COLORS[task.priority] || '#8E8E93';
   const hasTarget = task.target_value != null && Number(task.target_value) > 0;
   const prog     = hasTarget ? Math.min(Math.round((Number(task.progress_value)||0)/Number(task.target_value)*100),100) : 0;
   const progMode = _taskProgressMode.get(task.id) || 'value';
@@ -1133,14 +1116,7 @@ function renderTasks() {
   });
 
   document.getElementById("taskList").innerHTML = filtered.length
-    ? filtered.map((task) => {
-        const done = isTaskDone(task);
-        const sm   = STATUS_META[task.status] || STATUS_META.todo;
-        const deadlineBadge = renderDeadlineBadge(task.due, done);
-        const labelChips    = renderTaskLabelChips(task.labels);
-        return `
-          ${renderTaskListItem(task)}`;
-      }).join("")
+    ? filtered.map(task => renderTaskListItem(task)).join("")
     : emptyState("ยังไม่มีงานในมุมมองนี้", "tasks", "เพิ่มงาน");
 }
 
@@ -1157,10 +1133,9 @@ function renderKanban() {
     const zone = document.getElementById(`kdrop-${status}`);
     if (!zone) return;
 
-    const PC = { Critical:'#FF453A', High:'#FF9F0A', Medium:'#0A84FF', Low:'#8E8E93' };
     zone.innerHTML = tasks.length
       ? tasks.map(t => {
-          const pColor = PC[t.priority] || '#8E8E93';
+          const pColor = PRIORITY_COLORS[t.priority] || '#8E8E93';
           const done   = isTaskDone(t);
           const labels = t.labels?.map(id => {
             const l = TASK_LABELS.find(x => x.id === id);
@@ -1610,8 +1585,7 @@ function renderCalDayPanel(dateKey, tasks) {
 
 
 function renderSimpleTask(task) {
-  const PC = { Critical:'#FF453A', High:'#FF9F0A', Medium:'#0A84FF', Low:'#8E8E93' };
-  const pColor = PC[task.priority] || '#8E8E93';
+  const pColor = PRIORITY_COLORS[task.priority] || '#8E8E93';
   return `
     <div class="dash-task-row">
       <span class="tli-dot" style="background:${pColor}"></span>
@@ -1707,18 +1681,16 @@ function renderHomepageDemo() {
   if ($('hpDemoStatExpense')) $('hpDemoStatExpense').textContent = `฿${monthExp.toLocaleString()}`;
 
   // Focus list: top open tasks by priority
-  const PRI_RANK  = { Critical: 0, High: 1, Medium: 2, Low: 3 };
-  const PRI_COLOR = { Critical: '#FF453A', High: '#FF9F0A', Medium: '#0A84FF', Low: '#8E8E93' };
   const open = demo.tasks
     .filter(t => t.status !== 'done')
-    .sort((a, b) => (PRI_RANK[a.priority] ?? 9) - (PRI_RANK[b.priority] ?? 9))
+    .sort((a, b) => (PRIORITY_RANK[a.priority] ?? 9) - (PRIORITY_RANK[b.priority] ?? 9))
     .slice(0, 5);
 
   const focusEl = $('hpDemoFocus');
   if (focusEl) {
     focusEl.innerHTML = open.map(t => `
       <li class="hp-demo-task-item">
-        <span class="hp-demo-task-dot" style="background:${PRI_COLOR[t.priority] || '#8E8E93'}"></span>
+        <span class="hp-demo-task-dot" style="background:${PRIORITY_COLORS[t.priority] || '#8E8E93'}"></span>
         <span class="hp-demo-task-name">${t.title}</span>
         <span class="hp-demo-task-tag">${t.priority}</span>
       </li>`).join('');
@@ -2603,9 +2575,8 @@ document.getElementById("focusDoneNo")?.addEventListener("click", () => {
   showToast("⏰ Focus session เสร็จแล้ว! พักสักครู่");
 });
 
-setView(location.hash.replace("#", "") && views[location.hash.replace("#", "")]
-  ? location.hash.replace("#", "")
-  : "dashboard");
+const initialView = location.hash.slice(1);
+setView(initialView && views[initialView] ? initialView : "dashboard");
 render();
 
 /* ── Auth UI ── */
