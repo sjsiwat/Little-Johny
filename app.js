@@ -2609,7 +2609,7 @@ setView(location.hash.replace("#", "") && views[location.hash.replace("#", "")]
 render();
 
 /* ── Auth UI ── */
-function updateSyncStatus(status) {
+function updateSyncStatus(status, errMsg) {
   const dot   = document.getElementById('syncDot');
   const label = document.getElementById('syncLabel');
   if (!dot || !label) return;
@@ -2627,6 +2627,10 @@ function updateSyncStatus(status) {
   label.textContent = s.text;
   if (status === 'synced') {
     setTimeout(() => { if (label.textContent === 'บันทึกแล้ว ✓') updateSyncStatus('idle'); }, 3000);
+  }
+  if (status === 'error') {
+    const msg = errMsg ? `sync error: ${errMsg}` : 'บันทึกไม่สำเร็จ — เปิด Console (F12) ดู [storage] error';
+    showToast(msg, 6000);
   }
 }
 
