@@ -66,7 +66,7 @@ async function handleLineCallback(request, env) {
 
     // 3. Look up user in line_users table
     const lookupRes = await fetch(
-      `${supaUrl}/rest/v1/line_users?line_user_id=eq.${encodeURIComponent(lineUserId)}&select=user_id,plan`,
+      `${supaUrl}/rest/v1/line_users?line_user_id=eq.${encodeURIComponent(lineUserId)}&select=user_id`,
       { headers: { apikey: supaKey, Authorization: `Bearer ${supaKey}` } }
     );
     const lineUsers = await lookupRes.json();
