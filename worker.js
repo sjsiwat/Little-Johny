@@ -74,6 +74,7 @@ async function handleLineCallback(request, env) {
     // Email is always deterministic — no need to fetch it later
     const lineEmail = `line_${lineUserId}@johny.internal`;
     let userId;
+    let userEmail;
 
     if (Array.isArray(lineUsers) && lineUsers.length > 0) {
       userId = lineUsers[0].user_id;
@@ -86,6 +87,13 @@ async function handleLineCallback(request, env) {
           body: JSON.stringify({ display_name: displayName, picture_url: pictureUrl }),
         }
       );
+      // Get the actual email registered for this user
+      const userRes = await fetch(`${supaUrl}/auth/v1/admin/users/${userId}`, {
+        headers: supaHeaders,
+      });
+      const userData = await userRes.json();
+      userEmail = userData.email;
+      if (!userEmail) throw new Error(`Could not get email for user ${userId}`);
     } else {
       // Try to create Supabase auth user
       const createRes = await fetch(`${supaUrl}/auth/v1/admin/users`, {
@@ -97,6 +105,7 @@ async function handleLineCallback(request, env) {
 
       if (newUser.id) {
         userId = newUser.id;
+        userEmail = lineEmail;
       } else if (newUser.error_code === 'email_exists') {
         // Auth user exists but line_users record is missing — look up by email
         const listRes = await fetch(
@@ -105,6 +114,7 @@ async function handleLineCallback(request, env) {
         );
         const listData = await listRes.json();
         userId = listData?.users?.[0]?.id;
+        userEmail = listData?.users?.[0]?.email ?? lineEmail;
         if (!userId) throw new Error('email_exists but could not find existing user');
       } else {
         throw new Error(`Failed to create Supabase user: ${JSON.stringify(newUser)}`);
@@ -114,17 +124,17 @@ async function handleLineCallback(request, env) {
       await fetch(`${supaUrl}/rest/v1/line_users`, {
         method: 'POST',
         headers: { ...supaHeaders, Prefer: 'resolution=merge-duplicates,return=minimal' },
-        body: JSON.stringify({ line_user_id: lineUserId, user_id: userId, display_name: displayName, picture_url: pictureUrl, plan: 'free' }),
+        body: JSON.stringify({ line_user_id: lineUserId, user_id: userId, display_name: displayName, picture_url: pictureUrl }),
       });
     }
 
-    // 4. Generate magic link using the deterministic email
+    // 4. Generate magic link using the user's actual registered email
     const linkRes = await fetch(`${supaUrl}/auth/v1/admin/generate_link`, {
       method: 'POST',
       headers: supaHeaders,
       body: JSON.stringify({
         type: 'magiclink',
-        email: lineEmail,
+        email: userEmail,
         options: { redirect_to: origin },
       }),
     });
