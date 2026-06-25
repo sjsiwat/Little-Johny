@@ -79,7 +79,6 @@ const Storage = (() => {
       id: task.id,
       user_id: uid,
       title: task.title,
-      description: task.description || null,
       priority: task.priority,
       due: task.due || null,
       status: task.status,
@@ -170,12 +169,19 @@ const Storage = (() => {
     try {
       // Goals must be synced first — tasks/notes/expenses have FK references to goals
       await syncTable('goals', goals, goalToRow, uid);
-      await Promise.all([
+      const results = await Promise.allSettled([
         syncTable('tasks',    tasks,    taskToRow,    uid),
         syncTable('notes',    notes,    noteToRow,    uid),
         syncTable('expenses', expenses, expenseToRow, uid),
       ]);
-      if (_syncChangeListener) _syncChangeListener('synced');
+      const failed = results.filter(r => r.status === 'rejected');
+      if (failed.length > 0) {
+        const msg = failed.map(r => r.reason?.message).filter(Boolean).join('; ');
+        console.error('[storage] partial sync failure:', msg);
+        if (_syncChangeListener) _syncChangeListener('error', msg);
+      } else {
+        if (_syncChangeListener) _syncChangeListener('synced');
+      }
     } catch (err) {
       console.error('[storage] cloud sync failed:', err);
       if (_syncChangeListener) _syncChangeListener('error', err.message);
