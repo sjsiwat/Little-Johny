@@ -9,8 +9,13 @@ if (fabMain && fabMenu) {
   }
   fabMain.addEventListener('click', function (e) {
     e.stopPropagation();
-    const isOpen = !fabMenu.hidden;
-    isOpen ? closeFab() : (fabMenu.hidden = false, fabMain.setAttribute('aria-expanded', 'true'), fabMain.classList.add('open'));
+    if (!fabMenu.hidden) {
+      closeFab();
+    } else {
+      fabMenu.hidden = false;
+      fabMain.setAttribute('aria-expanded', 'true');
+      fabMain.classList.add('open');
+    }
   });
   document.addEventListener('click', function (e) {
     if (!fabMenu.hidden && !fabMenu.contains(e.target)) closeFab();
