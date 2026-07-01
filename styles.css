@@ -9,7 +9,16 @@
    New: layered animated bg (blobs + rings + particles + lines)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Caveat:wght@700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Caveat:wght@700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Mali:wght@700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
+
+/* Mali covers Thai Unicode block; Caveat covers everything else */
+@font-face {
+  font-family: 'HandThai';
+  src: local('Mali'), url('https://fonts.gstatic.com/s/mali/v10/N0bV2SRONuN4SCj8wlVQIfTTkdbJYA.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+  unicode-range: U+0E00-0E7F;
+}
 
 /* ── Tokens — Deep Navy × Ice Blue (v5 unified palette) ── */
 :root {
@@ -46,7 +55,7 @@
   --radius-md: 16px;
   --radius-lg: 20px;
   --radius-xl: 28px;
-  --font-hand: 'Caveat', cursive;
+  --font-hand: 'HandThai', 'Caveat', cursive;
   --font-body: 'IBM Plex Sans Thai', 'Anuphan', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, ui-sans-serif, system-ui, sans-serif;
   --ease-ios:    cubic-bezier(0.4, 0, 0.2, 1);
   --ease-snap:   cubic-bezier(0.4, 0, 0.2, 1);
@@ -7995,4 +8004,145 @@ button[type="submit"]:hover,
 /* ── Goal bars ── */
 [data-theme="light"] #dashGoalBars .hfm-goal-bar-track {
   background: rgba(160,140,115,0.12);
+}
+
+/* ── LINE QR Add Friend section ── */
+.hp-line-qr {
+  padding: 6rem 1.75rem;
+  background: linear-gradient(160deg, #02b246 0%, #06C755 55%, #00a040 100%);
+  position: relative;
+  overflow: hidden;
+}
+.hp-line-qr::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 80% at 80% 50%, rgba(255,255,255,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 10% 80%, rgba(0,0,0,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hp-line-qr-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4rem;
+  position: relative;
+}
+.hp-line-qr-text {
+  color: #ffffff;
+}
+.hp-badge--line {
+  background: rgba(255,255,255,0.2);
+  color: #ffffff;
+  backdrop-filter: blur(4px);
+}
+.hp-line-qr-title {
+  font-family: var(--font-hand);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  margin: 0.5rem 0 1rem;
+  line-height: 1.15;
+}
+.hp-line-qr-desc {
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+.hp-line-qr-perks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.hp-line-qr-perks li {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.9);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  line-height: 1.45;
+}
+.hp-qr-perk-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  margin-top: 0.1em;
+}
+.hp-line-qr-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 2rem 2rem 1.75rem;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.22), 0 4px 16px rgba(0,0,0,0.10);
+  min-width: 260px;
+}
+.hp-line-qr-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+.hp-line-qr-img {
+  display: block;
+  width: 220px;
+  height: 220px;
+  border-radius: 12px;
+  object-fit: contain;
+}
+.hp-line-qr-hint {
+  font-size: 0.78rem;
+  color: #8e8e93;
+  margin: 0;
+  text-align: center;
+}
+.hp-line-qr-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #06C755;
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0.6em 1.4em;
+  border-radius: 100px;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.1s;
+}
+.hp-line-qr-btn:hover {
+  background: #04a847;
+  transform: translateY(-1px);
+}
+.hp-line-qr-btn:active {
+  transform: translateY(0);
+}
+@media (max-width: 760px) {
+  .hp-line-qr { padding: 4rem 1.25rem; }
+  .hp-line-qr-inner {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 2.5rem;
+  }
+  .hp-line-qr-perks { align-items: flex-start; text-align: left; }
+  .hp-line-qr-card { min-width: unset; width: 100%; max-width: 280px; margin: 0 auto; }
 }
