@@ -6488,6 +6488,105 @@ body::before {
   font-size: 0.63rem; color: var(--ink-faint,#aaa4a0); margin-left: auto;
 }
 
+.note-card--clickable { cursor: pointer; }
+.note-card--clickable:hover { border-color: rgba(0,0,0,0.14); }
+.note-card--clickable:focus-visible {
+  outline: none;
+  border-color: var(--blue,#3478F6);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue,#3478F6) 20%, transparent);
+}
+[data-theme="dark"] .note-card--clickable:hover { border-color: rgba(255,255,255,0.18); }
+
+
+/* ── Note Modal (note-modal-*) ───────────────────────────────── */
+.note-modal { width: min(680px, calc(100vw - 2rem)); }
+
+.note-modal-header {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 1.125rem 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.note-modal-title-input {
+  flex: 1; min-width: 0;
+  border: none; background: transparent;
+  font-family: inherit; font-size: 1.1rem; font-weight: 700;
+  color: var(--ink); padding: 0.15rem 0;
+}
+.note-modal-title-input:focus { outline: none; }
+.note-modal-title-input::placeholder { color: var(--ink-faint); font-weight: 500; }
+
+.note-modal-body {
+  padding: 0.75rem 1.25rem 1rem;
+  display: flex; flex-direction: column; gap: 0.75rem;
+}
+.note-modal-meta {
+  font-size: 0.7rem; color: var(--ink-faint,#aaa4a0);
+}
+.note-modal-textarea {
+  width: 100%; min-height: 260px; resize: vertical;
+  border: none; background: transparent; padding: 0;
+  font-family: inherit; font-size: 0.9rem; line-height: 1.65;
+  color: var(--ink); box-sizing: border-box;
+}
+.note-modal-textarea:focus { outline: none; }
+.note-modal-textarea::placeholder { color: var(--ink-faint); }
+.note-modal-tags { max-width: 320px; }
+
+
+/* ── Dashboard recent notes list (dash-note-list) ────────────── */
+.dash-note-list {
+  display: flex; flex-direction: column;
+  border: 1.5px solid rgba(0,0,0,0.07);
+  border-radius: 12px; overflow: hidden;
+  background: var(--surface,#fff);
+}
+.dash-note-item {
+  display: flex; align-items: center; gap: 0.65rem;
+  width: 100%; padding: 0.6rem 0.8rem;
+  border: none; border-bottom: 1px solid rgba(0,0,0,0.05);
+  background: transparent; cursor: pointer;
+  text-align: left; font-family: inherit;
+  transition: background 120ms;
+}
+.dash-note-item:last-child { border-bottom: none; }
+.dash-note-item:hover { background: rgba(0,0,0,0.03); }
+.dash-note-item:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--blue,#3478F6) 35%, transparent);
+}
+.dash-note-icon {
+  width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(90,143,168,0.12); color: #5a8fa8;
+}
+.dash-note-main {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 0.08rem;
+}
+.dash-note-item-title {
+  font-size: 0.82rem; font-weight: 600; color: var(--ink,#2a2520);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.dash-note-item-preview {
+  font-size: 0.72rem; color: var(--ink-muted,#8a8076);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.dash-note-side {
+  display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;
+}
+.dash-note-item-date {
+  font-size: 0.65rem; color: var(--ink-faint,#aaa4a0); white-space: nowrap;
+}
+
+[data-theme="dark"] .dash-note-list { border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .dash-note-item { border-bottom-color: rgba(255,255,255,0.06); }
+[data-theme="dark"] .dash-note-item:hover { background: rgba(255,255,255,0.04); }
+[data-theme="dark"] .dash-note-icon { background: rgba(90,143,168,0.18); color: #8fb8cc; }
+
+@media (max-width: 640px) {
+  .dash-note-item-preview { display: none; }
+}
+
 
 /* ── Expense Items (exp-*) ───────────────────────────────────── */
 .exp-list-box {
@@ -6562,23 +6661,6 @@ body::before {
   background: var(--surface,#fff);
 }
 
-.dash-note-row {
-  display: flex; align-items: center; gap: 0.4rem;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-}
-.dash-note-row:last-child { border-bottom: none; }
-
-.dash-note-title {
-  flex: 1; font-size: 0.8rem; color: var(--ink,#2a2520);
-  min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-
-#recentNotes {
-  border: 1.5px solid rgba(0,0,0,0.07);
-  border-radius: 12px; overflow: hidden;
-  background: var(--surface,#fff);
-}
 
 
 /* ── Kanban card refresh ─────────────────────────────────────── */

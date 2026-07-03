@@ -753,7 +753,7 @@
                 <h2>โน้ตล่าสุด</h2>
                 <button class="ghost-button" type="button" data-view-jump="notes">ดูทั้งหมด →</button>
               </div>
-              <div class="item-list compact" id="recentNotes"></div>
+              <div class="dash-note-list" id="recentNotes"></div>
             </section>
 
 
@@ -989,6 +989,30 @@
           <button type="button" class="task-modal-delete-btn" id="taskModalDelete" hidden>ลบงาน</button>
           <div class="task-modal-footer-right">
             <button type="button" class="task-modal-cancel-btn" id="taskModalCancel">ยกเลิก</button>
+            <button type="submit" class="task-modal-save-btn">บันทึก</button>
+          </div>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- Note Read/Edit Modal -->
+    <dialog id="noteModal" class="task-modal note-modal" aria-labelledby="noteModalTitleInput">
+      <form id="noteModalForm" method="dialog" novalidate>
+        <div class="note-modal-header">
+          <input id="noteModalTitleInput" type="text" class="note-modal-title-input" placeholder="หัวข้อโน้ต" maxlength="160" autocomplete="off" required />
+          <button type="button" class="task-modal-close" id="noteModalClose" aria-label="ปิด">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div class="note-modal-body">
+          <div class="note-modal-meta" id="noteModalMeta"></div>
+          <textarea id="noteModalBody" class="note-modal-textarea" placeholder="เขียนความคิด ไอเดีย หรือความรู้ไว้ตรงนี้…" spellcheck="false"></textarea>
+          <input id="noteModalTags" type="text" class="task-modal-input note-modal-tags" placeholder="tags เช่น work, idea" autocomplete="off" />
+        </div>
+        <div class="task-modal-footer">
+          <button type="button" class="task-modal-delete-btn" id="noteModalDelete">ลบโน้ต</button>
+          <div class="task-modal-footer-right">
+            <button type="button" class="task-modal-cancel-btn" id="noteModalCancel">ยกเลิก</button>
             <button type="submit" class="task-modal-save-btn">บันทึก</button>
           </div>
         </div>

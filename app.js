@@ -7,7 +7,7 @@ import './fab.js';
 
 /* ── Module-level mutable state ── */
 let toastTimer = null;
-let _editingNoteId    = null;
+let _noteModalEditId  = null;
 let _editingExpenseId = null;
 let _focusTaskId      = null;
 let _taskModalEditId  = null;
@@ -563,7 +563,7 @@ function renderDashboard() {
   document.getElementById("recentNotes").innerHTML = state.notes.length
     ? [...state.notes]
         .sort((a, b) => b.createdAt - a.createdAt)
-        .slice(0, 4)
+        .slice(0, 5)
         .map(renderSimpleNote)
         .join("")
     : emptyState("ยังไม่มีโน้ต ลองบันทึกไอเดียหรือความคิดแรกของ Johny OS", "notes", "เขียนโน้ต");
@@ -965,6 +965,32 @@ function getSelectedModalLabels() {
   return [...document.querySelectorAll(".modal-label-chip.is-selected")].map(c => c.dataset.labelId);
 }
 
+/* ── Note Modal ── */
+function openNoteModal(noteId) {
+  const modal = document.getElementById("noteModal");
+  const note  = state.notes.find(n => n.id === noteId);
+  if (!modal || !note || note._isKVLine) return;
+  _noteModalEditId = noteId;
+  document.getElementById("noteModalTitleInput").value = note.title || "";
+  document.getElementById("noteModalBody").value       = note.body || "";
+  document.getElementById("noteModalTags").value       = note.tags || "";
+  const meta = document.getElementById("noteModalMeta");
+  if (meta) {
+    const created = new Intl.DateTimeFormat("th-TH", { day: "numeric", month: "long", year: "numeric" }).format(new Date(note.createdAt));
+    meta.textContent = `สร้างเมื่อ ${created} · ${relativeTime(note.createdAt)}`;
+  }
+  modal.showModal();
+  setTimeout(() => {
+    const body = document.getElementById("noteModalBody");
+    if (body) { body.focus(); body.setSelectionRange(body.value.length, body.value.length); }
+  }, 50);
+}
+
+function closeNoteModal() {
+  document.getElementById("noteModal")?.close();
+  _noteModalEditId = null;
+}
+
 function renderNotes() {
   const el = document.getElementById("noteList");
   if (!state.notes.length) {
@@ -976,17 +1002,15 @@ function renderNotes() {
   el.innerHTML = [...state.notes]
     .sort((a, b) => b.createdAt - a.createdAt)
     .map(note => {
-      if (note.id === _editingNoteId) return `<div class="note-card-edit-wrap">${renderNoteEditForm(note)}</div>`;
       const tags = note.tags ? note.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
-      const acts = note._isKVLine
-        ? `<button class="note-card-act note-card-act--del" type="button" data-delete-note="${note.id}" title="ลบโน้ต">×</button>`
-        : `<button class="note-card-act" type="button" data-edit-note="${note.id}" title="แก้ไขโน้ต" aria-label="แก้ไขโน้ต">${ICON_EDIT}</button>
-           <button class="note-card-act note-card-act--del" type="button" data-delete-note="${note.id}" title="ลบโน้ต">×</button>`;
+      const openAttr = note._isKVLine ? "" : ` data-open-note="${note.id}" role="button" tabindex="0"`;
       return `
-        <article class="note-card" data-note-id="${note.id}">
+        <article class="note-card${note._isKVLine ? "" : " note-card--clickable"}" data-note-id="${note.id}"${openAttr}>
           <div class="note-card-head">
             <span class="note-card-title">${escapeHtml(note.title)}</span>
-            <div class="note-card-acts">${acts}</div>
+            <div class="note-card-acts">
+              <button class="note-card-act note-card-act--del" type="button" data-delete-note="${note.id}" title="ลบโน้ต">×</button>
+            </div>
           </div>
           ${note.body ? `<p class="note-card-body">${escapeHtml(note.body.slice(0,140))}${note.body.length>140?'…':''}</p>` : ''}
           <div class="note-card-foot">
@@ -995,28 +1019,6 @@ function renderNotes() {
           </div>
         </article>`;
     }).join('');
-}
-
-function renderNoteEditForm(note) {
-  return `
-    <article class="list-item list-item--editing">
-      <form class="task-edit-form" data-edit-form-note="${note.id}">
-        <input class="task-edit-title" type="text" value="${escapeHtml(note.title)}"
-          placeholder="หัวข้อโน้ต" required maxlength="160"
-          autocorrect="off" autocapitalize="sentences" />
-        <textarea class="note-edit-body" rows="4"
-          placeholder="เนื้อหา">${escapeHtml(note.body || "")}</textarea>
-        <div class="task-edit-row">
-          <input class="note-edit-tags" type="text" value="${escapeHtml(note.tags || "")}"
-            placeholder="tags เช่น work, idea" />
-          <div class="task-edit-actions">
-            <button type="submit" class="task-edit-save">บันทึก</button>
-            <button type="button" class="task-edit-cancel" data-cancel-edit-note="${note.id}">ยกเลิก</button>
-          </div>
-        </div>
-      </form>
-    </article>
-  `;
 }
 
 function renderExpenseItem(expense) {
@@ -1293,14 +1295,24 @@ function relativeTime(ts) {
   return new Intl.DateTimeFormat("th-TH", { day: "numeric", month: "short" }).format(new Date(ts));
 }
 
+const ICON_NOTE_DOC = '<svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 1.5h5.5L11.5 4.5V12a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1V2.5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M8.5 1.5v3h3" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M5 8h4M5 10.2h2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>';
+
 function renderSimpleNote(note) {
   const tags = note.tags ? note.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+  const preview = (note.body || "").replace(/\s+/g, " ").trim();
+  const openAttr = note._isKVLine ? "" : ` data-open-note="${note.id}"`;
   return `
-    <div class="dash-note-row">
-      <span class="dash-note-title">${escapeHtml(note.title)}</span>
-      ${tags.slice(0,2).map(t => `<span class="tli-label" style="--lc:#5a8fa8">${escapeHtml(t)}</span>`).join('')}
-      <span class="note-card-date">${relativeTime(note.createdAt)}</span>
-    </div>`;
+    <button class="dash-note-item" type="button"${openAttr}>
+      <span class="dash-note-icon">${ICON_NOTE_DOC}</span>
+      <span class="dash-note-main">
+        <span class="dash-note-item-title">${escapeHtml(note.title)}</span>
+        ${preview ? `<span class="dash-note-item-preview">${escapeHtml(preview.slice(0, 90))}${preview.length > 90 ? "…" : ""}</span>` : ""}
+      </span>
+      <span class="dash-note-side">
+        ${tags.slice(0, 2).map(t => `<span class="tli-label" style="--lc:#5a8fa8">${escapeHtml(t)}</span>`).join('')}
+        <span class="dash-note-item-date">${relativeTime(note.createdAt)}</span>
+      </span>
+    </button>`;
 }
 
 function emptyState(message, view = "dashboard", action = "เริ่มใช้งาน") {
@@ -1656,6 +1668,44 @@ document.addEventListener("click", e => {
   }
 });
 
+/* ── Note modal: save / cancel / close / delete ── */
+document.getElementById("noteModalForm")?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const title = document.getElementById("noteModalTitleInput").value.trim();
+  if (!title || !_noteModalEditId) return;
+  const body = document.getElementById("noteModalBody").value.trim();
+  const tags = document.getElementById("noteModalTags").value.trim();
+  state.notes = state.notes.map(n =>
+    n.id === _noteModalEditId ? { ...n, title, body, tags } : n
+  );
+  closeNoteModal();
+  renderAfterNote();
+  showToast(`บันทึกโน้ต "${title}" แล้ว`);
+});
+
+document.getElementById("noteModalCancel")?.addEventListener("click", closeNoteModal);
+document.getElementById("noteModalClose")?.addEventListener("click", closeNoteModal);
+document.getElementById("noteModal")?.addEventListener("click", e => {
+  if (e.target === e.currentTarget) closeNoteModal();
+});
+
+/* Open note card with Enter/Space when focused via keyboard */
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const card = e.target instanceof HTMLElement ? e.target.closest("article[data-open-note]") : null;
+  if (card) { e.preventDefault(); openNoteModal(card.dataset.openNote); }
+});
+
+document.getElementById("noteModalDelete")?.addEventListener("click", () => {
+  const note = _noteModalEditId && state.notes.find(n => n.id === _noteModalEditId);
+  if (!note || !confirm(`ลบโน้ต "${note.title}"?`)) return;
+  state.notes = state.notes.filter(n => n.id !== _noteModalEditId);
+  Storage.deleteRow('notes', note.id);
+  closeNoteModal();
+  renderAfterNote();
+  showToast("ลบโน้ตแล้ว");
+});
+
 document.getElementById("noteForm").addEventListener("submit", (event) => {
   event.preventDefault();
   const title  = document.getElementById("noteTitle").value.trim();
@@ -1699,23 +1749,6 @@ document.querySelectorAll("[data-review-tab]").forEach(btn => {
     );
     renderReview();
   });
-});
-
-document.getElementById("noteList").addEventListener("submit", (e) => {
-  const form = e.target.closest("[data-edit-form-note]");
-  if (!form) return;
-  e.preventDefault();
-  const id = form.dataset.editFormNote;
-  const newTitle  = form.querySelector(".task-edit-title").value.trim();
-  const newBody   = form.querySelector(".note-edit-body").value.trim();
-  const newTags   = form.querySelector(".note-edit-tags").value.trim();
-  if (!newTitle) return;
-  state.notes = state.notes.map(n =>
-    n.id === id ? { ...n, title: newTitle, body: newBody, tags: newTags } : n
-  );
-  _editingNoteId = null;
-  renderAfterNote();
-  showToast("อัปเดตโน้ตแล้ว");
 });
 
 document.getElementById("expenseList").addEventListener("submit", (e) => {
@@ -1811,8 +1844,7 @@ document.addEventListener("click", (event) => {
     return;
   }
 
-  const editNoteId      = target.closest("[data-edit-note]")?.dataset.editNote;
-  const cancelNoteId    = target.closest("[data-cancel-edit-note]")?.dataset.cancelEditNote;
+  const openNoteId      = target.closest("[data-open-note]")?.dataset.openNote;
   const editExpenseId   = target.closest("[data-edit-expense]")?.dataset.editExpense;
   const cancelExpenseId = target.closest("[data-cancel-edit-expense]")?.dataset.cancelEditExpense;
 
@@ -1919,15 +1951,8 @@ document.addEventListener("click", (event) => {
   }
 
 
-  if (editNoteId) {
-    _editingNoteId = editNoteId;
-    renderNotes();
-    setTimeout(() => { const inp = document.querySelector(".task-edit-title"); if (inp) { inp.focus(); inp.select(); } }, 30);
-    return;
-  }
-  if (cancelNoteId !== undefined) {
-    _editingNoteId = null;
-    renderNotes();
+  if (openNoteId && !target.closest("[data-delete-note]")) {
+    openNoteModal(openNoteId);
     return;
   }
 
