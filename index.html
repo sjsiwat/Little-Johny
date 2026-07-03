@@ -7,7 +7,7 @@
       name="description"
       content="Johny Memo - personal digital workspace for tasks, notes, expenses, and daily planning."
     />
-    <meta name="theme-color" content="#1f7a6d" />
+    <meta name="theme-color" content="#fe6e00" />
     <title>Johny Memo</title>
     <!-- PWA -->
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
@@ -17,21 +17,11 @@
     <meta name="apple-mobile-web-app-title" content="Johny" />
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Caveat:wght@700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="./styles.css?v=4" />
+    <link rel="stylesheet" href="./styles.css?v=5" />
     <!-- Supabase JS client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
   </head>
   <body>
-    <!-- Animated background canvas -->
-    <canvas id="bg-canvas" aria-hidden="true"></canvas>
-    <div class="paper-grain" aria-hidden="true"></div>
-
     <!-- ══════════════════════════════════════════════════════
          HOMEPAGE — public face of Johny Memo
          Shown when unauthenticated. Hidden once user enters app.
@@ -57,7 +47,7 @@
             <div class="hp-hero-shadow"></div>
           </div>
           <h1 class="hp-hero-title">Your Personal<br>Digital Workspace</h1>
-          <p class="hp-hero-desc">Capture ideas, manage tasks, track expenses<br class="hp-desk-br">and plan your day — all in one place.</p>
+          <p class="hp-hero-desc">Capture ideas, manage tasks, track expenses <br class="hp-desk-br">and plan your day — all in one place.</p>
           <div class="hp-hero-cta">
             <button class="hp-cta-primary" id="hpLoginBtn" type="button">Log in with LINE</button>
           </div>
@@ -617,12 +607,6 @@
           </a>
         </nav>
 
-        <!-- Hidden elements kept for JS compatibility -->
-        <div hidden>
-          <div id="lineProfileCard"><img id="lineProfilePic" alt=""/><span id="lineProfileName"></span><span id="lineTierBadge"></span></div>
-          <span id="lineStatusDot"></span><span id="lineStatusText"></span>
-        </div>
-
         <!-- Motivational quote -->
         <div class="sidebar-quote" aria-label="Daily quote">
           <blockquote id="dailyQuote">"ความสำเร็จ คือ ผลรวมของความพยายามเล็ก ๆ ที่ทำทุกวัน"</blockquote>
@@ -1091,8 +1075,8 @@
 
     </dialog>
 
-    <script src="./auth.js?v=12"></script>
-    <script src="./storage.js?v=12"></script>
-    <script type="module" src="./app.js?v=12"></script>
+    <script src="./auth.js?v=13"></script>
+    <script src="./storage.js?v=13"></script>
+    <script type="module" src="./app.js?v=13"></script>
   </body>
 </html>

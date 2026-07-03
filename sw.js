@@ -1,4 +1,4 @@
-const CACHE_NAME = "johny-os-lite-v6";
+const CACHE_NAME = "johny-os-lite-v7";
 const APP_ASSETS = [
   "/",
   "/index.html",
@@ -6,6 +6,7 @@ const APP_ASSETS = [
   "/app.js",
   "/auth.js",
   "/storage.js",
+  "/fab.js",
   "/icon.svg",
   "/johny-cat.svg",
   "/manifest.webmanifest"

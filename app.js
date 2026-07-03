@@ -1,4 +1,3 @@
-import { pauseCanvas, resumeCanvas } from './canvas.js';
 import './fab.js';
 
 /* ================================================================
@@ -9,7 +8,6 @@ import './fab.js';
 let toastTimer = null;
 let _noteModalEditId  = null;
 let _editingExpenseId = null;
-let _focusTaskId      = null;
 let _taskModalEditId  = null;
 let _taskView         = "list"; // "list" | "kanban"
 const _taskProgressMode = new Map(); // taskId → 'value' | 'pct'
@@ -303,7 +301,7 @@ function createDemoState() {
 }
 
 const defaultState = {
-  theme: "dark",
+  theme: "light",
   taskFilter: "open",
   ...createDemoState()
 };
@@ -392,51 +390,17 @@ function render() {
   renderExpenses();
   renderCalendar();
   renderReview();
-  renderFocusTaskPicker();
   saveState();
 }
 
 function renderAfterTask() {
-  renderShell(); renderDashboard(); renderTasks(); renderCalendar(); renderFocusTaskPicker(); saveState();
+  renderShell(); renderDashboard(); renderTasks(); renderCalendar(); saveState();
 }
 function renderAfterNote() {
   renderShell(); renderDashboard(); renderNotes(); saveState();
 }
 function renderAfterExpense() {
   renderShell(); renderDashboard(); renderExpenses(); saveState();
-}
-
-function renderFocusTaskPicker() {
-  const picker = document.getElementById("focusTaskPicker");
-  if (!picker) return;
-  // If the currently focused task was completed or deleted, clear it
-  const focusTask = _focusTaskId
-    ? state.tasks.find(t => t.id === _focusTaskId && !isTaskDone(t))
-    : null;
-  if (_focusTaskId && !focusTask) _focusTaskId = null;
-
-  if (focusTask) {
-    picker.innerHTML = `
-      <div class="focus-task-selected">
-        <span class="focus-task-name">${escapeHtml(focusTask.title)}</span>
-        <button class="focus-task-clear" data-clear-focus-task type="button" aria-label="ยกเลิก focus task">✕</button>
-      </div>`;
-  } else {
-    const openTasks = state.tasks
-      .filter(t => !isTaskDone(t))
-      .sort((a, b) => { const r = {Critical:0,High:1,Medium:2,Low:3}; return r[a.priority]-r[b.priority]; })
-      .slice(0, 10);
-    if (!openTasks.length) { picker.innerHTML = ""; return; }
-    picker.innerHTML = `
-      <select class="focus-task-select" id="focusTaskSelect" aria-label="เลือก task ที่จะ focus">
-        <option value="">เลือก task ที่จะ focus…</option>
-        ${openTasks.map(t => `<option value="${t.id}">${escapeHtml(t.title)}</option>`).join("")}
-      </select>`;
-    document.getElementById("focusTaskSelect")?.addEventListener("change", e => {
-      _focusTaskId = e.target.value || null;
-      renderFocusTaskPicker();
-    });
-  }
 }
 
 function updateClock() {
@@ -448,18 +412,9 @@ function updateClock() {
 }
 
 function renderShell() {
-  const todayLabelEl = document.getElementById("todayLabel");
-  if (todayLabelEl) todayLabelEl.textContent = new Intl.DateTimeFormat("th-TH", {
-    weekday: "long",
-    day: "numeric",
-    month: "long"
-  }).format(new Date());
-
   updateClock();
 
   const openItems = state.tasks.filter((task) => !isTaskDone(task));
-  const focusCountEl = document.getElementById("focusCount");
-  if (focusCountEl) focusCountEl.textContent = `${openItems.length} focus items`;
 
   // ── Quick-tiles (dashboard top) ─────────────────────────
   const todayKey = getTodayKey();
@@ -526,20 +481,6 @@ function renderShell() {
   if (greetingDateText) greetingDateText.textContent = new Intl.DateTimeFormat("th-TH", {
     weekday: "long", day: "numeric", month: "long", year: "numeric"
   }).format(new Date());
-
-  const signalTasks = document.getElementById("signalTasks");
-  if (signalTasks) signalTasks.textContent = `${openItems.length} งานค้าง`;
-
-  const signalExpense = document.getElementById("signalExpense");
-  if (signalExpense) signalExpense.textContent = `฿${todayExpense.toLocaleString("th-TH")} วันนี้`;
-
-  const signalNotes = document.getElementById("signalNotes");
-  if (signalNotes) {
-    const lastNote = [...state.notes].sort((a, b) => b.createdAt - a.createdAt)[0];
-    signalNotes.textContent = lastNote
-      ? `โน้ต: ${lastNote.title.length > 22 ? lastNote.title.slice(0, 22) + "…" : lastNote.title}`
-      : "ยังไม่มีโน้ต";
-  }
 }
 
 let _clockInterval = null;
@@ -779,7 +720,6 @@ function renderTaskListItem(task) {
         ${dueChip}
         <div class="tli-acts">
           ${!done && !hasTarget ? `<button class="tli-act" type="button" data-add-progress="${task.id}" title="เพิ่ม Progress Bar" aria-label="เพิ่ม Progress Bar"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><rect x="1" y="6.5" width="1.5" height="3" rx="0.4" fill="currentColor" opacity=".4"/><rect x="3.5" y="3.5" width="1.5" height="6" rx="0.4" fill="currentColor" opacity=".7"/><rect x="6.5" y="1" width="1.5" height="8.5" rx="0.4" fill="currentColor"/></svg></button>` : ''}
-          ${!done ? `<button class="tli-act${_focusTaskId === task.id ? ' is-focusing' : ''}" type="button" data-focus-task="${task.id}" title="Focus" aria-label="Focus"><svg width="8" height="9" viewBox="0 0 8 9" fill="none" aria-hidden="true"><path d="M1 1.5l6 3-6 3V1.5z" fill="currentColor"/></svg></button>` : ''}
           <button class="tli-act" type="button" data-edit-task="${task.id}" title="แก้ไขงาน" aria-label="แก้ไขงาน">${ICON_EDIT}</button>
           <button class="tli-act tli-act--del" type="button" data-delete-task="${task.id}" title="ลบงาน">×</button>
         </div>
@@ -1341,9 +1281,7 @@ function showApp() {
   _inApp = true;
   document.getElementById("homepage")?.style.setProperty("display", "none");
   document.querySelector(".app-shell")?.style.removeProperty("display");
-  document.getElementById("bg-canvas")?.style.setProperty("display", "none");
-  document.querySelector(".paper-grain")?.style.setProperty("display", "none");
-  pauseCanvas();
+  document.getElementById("fabWrap")?.style.removeProperty("display");
   if (!_clockInterval) _clockInterval = setInterval(updateClock, 1000);
 }
 
@@ -1351,15 +1289,13 @@ function showHomepage() {
   _inApp = false;
   document.getElementById("homepage")?.style.removeProperty("display");
   document.querySelector(".app-shell")?.style.setProperty("display", "none");
-  document.getElementById("bg-canvas")?.style.removeProperty("display");
-  document.querySelector(".paper-grain")?.style.removeProperty("display");
-  resumeCanvas();
+  document.getElementById("fabWrap")?.style.setProperty("display", "none");
   clearInterval(_clockInterval);
   _clockInterval = null;
 }
 
 function freshDemoState() {
-  return { theme: state.theme || "dark", taskFilter: "open", ...createDemoState() };
+  return { theme: state.theme || "light", taskFilter: "open", ...createDemoState() };
 }
 
 function renderHomepageDemo() {
@@ -1461,18 +1397,6 @@ function addExpense(title, amount, category = "อื่นๆ", date = getToday
   });
 }
 
-
-function loadDemoData() {
-  const demo = createDemoState();
-  state = {
-    ...state,
-    tasks: demo.tasks,
-    notes: demo.notes,
-    expenses: demo.expenses,
-    logs: demo.logs
-  };
-  render();
-}
 
 function parseCommand(rawText) {
   const text = rawText.trim();
@@ -1828,21 +1752,6 @@ document.addEventListener("click", (event) => {
   const deleteNoteId = target.dataset.deleteNote;
   const deleteExpenseId = target.dataset.deleteExpense;
   const editTaskId = target.closest("[data-edit-task]")?.dataset.editTask;
-  // Focus task
-  if (target.closest("[data-focus-task]")) {
-    const id = target.closest("[data-focus-task]").dataset.focusTask;
-    _focusTaskId = (_focusTaskId === id) ? null : id;  // toggle
-    renderFocusTaskPicker();
-    renderTasks();
-    if (_focusTaskId) showToast("Focus: " + (state.tasks.find(t => t.id === id)?.title || ""));
-    return;
-  }
-  if (target.closest("[data-clear-focus-task]")) {
-    _focusTaskId = null;
-    renderFocusTaskPicker();
-    renderTasks();
-    return;
-  }
 
   const openNoteId      = target.closest("[data-open-note]")?.dataset.openNote;
   const editExpenseId   = target.closest("[data-edit-expense]")?.dataset.editExpense;
@@ -2041,169 +1950,6 @@ document.addEventListener("keydown", (e) => {
   }
 })();
 
-/* ── Focus timer (Pomodoro) ── */
-(function initFocusTimer() {
-  const btnStart  = document.getElementById("focusTimerBtn");
-  const btnReset  = document.getElementById("focusTimerReset");
-  const btnFinish = document.getElementById("focusFinishBtn");
-  const label     = document.getElementById("focusTimerLabel");
-  const input     = document.getElementById("focusTimeInput");
-  const arc       = document.getElementById("focusArc");
-  if (!btnStart || !arc) return;
-
-  const CIRCUMFERENCE = 2 * Math.PI * 28;
-  arc.style.strokeDasharray = CIRCUMFERENCE;
-
-  let totalSecs = 25 * 60;
-  let remaining = totalSecs;
-  let interval  = null;
-  let running   = false;
-
-  function fmt(secs) {
-    return `${String(Math.floor(secs / 60)).padStart(2, "0")}:${String(secs % 60).padStart(2, "0")}`;
-  }
-
-  function updateDisplay() {
-    if (label) label.textContent = fmt(remaining);
-    arc.style.strokeDashoffset = CIRCUMFERENCE * (1 - remaining / totalSecs);
-  }
-
-  function setTotal(mins) {
-    totalSecs = Math.max(1, Math.min(99, mins)) * 60;
-    remaining = totalSecs;
-    updateDisplay();
-    document.querySelectorAll(".focus-preset").forEach(b =>
-      b.classList.toggle("focus-preset--active", Number(b.dataset.minutes) === mins)
-    );
-  }
-
-  function playChime() {
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      [[523.25, 0], [659.25, 0.22], [783.99, 0.44], [1046.5, 0.66]].forEach(([freq, delay]) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain); gain.connect(ctx.destination);
-        osc.type = "sine"; osc.frequency.value = freq;
-        const t = ctx.currentTime + delay;
-        gain.gain.setValueAtTime(0, t);
-        gain.gain.linearRampToValueAtTime(0.22, t + 0.04);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + (delay < 0.6 ? 0.55 : 1.0));
-        osc.start(t); osc.stop(t + 1.1);
-      });
-      setTimeout(() => ctx.close(), 2500);
-    } catch (e) {}
-  }
-
-  function showDonePrompt() {
-    const ft = _focusTaskId ? state.tasks.find(t => t.id === _focusTaskId && !isTaskDone(t)) : null;
-    if (ft) {
-      const prompt = document.getElementById("focusDonePrompt");
-      const textEl = document.getElementById("focusDoneText");
-      const yesBtn = document.getElementById("focusDoneYes");
-      if (prompt && textEl && yesBtn) {
-        textEl.textContent = ft.title;
-        yesBtn.dataset.completeTask = _focusTaskId;
-        prompt.hidden = false;
-      }
-    } else {
-      showToast("⏰ Focus session เสร็จแล้ว! พักสักครู่");
-    }
-  }
-
-  function stop() {
-    clearInterval(interval); interval = null; running = false;
-    btnStart.textContent = "▶ Start";
-    btnStart.classList.remove("running");
-    if (btnFinish) btnFinish.hidden = true;
-    arc.style.stroke = "#0A84FF";
-  }
-
-  function reset() {
-    stop();
-    remaining = totalSecs;
-    updateDisplay();
-  }
-
-  // ── Start / Pause
-  btnStart.addEventListener("click", () => {
-    if (running) {
-      clearInterval(interval); interval = null; running = false;
-      btnStart.textContent = "▶ Resume";
-      btnStart.classList.remove("running");
-    } else {
-      if (remaining <= 0) { remaining = totalSecs; updateDisplay(); }
-      running = true;
-      btnStart.textContent = "⏸ Pause";
-      btnStart.classList.add("running");
-      if (btnFinish) btnFinish.hidden = false;
-      arc.style.stroke = "#0A84FF";
-      interval = setInterval(() => {
-        remaining--;
-        updateDisplay();
-        if (remaining <= 0) {
-          stop(); playChime(); showDonePrompt();
-        }
-      }, 1000);
-    }
-  });
-
-  // ── Reset
-  btnReset?.addEventListener("click", reset);
-
-  // ── Manual finish early
-  btnFinish?.addEventListener("click", () => {
-    stop(); remaining = 0; updateDisplay(); playChime(); showDonePrompt();
-  });
-
-  // ── Preset chips
-  document.querySelectorAll(".focus-preset").forEach(btn => {
-    btn.addEventListener("click", () => { if (!running) setTotal(Number(btn.dataset.minutes)); });
-  });
-
-  // ── Tap label to set custom time
-  label?.addEventListener("click", () => {
-    if (running || !input) return;
-    input.value = Math.round(totalSecs / 60);
-    label.hidden = true; input.hidden = false;
-    input.focus(); input.select();
-  });
-  label?.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") label.click(); });
-
-  function commitInput() {
-    const mins = parseInt(input.value, 10);
-    if (!isNaN(mins) && mins >= 1) setTotal(mins);
-    input.hidden = true; if (label) label.hidden = false;
-  }
-  input?.addEventListener("blur", commitInput);
-  input?.addEventListener("keydown", e => {
-    if (e.key === "Enter") { e.preventDefault(); commitInput(); }
-    if (e.key === "Escape") { input.hidden = true; if (label) label.hidden = false; }
-  });
-
-  updateDisplay();
-})();
-
-
-/* ── Focus done prompt ── */
-document.getElementById("focusDoneYes")?.addEventListener("click", e => {
-  const taskId = e.currentTarget.dataset.completeTask;
-  if (taskId) {
-    state.tasks = state.tasks.map(t => t.id === taskId ? { ...t, status: "done" } : t);
-    _focusTaskId = null;
-    renderAfterTask();
-    showToast("งานเสร็จแล้ว 🎉 เยี่ยมมาก!");
-  }
-  document.getElementById("focusDonePrompt").hidden = true;
-});
-document.getElementById("focusDoneNo")?.addEventListener("click", () => {
-  _focusTaskId = null;
-  document.getElementById("focusDonePrompt").hidden = true;
-  renderFocusTaskPicker();
-  renderTasks();
-  showToast("⏰ Focus session เสร็จแล้ว! พักสักครู่");
-});
-
 const initialView = location.hash.slice(1);
 setView(initialView && views[initialView] ? initialView : "dashboard");
 render();
@@ -2388,72 +2134,30 @@ if ("serviceWorker" in navigator) {
 // LINE Bot
 const LINE_WORKER_URL = 'https://johny-line-bot.sj-siwat.workers.dev'
 
-// ── Render sidebar based on LINE info from Supabase ──────────────────────────
+// ── Signed-in panel in auth modal (LINE profile + plan badge) ─────────────────
 
-function renderLineSidebar(lineInfo) {
-  const dot      = document.getElementById('lineStatusDot')
-  const text     = document.getElementById('lineStatusText')
-  const card     = document.getElementById('lineProfileCard')
-  const pic      = document.getElementById('lineProfilePic')
-  const name     = document.getElementById('lineProfileName')
-  const badge    = document.getElementById('lineTierBadge')
-
-  if (!dot || !text) return
-
-  if (!Auth.isLoggedIn()) {
-    dot.classList.remove('line-status-dot--connected')
-    text.textContent = 'ไม่ได้ Log in'
-    if (card) card.hidden = true
-    return
+function renderLineAuthPanel(lineInfo) {
+  if (!lineInfo) return
+  const modalPic  = document.getElementById('authSignedInPic')
+  const modalName = document.getElementById('authSignedInName')
+  const planBadge = document.getElementById('authPlanBadge')
+  if (modalPic && lineInfo.pictureUrl) {
+    modalPic.src = lineInfo.pictureUrl
+    modalPic.hidden = false
   }
-
-  if (lineInfo) {
-    dot.classList.add('line-status-dot--connected')
-    text.textContent = 'เชื่อมต่อแล้ว'
-
-    if (card) {
-      if (pic && lineInfo.pictureUrl) {
-        pic.src = lineInfo.pictureUrl
-        pic.hidden = false
-      } else if (pic) {
-        pic.hidden = true
-      }
-      if (name) name.textContent = lineInfo.displayName || 'LINE User'
-      if (badge) {
-        const isPro = lineInfo.plan === 'pro'
-        badge.textContent = isPro ? 'Pro' : 'Free'
-        badge.className = 'line-tier-badge' + (isPro ? ' line-tier-badge--premium' : '')
-      }
-      card.hidden = false
-    }
-
-    /* Update signed-in panel in auth modal */
-    const modalPic  = document.getElementById('authSignedInPic')
-    const modalName = document.getElementById('authSignedInName')
-    const planBadge = document.getElementById('authPlanBadge')
-    if (modalPic && lineInfo.pictureUrl) {
-      modalPic.src = lineInfo.pictureUrl
-      modalPic.hidden = false
-    }
-    if (modalName) modalName.textContent = lineInfo.displayName || 'LINE User'
-    if (planBadge) {
-      planBadge.textContent = lineInfo.plan === 'pro' ? 'Pro' : 'Free'
-      planBadge.className = 'auth-plan-badge' + (lineInfo.plan === 'pro' ? ' auth-plan-badge--pro' : '')
-    }
-  } else {
-    // Logged in but not a LINE user (email-only account)
-    dot.classList.remove('line-status-dot--connected')
-    text.textContent = 'ยังไม่ได้เชื่อม'
-    if (card) card.hidden = true
+  if (modalName) modalName.textContent = lineInfo.displayName || 'LINE User'
+  if (planBadge) {
+    planBadge.textContent = lineInfo.plan === 'pro' ? 'Pro' : 'Free'
+    planBadge.className = 'auth-plan-badge' + (lineInfo.plan === 'pro' ? ' auth-plan-badge--pro' : '')
   }
 }
 
-// Fetch LINE info then update sidebar. Called after login and on auth change.
-async function updateLineSidebar() {
+// Fetch LINE info then update UI. Called after login and on auth change.
+async function updateLineInfo() {
   const lineInfo = Auth.isLoggedIn()
     ? await Auth.fetchLineInfo()
     : null
-  renderLineSidebar(lineInfo)
+  renderLineAuthPanel(lineInfo)
 
   // Load legacy KV notes for LINE users who joined before auto-create
   if (lineInfo?.lineUserId) {
@@ -2475,7 +2179,6 @@ async function loadLineNotes(userId) {
       title: n.text,
       body: '',
       tags: 'LINE',
-      goal_id: null,
       createdAt: new Date(n.createdAt).getTime(),
       _isKVLine: true
     }))
@@ -2487,15 +2190,15 @@ async function loadLineNotes(userId) {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 
-function initLineSidebar() {
+function initLineInfo() {
   // Remove legacy localStorage key — no longer used
   localStorage.removeItem('lineUserId')
 
   // Initial render (may be logged in already on page load)
-  updateLineSidebar()
+  updateLineInfo()
 
   // Re-render on every auth state change (login / logout)
-  Auth.onChange(() => updateLineSidebar())
+  Auth.onChange(() => updateLineInfo())
 }
 
-initLineSidebar()
+initLineInfo()

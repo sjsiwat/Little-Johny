@@ -2,17 +2,16 @@
 
 Always reference:
 
-docs/design-reference.pdf
+DESIGN.md
 
-Use it as inspiration only.
+It is the source of truth for the visual design system.
 
-Never copy layouts directly.
+Extract and apply:
 
-Extract:
-
+- colors (warm off-white workspace, dark frosted shell, orange accents)
 - spacing
 - hierarchy
-- typography
+- typography (system sans stack — no webfonts)
 - component style
 - visual rhythm
 
@@ -20,4 +19,4 @@ Apply them to JohnyMemo.
 
 Design style:
 
-Apple + Notion + Slack + Discord.
+Light warm workspace framed by a dark frosted shell; orange carries action, hover, focus, and brand emphasis.

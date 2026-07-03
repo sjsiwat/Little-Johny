@@ -94,9 +94,5 @@ const Auth = (() => {
     getLineInfo() {
       return _lineInfo;
     },
-
-    isPro() {
-      return _lineInfo?.plan === 'pro';
-    },
   };
 })();

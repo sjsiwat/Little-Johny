@@ -34,7 +34,6 @@ const Storage = (() => {
       due: row.due || '',
       status: row.status,
       labels: Array.isArray(row.labels) ? row.labels : [],
-      goal_id: row.goal_id || null,
       target_value: row.target_value != null ? Number(row.target_value) : null,
       target_unit: row.target_unit || '',
       progress_value: Number(row.progress_value) || 0,
@@ -48,7 +47,6 @@ const Storage = (() => {
       title: row.title,
       body: row.body || '',
       tags: row.tags || '',
-      goal_id: row.goal_id || null,
       createdAt: new Date(row.created_at).getTime()
     };
   }
@@ -60,7 +58,6 @@ const Storage = (() => {
       amount: Number(row.amount),
       category: row.category,
       date: row.date || '',
-      goal_id: row.goal_id || null,
       createdAt: new Date(row.created_at).getTime()
     };
   }
@@ -73,7 +70,6 @@ const Storage = (() => {
       priority: task.priority,
       due: task.due || null,
       status: task.status,
-      goal_id: task.goal_id || null,
       created_at: new Date(task.createdAt).toISOString()
     };
   }
@@ -85,7 +81,6 @@ const Storage = (() => {
       title: note.title,
       body: note.body || '',
       tags: note.tags || '',
-      goal_id: note.goal_id || null,
       created_at: new Date(note.createdAt).toISOString()
     };
   }
@@ -98,7 +93,6 @@ const Storage = (() => {
       amount: expense.amount,
       category: expense.category,
       date: expense.date || null,
-      goal_id: expense.goal_id || null,
       created_at: new Date(expense.createdAt).toISOString()
     };
   }
@@ -206,10 +200,6 @@ const Storage = (() => {
         console.error('[storage] loadCloud failed:', err);
         return null;
       }
-    },
-
-    clearLocal() {
-      localStorage.removeItem(LOCAL_KEY);
     },
 
     // Immediate, targeted delete — bypasses the debounced diff-sync so a
