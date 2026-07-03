@@ -1636,6 +1636,7 @@ document.getElementById("taskModalDelete")?.addEventListener("click", () => {
   const task = _taskModalEditId && state.tasks.find(t => t.id === _taskModalEditId);
   if (!task || !confirm(`ลบงาน "${task.title}"?`)) return;
   state.tasks = state.tasks.filter(t => t.id !== _taskModalEditId);
+  Storage.deleteRow('tasks', task.id);
   closeTaskModal();
   renderAfterTask();
   showToast("ลบงานแล้ว");
@@ -1958,6 +1959,7 @@ document.addEventListener("click", (event) => {
     const task = state.tasks.find((t) => t.id === deleteTaskId);
     if (!task || !confirm(`ลบงาน "${task.title}"?`)) return;
     state.tasks = state.tasks.filter((t) => t.id !== deleteTaskId);
+    Storage.deleteRow('tasks', deleteTaskId);
     renderAfterTask();
     showToast("ลบงานแล้ว");
   }
@@ -1966,6 +1968,7 @@ document.addEventListener("click", (event) => {
     const note = state.notes.find((n) => n.id === deleteNoteId);
     if (!note || !confirm(`ลบโน้ต "${note.title}"?`)) return;
     state.notes = state.notes.filter((n) => n.id !== deleteNoteId);
+    Storage.deleteRow('notes', deleteNoteId);
     renderAfterNote();
     showToast("ลบโน้ตแล้ว");
   }
@@ -1974,6 +1977,7 @@ document.addEventListener("click", (event) => {
     const expense = state.expenses.find((e) => e.id === deleteExpenseId);
     if (!expense || !confirm(`ลบรายการ "${expense.title}"?`)) return;
     state.expenses = state.expenses.filter((e) => e.id !== deleteExpenseId);
+    Storage.deleteRow('expenses', deleteExpenseId);
     renderAfterExpense();
     showToast("ลบรายจ่ายแล้ว");
   }

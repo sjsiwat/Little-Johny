@@ -210,6 +210,20 @@ const Storage = (() => {
 
     clearLocal() {
       localStorage.removeItem(LOCAL_KEY);
+    },
+
+    // Immediate, targeted delete — bypasses the debounced diff-sync so a
+    // deletion reaches Supabase right away, even if the tab closes/refreshes
+    // before the next debounced push (and even if it was the last item).
+    async deleteRow(table, id) {
+      if (!Auth.isLoggedIn()) return;
+      try {
+        const uid = Auth.getUser().id;
+        const { error } = await Auth.db.from(table).delete().eq('id', id).eq('user_id', uid);
+        if (error) console.error(`[storage] deleteRow ${table}:`, error.message);
+      } catch (err) {
+        console.error(`[storage] deleteRow ${table} failed:`, err);
+      }
     }
   };
 })();
