@@ -42,15 +42,6 @@ const Storage = (() => {
     };
   }
 
-  function rowToGoal(row) {
-    return {
-      id: row.id,
-      title: row.title,
-      color: row.color || '#0A84FF',
-      createdAt: new Date(row.created_at).getTime()
-    };
-  }
-
   function rowToNote(row) {
     return {
       id: row.id,
@@ -84,16 +75,6 @@ const Storage = (() => {
       status: task.status,
       goal_id: task.goal_id || null,
       created_at: new Date(task.createdAt).toISOString()
-    };
-  }
-
-  function goalToRow(goal, uid) {
-    return {
-      id: goal.id,
-      user_id: uid,
-      title: goal.title,
-      color: goal.color || '#0A84FF',
-      created_at: new Date(goal.createdAt).toISOString()
     };
   }
 
@@ -161,10 +142,7 @@ const Storage = (() => {
     const tasks    = state.tasks.filter(t => !t._isDemo);
     const notes    = state.notes.filter(n => !n._isDemo && !n._isKVLine);
     const expenses = state.expenses.filter(e => !e._isDemo);
-    const goals    = (state.goals || []).filter(g => !g._isDemo);
     try {
-      // Goals must be synced first — tasks/notes/expenses have FK references to goals
-      await syncTable('goals', goals, goalToRow, uid);
       const results = await Promise.allSettled([
         syncTable('tasks',    tasks,    taskToRow,    uid),
         syncTable('notes',    notes,    noteToRow,    uid),
@@ -213,18 +191,16 @@ const Storage = (() => {
       const uid = Auth.getUser().id;
       const db = Auth.db;
       try {
-        const [tasksRes, notesRes, expensesRes, goalsRes] = await Promise.all([
+        const [tasksRes, notesRes, expensesRes] = await Promise.all([
           db.from('tasks').select('*').eq('user_id', uid),
           db.from('notes').select('*').eq('user_id', uid),
           db.from('expenses').select('*').eq('user_id', uid),
-          db.from('goals').select('*').eq('user_id', uid),
         ]);
-        if (tasksRes.error || notesRes.error || expensesRes.error || goalsRes.error) return null;
+        if (tasksRes.error || notesRes.error || expensesRes.error) return null;
         return {
           tasks:    dedupeByTitle(tasksRes.data.map(rowToTask)),
           notes:    dedupeByTitle(notesRes.data.map(rowToNote)),
           expenses: dedupeByTitle(expensesRes.data.map(rowToExpense)),
-          goals:    goalsRes.data.map(rowToGoal).sort((a, b) => b.createdAt - a.createdAt),
         };
       } catch (err) {
         console.error('[storage] loadCloud failed:', err);

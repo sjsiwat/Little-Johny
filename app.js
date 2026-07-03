@@ -54,9 +54,6 @@ const EXPENSE_ICONS = {
 /* ── Icons ── */
 const ICON_EDIT = '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M7.5 1.5l2 2-6 6H1.5v-2l6-6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>';
 
-/* ── Goals ── */
-const GOAL_COLORS = ["#0A84FF", "#30D158", "#FF9F0A", "#BF5AF2", "#FF453A", "#64D2FF"];
-
 /* ── Thai locale ── */
 const THAI_MONTHS = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
 const THAI_DOW    = ["อา","จ","อ","พ","พฤ","ศ","ส"];
@@ -153,67 +150,54 @@ function createDemoState() {
   };
   const ts = (offsetMin) => Date.now() - offsetMin * 60000;
 
-  const goalBuild  = crypto.randomUUID();
-  const goalHealth = crypto.randomUUID();
-  const goalSave   = crypto.randomUUID();
-
   return {
-    _demoGoalIds: { build: goalBuild, health: goalHealth, save: goalSave },
-
     // ── Tasks ──────────────────────────────────────────────────
     tasks: [
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "ออกแบบ Dashboard UI", goal_id: goalBuild,
+        title: "ออกแบบ Dashboard UI",
         description: "วางโครงสร้างหน้า Dashboard ให้ครบทุก widget",
         priority: "High", due: d(-5), status: "done",
         labels: ["work"], createdAt: ts(500)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "ระบบ Login & Auth", goal_id: goalBuild,
+        title: "ระบบ Login & Auth",
         description: "Supabase Auth + guest mode",
         priority: "Critical", due: d(-3), status: "done",
         labels: ["work"], createdAt: ts(400)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "Goals Module", goal_id: goalBuild,
-        description: "เชื่อม Tasks กับ Goals ให้คำนวณ progress อัตโนมัติ",
-        priority: "High", due: d(2), status: "in_progress",
-        labels: ["work"], createdAt: ts(90)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "LINE Bot Integration", goal_id: goalBuild,
+        title: "LINE Bot Integration",
         description: "รับ command เพิ่มงาน/โน้ตผ่าน LINE",
         priority: "Medium", due: d(7), status: "todo",
         labels: ["work"], createdAt: ts(60)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "ออกกำลังกาย 30 นาที", goal_id: goalHealth,
+        title: "ออกกำลังกาย 30 นาที",
         description: "",
         priority: "Medium", due: d(-1), status: "done",
         labels: ["personal"], createdAt: ts(300)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "อ่านหนังสือก่อนนอน", goal_id: goalHealth,
+        title: "อ่านหนังสือก่อนนอน",
         description: "",
         priority: "Low", due: d(0), status: "todo",
         labels: ["personal"], createdAt: ts(120)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "ส่งสรุปรายงานประจำเดือน", goal_id: null,
+        title: "ส่งสรุปรายงานประจำเดือน",
         description: "รวบรวมข้อมูลรายจ่ายและรายรับ พร้อม slide สรุปให้ทีม",
         priority: "Critical", due: d(0), status: "in_progress",
         labels: ["urgent", "work"], createdAt: ts(20)
       },
       {
         id: crypto.randomUUID(), _isDemo: true,
-        title: "ประชุม Product Review 14:00 น.", goal_id: null,
+        title: "ประชุม Product Review 14:00 น.",
         description: "เตรียม slide deck และ demo ฟีเจอร์ใหม่ให้พร้อม",
         priority: "High", due: d(0), status: "todo",
         labels: ["meeting", "work"], createdAt: ts(5)
@@ -223,21 +207,21 @@ function createDemoState() {
     // ── Notes ─────────────────────────────────────────────────
     notes: [
       {
-        id: crypto.randomUUID(), _isDemo: true, goal_id: goalBuild,
+        id: crypto.randomUUID(), _isDemo: true,
         title: "ไอเดีย Feature Q3",
         body: "• Reminder แจ้งเตือนก่อน deadline อัตโนมัติ\n• Export รายจ่ายเป็น PDF รายเดือน\n• Focus Timer เชื่อมกับ task โดยตรง\n• Weekly summary รายงานสรุปประจำสัปดาห์\n• Shortcut เพิ่มงานด้วยเสียง",
         tags: "ไอเดีย, product, Q3",
         createdAt: ts(10)
       },
       {
-        id: crypto.randomUUID(), _isDemo: true, goal_id: goalBuild,
+        id: crypto.randomUUID(), _isDemo: true,
         title: "สรุป Sprint Meeting 23 มิ.ย.",
-        body: "Sprint Goal: ปิด 3 feature ภายใน 2 สัปดาห์\n\n✅ เสร็จแล้ว: Login, Dashboard, Tasks CRUD\n🔄 กำลังทำ: Notes inline edit, Expenses chart\n⛔ Blocked: รอ design จาก UX team\n\nAction items:\n→ @Beam ส่ง mockup ภายใน พฤ. นี้\n→ @Me เขียน API spec ก่อน ศ.",
+        body: "ปิด 3 feature ภายใน 2 สัปดาห์\n\n✅ เสร็จแล้ว: Login, Dashboard, Tasks CRUD\n🔄 กำลังทำ: Notes inline edit, Expenses chart\n⛔ Blocked: รอ design จาก UX team\n\nAction items:\n→ @Beam ส่ง mockup ภายใน พฤ. นี้\n→ @Me เขียน API spec ก่อน ศ.",
         tags: "ประชุม, sprint, สรุป",
         createdAt: ts(120)
       },
       {
-        id: crypto.randomUUID(), _isDemo: true, goal_id: null,
+        id: crypto.randomUUID(), _isDemo: true,
         title: "แรงบันดาลใจ",
         body: "\"Done is better than perfect.\"\n— Mark Zuckerberg\n\n\"ความสำเร็จ คือผลรวมของความพยายามเล็กๆ น้อยๆ ที่ทำทุกวัน\"\n\n\"The secret of getting ahead is getting started.\"\n— Mark Twain",
         tags: "แรงบันดาล, คำคม",
@@ -247,76 +231,66 @@ function createDemoState() {
 
     // ── Expenses ───────────────────────────────────────────────
     expenses: [
-      // วันนี้
       {
-        id: crypto.randomUUID(), _isDemo: true, goal_id: null,
+        id: crypto.randomUUID(), _isDemo: true,
         title: "กาแฟ Oat Latte",
         amount: 95, category: "เครื่องดื่ม", date: d(0), createdAt: ts(30)
       },
       {
-        id: crypto.randomUUID(), _isDemo: true, goal_id: null,
+        id: crypto.randomUUID(), _isDemo: true,
         title: "ข้าวกลางวัน + น้ำ",
         amount: 135, category: "อาหาร", date: d(0), createdAt: ts(90)
       },
       {
-        id: crypto.randomUUID(), _isDemo: true, goal_id: null,
+        id: crypto.randomUUID(), _isDemo: true,
         title: "BTS ไป-กลับ",
         amount: 84, category: "เดินทาง", date: d(0), createdAt: ts(120)
       },
-      // เมื่อวาน
       {
-        id: crypto.randomUUID(), _isDemo: true, goal_id: null,
+        id: crypto.randomUUID(), _isDemo: true,
         title: "อาหารเย็น ชาบู",
         amount: 380, category: "อาหาร", date: d(-1), createdAt: ts(300)
       },
       {
-        id: crypto.randomUUID(), _isDemo: true, goal_id: null,
+        id: crypto.randomUUID(), _isDemo: true,
         title: "ชาไข่มุก",
         amount: 65, category: "เครื่องดื่ม", date: d(-1), createdAt: ts(360)
       },
       {
-        id: crypto.randomUUID(), _isDemo: true, goal_id: null,
+        id: crypto.randomUUID(), _isDemo: true,
         title: "Grab ไปห้าง",
         amount: 120, category: "เดินทาง", date: d(-1), createdAt: ts(420)
       },
-      // 3 วันก่อน
       {
-        id: crypto.randomUUID(), _isDemo: true, goal_id: goalHealth,
+        id: crypto.randomUUID(), _isDemo: true,
         title: "ค่ายา + วิตามิน",
         amount: 350, category: "สุขภาพ", date: d(-3), createdAt: ts(600)
       },
       {
-        id: crypto.randomUUID(), _isDemo: true, goal_id: null,
+        id: crypto.randomUUID(), _isDemo: true,
         title: "เสื้อยืด Uniqlo",
         amount: 590, category: "ช้อปปิ้ง", date: d(-3), createdAt: ts(660)
       },
-      // ต้นเดือน
       {
-        id: crypto.randomUUID(), _isDemo: true, goal_id: null,
+        id: crypto.randomUUID(), _isDemo: true,
         title: "Netflix รายเดือน",
         amount: 419, category: "อื่นๆ", date: d(-8), createdAt: ts(1440)
       },
       {
-        id: crypto.randomUUID(), _isDemo: true, goal_id: null,
+        id: crypto.randomUUID(), _isDemo: true,
         title: "ค่าอินเทอร์เน็ตบ้าน",
         amount: 599, category: "อินเทอร์เน็ต", date: d(-10), createdAt: ts(2000)
       },
       {
-        id: crypto.randomUUID(), _isDemo: true, goal_id: null,
+        id: crypto.randomUUID(), _isDemo: true,
         title: "ค่าอาหารเช้า + กาแฟ",
         amount: 110, category: "อาหาร", date: d(-5), createdAt: ts(900)
       },
       {
-        id: crypto.randomUUID(), _isDemo: true, goal_id: goalHealth,
+        id: crypto.randomUUID(), _isDemo: true,
         title: "ออกกำลังกาย รายเดือน",
         amount: 450, category: "สุขภาพ", date: d(-12), createdAt: ts(2400)
       }
-    ],
-
-    goals: [
-      { id: goalBuild,  _isDemo: true, title: "Build Johny Memo",  color: "#0A84FF", createdAt: ts(10) },
-      { id: goalSave,   _isDemo: true, title: "Save 100,000 THB",  color: "#FF9F0A", createdAt: ts(20) },
-      { id: goalHealth, _isDemo: true, title: "Improve Health",     color: "#30D158", createdAt: ts(30) },
     ],
 
     logs: [
@@ -339,49 +313,16 @@ let state = (() => {
   s.tasks = (s.tasks || []).map(t => ({
     description: "",
     labels: [],
-    goal_id: null,
     target_value: null,
     target_unit: "",
     progress_value: 0,
     ...t,
     status: normalizeStatus(t.status),
   }));
-  s.notes = (s.notes || []).map(n => ({ goal_id: null, ...n }));
-  s.expenses = (s.expenses || []).map(e => ({ goal_id: null, ...e }));
-  if (!s.goals) s.goals = [];
-  s.goals = s.goals.map(({ progress: _p, ...g }) => g);
+  s.notes = s.notes || [];
+  s.expenses = s.expenses || [];
   return s;
 })();
-
-function calcGoalProgressInfo(goalId) {
-  const linked = state.tasks.filter(t => t.goal_id === goalId);
-  if (!linked.length) return { pct: 0, mode: 'binary', current: 0, target: 0, unit: '' };
-
-  const numericTasks = linked.filter(t => t.target_value != null && Number(t.target_value) > 0);
-  if (numericTasks.length > 0) {
-    const current = numericTasks.reduce((s, t) => s + (Number(t.progress_value) || 0), 0);
-    const target  = numericTasks.reduce((s, t) => s + Number(t.target_value), 0);
-    const unit    = numericTasks[0].target_unit || '';
-    const pct     = target > 0 ? Math.min(Math.round(current / target * 100), 100) : 0;
-    return { pct, mode: 'numeric', current, target, unit };
-  }
-
-  const pct = Math.round(linked.filter(t => isTaskDone(t)).length / linked.length * 100);
-  return { pct, mode: 'binary', current: 0, target: 0, unit: '' };
-}
-
-function calcGoalProgress(goalId) {
-  return calcGoalProgressInfo(goalId).pct;
-}
-
-function populateGoalSelects(...ids) {
-  const opts = `<option value="">ไม่ระบุ Goal</option>` +
-    state.goals.map(g => `<option value="${g.id}">${escapeHtml(g.title)}</option>`).join("");
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = opts;
-  });
-}
 
 const views = {
   dashboard: document.getElementById("dashboard"),
@@ -389,7 +330,6 @@ const views = {
   notes: document.getElementById("notes"),
   expenses: document.getElementById("expenses"),
   calendar: document.getElementById("calendar"),
-  goals: document.getElementById("goals"),
   review: document.getElementById("review"),
 };
 
@@ -399,7 +339,6 @@ const viewTitles = {
   notes: "Notes",
   expenses: "Expenses",
   calendar: "Calendar",
-  goals: "Goals",
   review: "Review",
 };
 
@@ -442,7 +381,6 @@ function setView(viewName) {
 
 function render() {
   document.documentElement.dataset.theme = state.theme;
-  populateGoalSelects("noteGoal", "expenseGoal");
   // Sync task filter chip active state with current state
   document.querySelectorAll("[data-task-filter]").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.taskFilter === state.taskFilter);
@@ -453,7 +391,6 @@ function render() {
   renderNotes();
   renderExpenses();
   renderCalendar();
-  renderGoals();
   renderReview();
   renderFocusTaskPicker();
   saveState();
@@ -658,7 +595,6 @@ function renderDashboard() {
   }
 
   renderExpenseBars();
-  renderGoalProgressDash();
   renderWeeklyReviewDash();
 }
 
@@ -689,184 +625,6 @@ function renderExpenseBars() {
     : emptyState("ยังไม่มีรายจ่ายให้สรุป ลองบันทึกกาแฟ มื้อกลางวัน หรือค่าเดินทางรายการแรก", "expenses", "บันทึกรายจ่าย");
 }
 
-/* ── Goals ── */
-let _expandedGoalId = null;
-
-function addGoal(title, color) {
-  state.goals.unshift({
-    id: crypto.randomUUID(),
-    title,
-    color: color || GOAL_COLORS[state.goals.length % GOAL_COLORS.length],
-    createdAt: Date.now()
-  });
-}
-
-function renderGoalDetail(goal) {
-  const color = goal.color || "#0A84FF";
-  const tasks    = state.tasks.filter(t => t.goal_id === goal.id);
-  const notes    = state.notes.filter(n => n.goal_id === goal.id);
-  const expenses = state.expenses.filter(e => e.goal_id === goal.id);
-  const expTotal = expenses.reduce((s, e) => s + Number(e.amount), 0);
-
-  const taskRows = tasks.length
-    ? tasks.map(t => {
-        const sm = STATUS_META[t.status] || {};
-        return `<div class="gd-row">
-          <span class="gd-status-dot" style="background:${sm.color || '#8E8E93'}"></span>
-          <span class="gd-row-text">${escapeHtml(t.title)}</span>
-          <span class="gd-row-meta">${sm.label || t.status}</span>
-        </div>`;
-      }).join("")
-    : `<p class="gd-empty">ยังไม่มีงาน — <button type="button" class="gd-link" data-view-jump="tasks">เพิ่มงาน</button></p>`;
-
-  const noteRows = notes.length
-    ? notes.map(n => `<div class="gd-row">
-        <span class="gd-row-text">${escapeHtml(n.title)}</span>
-        <span class="gd-row-meta">${escapeHtml(n.tags || "")}</span>
-      </div>`).join("")
-    : `<p class="gd-empty">ยังไม่มีโน้ต</p>`;
-
-  const expRows = expenses.length
-    ? expenses.map(e => `<div class="gd-row">
-        <span class="gd-row-text">${escapeHtml(e.title)}</span>
-        <span class="gd-row-meta">${formatMoney(e.amount)} · ${escapeHtml(e.category)}</span>
-      </div>`).join("")
-    : `<p class="gd-empty">ยังไม่มีรายจ่าย</p>`;
-
-  return `
-    <div class="goal-detail" style="--gc:${color}">
-      <div class="gd-section">
-        <div class="gd-section-head">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><rect x="0.75" y="0.75" width="10.5" height="10.5" rx="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 6l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          งาน (${tasks.length})
-        </div>
-        ${taskRows}
-      </div>
-      <div class="gd-section">
-        <div class="gd-section-head">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><rect x="1.5" y="0.75" width="9" height="10.5" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M3.5 4h5M3.5 6h5M3.5 8h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-          โน้ต (${notes.length})
-        </div>
-        ${noteRows}
-      </div>
-      <div class="gd-section">
-        <div class="gd-section-head">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="5.25" stroke="currentColor" stroke-width="1.3"/><path d="M6 3.5v5M4 6h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-          รายจ่าย (${expenses.length})${expenses.length ? ` · <strong>${formatMoney(expTotal)}</strong>` : ""}
-        </div>
-        ${expRows}
-      </div>
-    </div>`;
-}
-
-function renderGoals() {
-  const list = document.getElementById("goalList");
-  if (!list) return;
-  if (!state.goals.length) {
-    list.innerHTML = emptyState("ยังไม่มี Goal ลองเพิ่ม Goal แรกของคุณ", "goals", "เพิ่ม Goal");
-    return;
-  }
-  list.innerHTML = state.goals.map(goal => {
-    const info    = calcGoalProgressInfo(goal.id);
-    const color   = goal.color || "#0A84FF";
-    const linked  = state.tasks.filter(t => t.goal_id === goal.id);
-    const done    = linked.filter(t => isTaskDone(t)).length;
-    const taskLabel = linked.length ? `${done}/${linked.length} งาน` : "ยังไม่มีงาน";
-    const expanded  = _expandedGoalId === goal.id;
-
-    const progressDisplay = info.mode === 'numeric' && info.target > 0
-      ? `<div class="goal-progress-numeric">
-           <span class="goal-numeric-current" style="color:${color}">${formatNum(info.current)}</span>
-           <span class="goal-numeric-sep"> / ${formatNum(info.target)}${info.unit ? " " + escapeHtml(info.unit) : ""}</span>
-         </div>
-         <div class="goal-bar-track">
-           <div class="goal-bar-fill" style="width:${info.pct}%; background:${color}"></div>
-         </div>
-         <div class="goal-progress-foot">
-           <span class="goal-task-count">${taskLabel}</span>
-           <span class="goal-pct-small">${info.pct}%</span>
-         </div>`
-      : `<div class="goal-bar-track">
-           <div class="goal-bar-fill" style="width:${info.pct}%; background:${color}"></div>
-         </div>
-         <span class="goal-task-count">${taskLabel}</span>`;
-
-    return `
-      <article class="list-item goal-item${expanded ? " goal-item--expanded" : ""}" data-goal-id="${goal.id}">
-        <div class="goal-item-header" data-toggle-goal="${goal.id}" role="button" tabindex="0" aria-expanded="${expanded}">
-          <div class="goal-item-body">
-            <div class="goal-item-top">
-              <span class="goal-item-title">${escapeHtml(goal.title)}</span>
-              <span class="goal-pct">${info.pct}%</span>
-            </div>
-            ${progressDisplay}
-          </div>
-          <div class="goal-item-chevron" aria-hidden="true">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-        </div>
-        ${expanded ? renderGoalDetail(goal) : ""}
-        <div class="item-actions goal-item-actions">
-          <button class="icon-button" type="button" data-delete-goal="${goal.id}" title="ลบ Goal">×</button>
-        </div>
-      </article>`;
-  }).join("");
-
-  list.querySelectorAll("[data-toggle-goal]").forEach(el => {
-    el.addEventListener("click", () => {
-      const id = el.dataset.toggleGoal;
-      _expandedGoalId = _expandedGoalId === id ? null : id;
-      renderGoals();
-    });
-    el.addEventListener("keydown", e => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); el.click(); }
-    });
-  });
-
-  list.querySelectorAll("[data-view-jump]").forEach(btn => {
-    btn.addEventListener("click", () => setView(btn.dataset.viewJump));
-  });
-}
-
-function renderGoalProgressLabel(info, color) {
-  if (info.mode === 'numeric' && info.target > 0) {
-    return `
-      <div class="goal-dash-label">
-        <span style="color:${color}">${formatNum(info.current)}<small> / ${formatNum(info.target)}${info.unit ? " " + info.unit : ""}</small></span>
-        <strong>${info.pct}%</strong>
-      </div>
-      <div class="goal-bar-track">
-        <div class="goal-bar-fill" style="width:${info.pct}%; background:${color}"></div>
-      </div>`;
-  }
-  return `
-    <div class="goal-dash-label">
-      <span></span>
-      <strong>${info.pct}%</strong>
-    </div>
-    <div class="goal-bar-track">
-      <div class="goal-bar-fill" style="width:${info.pct}%; background:${color}"></div>
-    </div>`;
-}
-
-function renderGoalProgressDash() {
-  const el = document.getElementById("dashGoalBars");
-  if (!el) return;
-  if (!state.goals.length) {
-    el.innerHTML = emptyState("ยังไม่มี Goal", "goals", "เพิ่ม Goal");
-    return;
-  }
-  el.innerHTML = state.goals.slice(0, 4).map(goal => {
-    const info  = calcGoalProgressInfo(goal.id);
-    const color = goal.color || "#0A84FF";
-    return `
-      <div class="goal-dash-row">
-        <div class="goal-dash-name">${escapeHtml(goal.title)}</div>
-        ${renderGoalProgressLabel(info, color)}
-      </div>`;
-  }).join("");
-}
-
 /* ── Review ── */
 let _reviewTab = "daily";
 
@@ -885,9 +643,6 @@ function renderWeeklyReviewDash() {
   const monthNotes = state.notes.filter(n =>
     n.createdAt && new Date(n.createdAt).toISOString().slice(0, 7) === monthKey
   ).length;
-  const avgGoalProgress = state.goals.length
-    ? Math.round(state.goals.reduce((s, g) => s + calcGoalProgress(g.id), 0) / state.goals.length)
-    : 0;
   el.innerHTML = `
     <div class="review-dash-grid">
       <div class="review-dash-stat">
@@ -901,10 +656,6 @@ function renderWeeklyReviewDash() {
       <div class="review-dash-stat">
         <strong>${monthNotes}</strong>
         <span>โน้ตเดือนนี้</span>
-      </div>
-      <div class="review-dash-stat">
-        <strong>${avgGoalProgress}%</strong>
-        <span>Goal Progress</span>
       </div>
     </div>`;
 }
@@ -929,13 +680,8 @@ function renderReview() {
       .filter(e => e.date === todayKey)
       .reduce((s, e) => s + Number(e.amount), 0);
 
-    const taskRowWithGoal = (t, prefix, cls = "") => {
-      const g = t.goal_id ? state.goals.find(g => g.id === t.goal_id) : null;
-      return `<div class="review-task-row${cls ? " " + cls : ""}">
-        ${prefix} ${escapeHtml(t.title)}
-        ${g ? `<span class="review-goal-tag" style="--gc:${g.color}">${escapeHtml(g.title)}</span>` : ""}
-      </div>`;
-    };
+    const taskRow = (t, prefix, cls = "") =>
+      `<div class="review-task-row${cls ? " " + cls : ""}">${prefix} ${escapeHtml(t.title)}</div>`;
 
     el.innerHTML = `
       <div class="review-section">
@@ -945,8 +691,8 @@ function renderReview() {
           <div class="review-stat-card review-stat-card--amber"><strong>${todayNotes.length}</strong><span>โน้ตวันนี้</span></div>
           <div class="review-stat-card review-stat-card--blue"><strong>${formatMoney(todayExpense)}</strong><span>รายจ่ายวันนี้</span></div>
         </div>
-        ${todayDone.length ? `<div class="review-subsection"><h3>งานที่เสร็จวันนี้</h3>${todayDone.map(t => taskRowWithGoal(t, "✓")).join("")}</div>` : ""}
-        ${todayOverdue.length ? `<div class="review-subsection"><h3>งานที่เกินกำหนด</h3>${todayOverdue.map(t => taskRowWithGoal(t, "!", "review-task-row--overdue")).join("")}</div>` : ""}
+        ${todayDone.length ? `<div class="review-subsection"><h3>งานที่เสร็จวันนี้</h3>${todayDone.map(t => taskRow(t, "✓")).join("")}</div>` : ""}
+        ${todayOverdue.length ? `<div class="review-subsection"><h3>งานที่เกินกำหนด</h3>${todayOverdue.map(t => taskRow(t, "!", "review-task-row--overdue")).join("")}</div>` : ""}
       </div>`;
   } else if (_reviewTab === "weekly") {
     const weekDone = state.tasks.filter(t => isTaskDone(t));
@@ -963,7 +709,6 @@ function renderReview() {
     const completionRate = state.tasks.length
       ? Math.round(state.tasks.filter(t => isTaskDone(t)).length / state.tasks.length * 100) : 0;
 
-    const goalsWithTasks = state.goals.filter(g => state.tasks.some(t => t.goal_id === g.id));
     el.innerHTML = `
       <div class="review-section">
         <div class="review-stat-grid">
@@ -973,20 +718,6 @@ function renderReview() {
           <div class="review-stat-card review-stat-card--primary"><strong>${completionRate}%</strong><span>Completion Rate</span></div>
         </div>
         ${topCat ? `<div class="review-subsection"><h3>หมวดที่ใช้มากสุดสัปดาห์นี้</h3><div class="review-top-cat">${escapeHtml(topCat[0])} · ${formatMoney(topCat[1])}</div></div>` : ""}
-        ${goalsWithTasks.length ? `
-          <div class="review-subsection">
-            <h3>Goals Progress</h3>
-            ${goalsWithTasks.map(g => {
-              const pct   = calcGoalProgress(g.id);
-              const done  = state.tasks.filter(t => t.goal_id === g.id && isTaskDone(t)).length;
-              const total = state.tasks.filter(t => t.goal_id === g.id).length;
-              return `<div class="review-goal-row">
-                <span>${escapeHtml(g.title)}</span>
-                <div class="goal-bar-track"><div class="goal-bar-fill" style="width:${pct}%;background:${g.color||'#0A84FF'}"></div></div>
-                <strong>${done}/${total}</strong>
-              </div>`;
-            }).join("")}
-          </div>` : ""}
       </div>`;
   } else {
     const monthDone = state.tasks.filter(t => isTaskDone(t)).length;
@@ -998,8 +729,6 @@ function renderReview() {
     ).length;
     const completionRate = state.tasks.length
       ? Math.round(state.tasks.filter(t => isTaskDone(t)).length / state.tasks.length * 100) : 0;
-    const avgGoalProgress = state.goals.length
-      ? Math.round(state.goals.reduce((s, g) => s + calcGoalProgress(g.id), 0) / state.goals.length) : 0;
     el.innerHTML = `
       <div class="review-section">
         <div class="review-stat-grid">
@@ -1007,21 +736,6 @@ function renderReview() {
           <div class="review-stat-card review-stat-card--amber"><strong>${formatMoney(monthExpense)}</strong><span>รายจ่ายเดือนนี้</span></div>
           <div class="review-stat-card review-stat-card--blue"><strong>${monthNotes}</strong><span>โน้ตเดือนนี้</span></div>
           <div class="review-stat-card review-stat-card--primary"><strong>${completionRate}%</strong><span>Completion Rate</span></div>
-        </div>
-        ${state.goals.length ? `
-          <div class="review-subsection">
-            <h3>ความคืบหน้า Goals</h3>
-            ${state.goals.map(g => {
-              const pct = calcGoalProgress(g.id);
-              return `<div class="review-goal-row">
-                <span>${escapeHtml(g.title)}</span>
-                <div class="goal-bar-track"><div class="goal-bar-fill" style="width:${pct}%;background:${g.color||'#0A84FF'}"></div></div>
-                <strong>${pct}%</strong>
-              </div>`;
-            }).join("")}
-          </div>` : ""}
-        <div class="review-subsection">
-          <div class="review-summary-item"><span>Average Goal Progress</span><strong>${avgGoalProgress}%</strong></div>
         </div>
       </div>`;
   }
@@ -1052,12 +766,6 @@ function renderTaskListItem(task) {
     return `<span class="tli-due">${formatDate(task.due)}</span>`;
   })();
 
-  const goalBadge = (() => {
-    if (!task.goal_id) return '';
-    const g = state.goals.find(g => g.id === task.goal_id);
-    return g ? `<span class="tli-goal" style="--gc:${g.color}">${escapeHtml(g.title)}</span>` : '';
-  })();
-
   return `
     <article class="tli${done ? ' tli--done' : ''}" data-task-id="${task.id}">
       <div class="tli-row">
@@ -1068,7 +776,6 @@ function renderTaskListItem(task) {
         <span class="tli-title">${escapeHtml(task.title)}</span>
         <span class="tli-badge" style="--bc:${pColor}18;--bt:${pColor}">${task.priority}</span>
         ${labelChips}
-        ${goalBadge}
         ${dueChip}
         <div class="tli-acts">
           ${!done && !hasTarget ? `<button class="tli-act" type="button" data-add-progress="${task.id}" title="เพิ่ม Progress Bar" aria-label="เพิ่ม Progress Bar"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><rect x="1" y="6.5" width="1.5" height="3" rx="0.4" fill="currentColor" opacity=".4"/><rect x="3.5" y="3.5" width="1.5" height="6" rx="0.4" fill="currentColor" opacity=".7"/><rect x="6.5" y="1" width="1.5" height="8.5" rx="0.4" fill="currentColor"/></svg></button>` : ''}
@@ -1220,14 +927,6 @@ function openTaskModal(taskId = null, defaultStatus = "todo") {
   document.getElementById("modalTaskDue").value      = task?.due || "";
   document.getElementById("taskModalDelete").hidden  = !task;
 
-  const goalSel = document.getElementById("modalTaskGoal");
-  if (goalSel) {
-    goalSel.innerHTML = `<option value="">ไม่ระบุ Goal</option>` +
-      state.goals.map(g =>
-        `<option value="${g.id}"${task?.goal_id === g.id ? " selected" : ""}>${escapeHtml(g.title)}</option>`
-      ).join("");
-  }
-
   const targetToggle = document.getElementById("taskTargetToggle");
   const targetFields = document.getElementById("taskTargetFields");
   const hasTarget = task?.target_value != null && task.target_value > 0;
@@ -1278,7 +977,6 @@ function renderNotes() {
     .sort((a, b) => b.createdAt - a.createdAt)
     .map(note => {
       if (note.id === _editingNoteId) return `<div class="note-card-edit-wrap">${renderNoteEditForm(note)}</div>`;
-      const noteGoal = note.goal_id ? state.goals.find(g => g.id === note.goal_id) : null;
       const tags = note.tags ? note.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
       const acts = note._isKVLine
         ? `<button class="note-card-act note-card-act--del" type="button" data-delete-note="${note.id}" title="ลบโน้ต">×</button>`
@@ -1293,7 +991,6 @@ function renderNotes() {
           ${note.body ? `<p class="note-card-body">${escapeHtml(note.body.slice(0,140))}${note.body.length>140?'…':''}</p>` : ''}
           <div class="note-card-foot">
             ${tags.map(t => `<span class="tli-label" style="--lc:#5a8fa8">${escapeHtml(t)}</span>`).join('')}
-            ${noteGoal ? `<span class="tli-goal" style="--gc:${noteGoal.color}">${escapeHtml(noteGoal.title)}</span>` : ''}
             <span class="note-card-date">${relativeTime(note.createdAt)}</span>
           </div>
         </article>`;
@@ -1301,10 +998,6 @@ function renderNotes() {
 }
 
 function renderNoteEditForm(note) {
-  const goalOpts = `<option value="">ไม่ระบุ Goal</option>` +
-    state.goals.map(g =>
-      `<option value="${g.id}"${note.goal_id === g.id ? " selected" : ""}>${escapeHtml(g.title)}</option>`
-    ).join("");
   return `
     <article class="list-item list-item--editing">
       <form class="task-edit-form" data-edit-form-note="${note.id}">
@@ -1316,7 +1009,6 @@ function renderNoteEditForm(note) {
         <div class="task-edit-row">
           <input class="note-edit-tags" type="text" value="${escapeHtml(note.tags || "")}"
             placeholder="tags เช่น work, idea" />
-          <select class="note-edit-goal task-edit-select" aria-label="Goal">${goalOpts}</select>
           <div class="task-edit-actions">
             <button type="submit" class="task-edit-save">บันทึก</button>
             <button type="button" class="task-edit-cancel" data-cancel-edit-note="${note.id}">ยกเลิก</button>
@@ -1328,7 +1020,6 @@ function renderNoteEditForm(note) {
 }
 
 function renderExpenseItem(expense) {
-  const expGoal  = expense.goal_id ? state.goals.find(g => g.id === expense.goal_id) : null;
   const icon     = EXPENSE_ICONS[expense.category] || '📦';
   const catColor = EXPENSE_BAR_COLORS[expense.category] || '#8E8E93';
   return `
@@ -1336,7 +1027,6 @@ function renderExpenseItem(expense) {
       <span class="exp-icon" style="background:${catColor}20">${icon}</span>
       <span class="exp-name">${escapeHtml(expense.title)}</span>
       <span class="exp-cat">${escapeHtml(expense.category)}</span>
-      ${expGoal ? `<span class="tli-goal" style="--gc:${expGoal.color}">${escapeHtml(expGoal.title)}</span>` : ''}
       <span class="exp-amt">−${formatMoney(expense.amount)}</span>
       <div class="exp-acts">
         <button class="tli-act" type="button" data-edit-expense="${expense.id}" title="แก้ไขรายจ่าย" aria-label="แก้ไขรายจ่าย">${ICON_EDIT}</button>
@@ -1426,10 +1116,6 @@ function renderExpenseEditForm(expense) {
   const catOpts = EXPENSE_CATEGORIES.map(c =>
     `<option value="${c}"${c === expense.category ? " selected" : ""}>${c}</option>`
   ).join("");
-  const goalOpts = `<option value="">ไม่ระบุ Goal</option>` +
-    state.goals.map(g =>
-      `<option value="${g.id}"${expense.goal_id === g.id ? " selected" : ""}>${escapeHtml(g.title)}</option>`
-    ).join("");
   return `
     <article class="list-item list-item--editing">
       <form class="task-edit-form" data-edit-form-expense="${expense.id}">
@@ -1442,7 +1128,6 @@ function renderExpenseEditForm(expense) {
         <div class="task-edit-row">
           <select class="task-edit-select" aria-label="หมวดหมู่">${catOpts}</select>
           <input class="task-edit-date" type="date" value="${expense.date || ""}" aria-label="วันที่" />
-          <select class="expense-edit-goal task-edit-select" aria-label="Goal">${goalOpts}</select>
           <div class="task-edit-actions">
             <button type="submit" class="task-edit-save">บันทึก</button>
             <button type="button" class="task-edit-cancel" data-cancel-edit-expense="${expense.id}">ยกเลิก</button>
@@ -1662,7 +1347,7 @@ function showHomepage() {
 }
 
 function freshDemoState() {
-  return { theme: state.theme || "dark", taskFilter: "open", goals: [], ...createDemoState() };
+  return { theme: state.theme || "dark", taskFilter: "open", ...createDemoState() };
 }
 
 function renderHomepageDemo() {
@@ -1720,7 +1405,7 @@ function renderHomepageDemo() {
   }
 }
 
-function addTask(title, priority = "Medium", due = "", status = "todo", description = "", labels = [], goalId = null, targetValue = null, targetUnit = "") {
+function addTask(title, priority = "Medium", due = "", status = "todo", description = "", labels = [], targetValue = null, targetUnit = "") {
   state.tasks.unshift({
     id: crypto.randomUUID(),
     title,
@@ -1729,7 +1414,6 @@ function addTask(title, priority = "Medium", due = "", status = "todo", descript
     due,
     status,
     labels,
-    goal_id: goalId || null,
     target_value: targetValue ? Number(targetValue) : null,
     target_unit: targetUnit || "",
     progress_value: 0,
@@ -1744,25 +1428,23 @@ function formatNum(n) {
     : num.toLocaleString('th-TH', { maximumFractionDigits: 2 });
 }
 
-function addNote(title, body = "", tags = "", goalId = null) {
+function addNote(title, body = "", tags = "") {
   state.notes.unshift({
     id: crypto.randomUUID(),
     title,
     body,
     tags,
-    goal_id: goalId || null,
     createdAt: Date.now()
   });
 }
 
-function addExpense(title, amount, category = "อื่นๆ", date = getTodayKey(), goalId = null) {
+function addExpense(title, amount, category = "อื่นๆ", date = getTodayKey()) {
   state.expenses.unshift({
     id: crypto.randomUUID(),
     title,
     amount: Number(amount),
     category,
     date,
-    goal_id: goalId || null,
     createdAt: Date.now()
   });
 }
@@ -1780,75 +1462,35 @@ function loadDemoData() {
   render();
 }
 
-/* ── Smart Goal inference ──────────────────────────────────
-   Priority: explicit #tag > keyword overlap > null
-   Explicit: text ends with  #<partial goal name>
-   Keyword : tokenise text + each goal title, count overlap
-───────────────────────────────────────────────────────── */
-function inferGoalId(text) {
-  if (!state.goals.length) return null;
-
-  // 1. Explicit tag: #<partial>  (case-insensitive, strip trailing punctuation)
-  const tagMatch = text.match(/#([฀-๿\w]+)/u);
-  if (tagMatch) {
-    const tag = tagMatch[1].toLowerCase();
-    const found = state.goals.find(g => g.title.toLowerCase().includes(tag));
-    if (found) return found.id;
-  }
-
-  // 2. Keyword overlap: tokenise both sides (≥2 chars), pick highest score ≥1
-  const textTokens = new Set(
-    text.toLowerCase().replace(/#[\S]+/g, "").split(/[\s,./]+/).filter(w => w.length >= 2)
-  );
-  let bestId = null, bestScore = 0;
-  for (const g of state.goals) {
-    const goalTokens = g.title.toLowerCase().split(/[\s,./]+/).filter(w => w.length >= 2);
-    const score = goalTokens.filter(w => textTokens.has(w)).length;
-    if (score > bestScore) { bestScore = score; bestId = g.id; }
-  }
-  return bestScore >= 1 ? bestId : null;
-}
-
-function goalLabel(goalId) {
-  if (!goalId) return "";
-  const g = state.goals.find(g => g.id === goalId);
-  return g ? ` [${g.title}]` : "";
-}
-
 function parseCommand(rawText) {
   const text = rawText.trim();
   if (!text) return "ยังไม่ได้พิมพ์คำสั่ง";
 
   if (text.startsWith("เพิ่มงาน")) {
-    const body   = text.replace("เพิ่มงาน", "").trim();
-    const title  = body.replace(/#[\S]+/g, "").trim() || "งานใหม่จาก Secretary";
-    const goalId = inferGoalId(body);
-    addTask(title, "Medium", "", "todo", "", [], goalId);
+    const title = text.replace("เพิ่มงาน", "").trim() || "งานใหม่จาก Secretary";
+    addTask(title, "Medium", "", "todo", "", []);
     render(); saveState();
-    return `เพิ่มงานแล้ว: ${title}${goalLabel(goalId)}`;
+    return `เพิ่มงานแล้ว: ${title}`;
   }
 
   if (text.startsWith("โน้ต:") || text.startsWith("note:")) {
-    const body   = text.replace(/^โน้ต:|^note:/i, "").trim();
-    const title  = body.split("\n")[0].replace(/#[\S]+/g, "").trim() || "โน้ตใหม่";
-    const goalId = inferGoalId(body);
-    addNote(title, body, "secretary", goalId);
+    const body  = text.replace(/^โน้ต:|^note:/i, "").trim();
+    const title = body.split("\n")[0].trim() || "โน้ตใหม่";
+    addNote(title, body, "secretary");
     render(); saveState();
-    return `บันทึกโน้ตแล้ว: ${title}${goalLabel(goalId)}`;
+    return `บันทึกโน้ตแล้ว: ${title}`;
   }
 
   if (text.startsWith("จ่าย")) {
     const parts       = text.split(/\s+/);
     const amountIndex = parts.findIndex((p) => Number.isFinite(Number(p)));
     if (amountIndex > 0) {
-      const titleRaw = parts.slice(1, amountIndex).join(" ");
-      const title    = titleRaw.replace(/#[\S]+/g, "").trim() || "รายจ่าย";
+      const title    = parts.slice(1, amountIndex).join(" ").trim() || "รายจ่าย";
       const amount   = Number(parts[amountIndex]);
-      const category = parts[amountIndex + 1]?.startsWith("#") ? "อื่นๆ" : (parts[amountIndex + 1] || "อื่นๆ");
-      const goalId   = inferGoalId(text);
-      addExpense(title, amount, category, getTodayKey(), goalId);
+      const category = parts[amountIndex + 1] || "อื่นๆ";
+      addExpense(title, amount, category, getTodayKey());
       render(); saveState();
-      return `บันทึกรายจ่ายแล้ว: ${title} ${formatMoney(amount)}${goalLabel(goalId)}`;
+      return `บันทึกรายจ่ายแล้ว: ${title} ${formatMoney(amount)}`;
     }
   }
 
@@ -1864,17 +1506,7 @@ function parseCommand(rawText) {
     return `รายจ่ายทั้งหมดที่บันทึกไว้ตอนนี้คือ ${formatMoney(total)}`;
   }
 
-  if (text.includes("goals") || text.includes("เป้าหมาย")) {
-    if (!state.goals.length) return "ยังไม่มี Goal ที่บันทึกไว้";
-    return state.goals.map(g => {
-      const pct = calcGoalProgress(g.id);
-      const done = state.tasks.filter(t => t.goal_id === g.id && isTaskDone(t)).length;
-      const total = state.tasks.filter(t => t.goal_id === g.id).length;
-      return `• ${g.title}: ${pct}% (${done}/${total} งาน)`;
-    }).join("\n");
-  }
-
-  return "ยังไม่เข้าใจคำสั่งนี้ ตอนนี้รองรับ:\nเพิ่มงาน, โน้ต:, จ่าย, วันนี้มีงานอะไร, สรุปรายจ่าย, goals\nใช้ #ชื่อgoal ต่อท้ายเพื่อระบุ Goal โดยตรง";
+  return "ยังไม่เข้าใจคำสั่งนี้ ตอนนี้รองรับ:\nเพิ่มงาน, โน้ต:, จ่าย, วันนี้มีงานอะไร, สรุปรายจ่าย";
 }
 
 document.querySelectorAll(".nav-link").forEach((link) => {
@@ -1962,7 +1594,6 @@ document.getElementById("taskModalForm")?.addEventListener("submit", (e) => {
   const due         = document.getElementById("modalTaskDue").value;
   const description = document.getElementById("modalTaskDesc").value.trim();
   const labels      = getSelectedModalLabels();
-  const goalId      = document.getElementById("modalTaskGoal")?.value || null;
   const hasTarget   = document.getElementById("taskTargetToggle")?.checked;
   const targetValue = hasTarget ? (Number(document.getElementById("modalTaskTargetValue")?.value) || null) : null;
   const targetUnit  = hasTarget ? (document.getElementById("modalTaskTargetUnit")?.value.trim() || "") : "";
@@ -1973,14 +1604,14 @@ document.getElementById("taskModalForm")?.addEventListener("submit", (e) => {
     const existing = state.tasks.find(t => t.id === _taskModalEditId);
     state.tasks = state.tasks.map(t =>
       t.id === _taskModalEditId
-        ? { ...t, title, description, status, priority, due, labels, goal_id: goalId || null,
+        ? { ...t, title, description, status, priority, due, labels,
             target_value: targetValue, target_unit: targetUnit,
             progress_value: progressVal !== null ? progressVal : (existing?.progress_value || 0) }
         : t
     );
     showToast(`อัปเดตงาน "${title}" แล้ว`);
   } else {
-    addTask(title, priority, due, status, description, labels, goalId, targetValue, targetUnit);
+    addTask(title, priority, due, status, description, labels, targetValue, targetUnit);
     showToast(`เพิ่มงาน "${title}" แล้ว`);
   }
   closeTaskModal();
@@ -2028,10 +1659,8 @@ document.getElementById("noteForm").addEventListener("submit", (event) => {
   event.preventDefault();
   const title  = document.getElementById("noteTitle").value.trim();
   if (!title) return;
-  const goalId = document.getElementById("noteGoal")?.value || null;
-  addNote(title, document.getElementById("noteBody").value.trim(), document.getElementById("noteTags").value.trim(), goalId);
+  addNote(title, document.getElementById("noteBody").value.trim(), document.getElementById("noteTags").value.trim());
   event.currentTarget.reset();
-  populateGoalSelects("noteGoal", "expenseGoal");
   renderAfterNote();
   showToast(`บันทึกโน้ต "${title}" แล้ว`);
 });
@@ -2042,27 +1671,11 @@ document.getElementById("expenseForm").addEventListener("submit", (event) => {
   const title  = document.getElementById("expenseTitle").value.trim();
   const amount = document.getElementById("expenseAmount").value;
   if (!title || !amount) return;
-  const goalId = document.getElementById("expenseGoal")?.value || null;
-  addExpense(title, amount, document.getElementById("expenseCategory").value, document.getElementById("expenseDate").value, goalId);
+  addExpense(title, amount, document.getElementById("expenseCategory").value, document.getElementById("expenseDate").value);
   event.currentTarget.reset();
   document.getElementById("expenseDate").value = getTodayKey();
-  populateGoalSelects("noteGoal", "expenseGoal");
   renderAfterExpense();
   showToast(`บันทึก ${title} ${formatMoney(Number(amount))} แล้ว`);
-});
-
-/* ── Goals form ── */
-document.getElementById("goalForm")?.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const title = document.getElementById("goalTitle").value.trim();
-  if (!title) return;
-  addGoal(title);
-  e.currentTarget.reset();
-  populateGoalSelects("noteGoal", "expenseGoal");
-  renderGoals();
-  renderGoalProgressDash();
-  saveState();
-  showToast(`เพิ่ม Goal "${title}" แล้ว`);
 });
 
 /* ── Expense period tabs ── */
@@ -2095,10 +1708,9 @@ document.getElementById("noteList").addEventListener("submit", (e) => {
   const newTitle  = form.querySelector(".task-edit-title").value.trim();
   const newBody   = form.querySelector(".note-edit-body").value.trim();
   const newTags   = form.querySelector(".note-edit-tags").value.trim();
-  const newGoalId = form.querySelector(".note-edit-goal")?.value || null;
   if (!newTitle) return;
   state.notes = state.notes.map(n =>
-    n.id === id ? { ...n, title: newTitle, body: newBody, tags: newTags, goal_id: newGoalId || null } : n
+    n.id === id ? { ...n, title: newTitle, body: newBody, tags: newTags } : n
   );
   _editingNoteId = null;
   renderAfterNote();
@@ -2114,10 +1726,9 @@ document.getElementById("expenseList").addEventListener("submit", (e) => {
   const newAmount  = Number(form.querySelector(".expense-edit-amount").value);
   const newCat     = form.querySelector(".task-edit-select").value;
   const newDate    = form.querySelector(".task-edit-date").value;
-  const newGoalId  = form.querySelector(".expense-edit-goal")?.value || null;
   if (!newTitle || isNaN(newAmount)) return;
   state.expenses = state.expenses.map(ex =>
-    ex.id === id ? { ...ex, title: newTitle, amount: newAmount, category: newCat, date: newDate, goal_id: newGoalId || null } : ex
+    ex.id === id ? { ...ex, title: newTitle, amount: newAmount, category: newCat, date: newDate } : ex
   );
   _editingExpenseId = null;
   renderAfterExpense();
@@ -2249,7 +1860,7 @@ document.addEventListener("click", (event) => {
     );
     const task = state.tasks.find(t => t.id === logConfirmId);
     showToast(`บันทึก +${formatNum(amount)} ${task?.target_unit || ""} แล้ว`);
-    saveState(); renderTasks(); renderGoals(); renderGoalProgressDash();
+    saveState(); renderTasks();
     return;
   }
 
@@ -2270,7 +1881,7 @@ document.addEventListener("click", (event) => {
     );
     _taskProgressMode.delete(removeProg);
     showToast("ลบ Progress Bar แล้ว");
-    saveState(); renderTasks(); renderGoals(); renderGoalProgressDash();
+    saveState(); renderTasks();
     return;
   }
 
@@ -2302,7 +1913,7 @@ document.addEventListener("click", (event) => {
       t.id === quickConfirmId ? { ...t, target_value: targetVal, target_unit: targetUnit, progress_value: 0 } : t
     );
     showToast(`เพิ่ม Progress Bar แล้ว (เป้าหมาย ${formatNum(targetVal)} ${targetUnit})`);
-    saveState(); renderTasks(); renderGoals(); renderGoalProgressDash();
+    saveState(); renderTasks();
     return;
   }
 
@@ -2367,24 +1978,13 @@ document.addEventListener("click", (event) => {
     showToast("ลบรายจ่ายแล้ว");
   }
 
-  const deleteGoalId = target.closest("[data-delete-goal]")?.dataset.deleteGoal;
-  if (deleteGoalId) {
-    const goal = state.goals.find(g => g.id === deleteGoalId);
-    if (!goal || !confirm(`ลบ Goal "${goal.title}"?`)) return;
-    state.goals = state.goals.filter(g => g.id !== deleteGoalId);
-    populateGoalSelects("noteGoal", "expenseGoal");
-    renderGoals();
-    renderGoalProgressDash();
-    saveState();
-    showToast("ลบ Goal แล้ว");
-  }
 });
 
 document.addEventListener("keydown", (e) => {
   if (e.target.matches("input, textarea, select")) return;
   if (e.metaKey || e.ctrlKey || e.altKey) return;
 
-  const viewKeys = { "1": "dashboard", "2": "tasks", "3": "notes", "4": "expenses", "5": "calendar", "6": "goals", "7": "review" };
+  const viewKeys = { "1": "dashboard", "2": "tasks", "3": "notes", "4": "expenses", "5": "calendar", "6": "review" };
   if (viewKeys[e.key]) {
     e.preventDefault();
     setView(viewKeys[e.key]);
@@ -2651,7 +2251,6 @@ async function onSignedIn(user) {
       tasks:    mergeItems(state.tasks,    cloud.tasks),
       notes:    mergeItems(state.notes,    cloud.notes),
       expenses: mergeItems(state.expenses, cloud.expenses),
-      goals:    mergeItems(state.goals,    cloud.goals),
     };
     state = { ...state, ...merged };
     showToast(merged.tasks.length > 0 ? `โหลดข้อมูลจาก cloud (${merged.tasks.length} งาน)` : "เชื่อมต่อแล้ว ✓");
