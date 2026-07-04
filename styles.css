@@ -454,18 +454,33 @@ h1 {
 .note-editor,
 .list-item,
 .empty-state {
+  --edge-highlight: rgba(255,255,255,0.55);
   border-radius: var(--radius-lg);
   border: 1px solid var(--line);
   background: var(--surface-raised);
-  box-shadow: var(--shadow-ios);
+  box-shadow:
+    var(--shadow-ios),
+    inset 0 1px 0 var(--edge-highlight);
   transition:
     box-shadow var(--t-fast) var(--ease-ios),
+    border-color var(--t-fast),
     transform var(--t-fast) var(--ease-ios);
 }
 
+[data-theme="dark"] .panel,
+[data-theme="dark"] .composer,
+[data-theme="dark"] .note-editor,
+[data-theme="dark"] .list-item,
+[data-theme="dark"] .empty-state {
+  --edge-highlight: rgba(255,255,255,0.05);
+}
+
 .panel:hover {
-  box-shadow: var(--shadow-ios-lg);
-  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--primary) 18%, var(--line));
+  box-shadow:
+    var(--shadow-ios-lg),
+    inset 0 1px 0 var(--edge-highlight);
+  transform: translateY(-1px);
 }
 
 .list-item:hover {
@@ -984,7 +999,12 @@ body::before {
    RESPONSIVE
    ============================================================ */
 @media (max-width: 960px) {
-  .app-shell { grid-template-columns: 1fr; }
+  .app-shell,
+  .app-shell.sidebar-collapsed { grid-template-columns: 1fr; }
+
+  /* Collapsed mode is a desktop concept — restore full nav on small screens */
+  .app-shell.sidebar-collapsed .nav-link { justify-content: center; padding: 0 0.35rem; }
+  .app-shell.sidebar-collapsed .nav-link > span:last-child { display: initial; }
 
   .sidebar {
     position: static;
@@ -1074,80 +1094,6 @@ body::before {
   gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
-
-/* macOS-style dark glass stat card */
-.sb-stat {
-  border-radius: 14px;
-  padding: 1rem 1.15rem 0.9rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Colored glow strip along the top */
-.sb-stat::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  border-radius: 14px 14px 0 0;
-}
-
-.sb-stat--blue::before  { background: #0A84FF; }
-.sb-stat--amber::before { background: #FF9F0A; }
-.sb-stat--green::before { background: #30D158; }
-.sb-stat--red::before   { background: #FF453A; }
-
-/* Colored icon badge */
-.sb-stat-icon {
-  width: 1.9rem;
-  height: 1.9rem;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  margin-bottom: 0.65rem;
-  flex-shrink: 0;
-}
-.sb-stat--blue  .sb-stat-icon { background: rgba(10,132,255,0.15);  color: #0A84FF; }
-.sb-stat--amber .sb-stat-icon { background: rgba(255,159,10,0.15);  color: #FF9F0A; }
-.sb-stat--green .sb-stat-icon { background: rgba(48,209,88,0.15);   color: #30D158; }
-.sb-stat--red   .sb-stat-icon { background: rgba(255,69,58,0.15);   color: #FF453A; }
-
-.sb-stat strong {
-  font-size: 1.85rem;
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  margin-bottom: 0.2rem;
-}
-.sb-stat--blue  strong { color: #0A84FF; }
-.sb-stat--amber strong { color: #FF9F0A; }
-.sb-stat--green strong { color: #30D158; }
-.sb-stat--red   strong { color: #FF453A; }
-
-.sb-stat > span {
-  font-size: 0.73rem;
-  font-weight: 500;
-  color: var(--ink-muted);
-  line-height: 1.2;
-}
-
-/* Trend line */
-.sb-stat-trend {
-  font-size: 0.67rem;
-  font-weight: 500;
-  color: var(--ink-faint);
-  margin-top: 0.35rem;
-  display: flex;
-  align-items: center;
-  gap: 0.2rem;
-}
-.sb-stat-trend.up   { color: #30D158; }
 
 @media (max-width: 960px) {
   .quick-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -2139,17 +2085,6 @@ body::before {
   gap: 0.75rem;
   margin-bottom: 1.75rem;
 }
-.sb-stat strong {
-  font-size: 1.7rem;
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  margin-bottom: 0.1rem;
-}
-.sb-stat > span        { font-size: 0.71rem; color: #5A5E6A; font-weight: 500; }
-.sb-stat-trend         { font-size: 0.63rem; margin-top: 0.2rem; }
-.sb-stat-icon          { width: 1.6rem; height: 1.6rem; border-radius: 7px; margin-bottom: 0.5rem; }
-
 /* ── 8. PANELS — quiet cards ── */
 .panel { padding: 1.2rem; }
 .panel-head {
@@ -3151,20 +3086,6 @@ body::before {
   min-height: 0;
 }
 
-/* ── Stat card micro-interactions ── */
-[data-theme="dark"] .sb-stat {
-  transition:
-    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.18s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 0.18s;
-}
-
-[data-theme="dark"] .sb-stat:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.52);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
 /* ── Dashboard panel hover ── */
 [data-theme="dark"] .dashboard-grid .panel {
   transition:
@@ -3248,7 +3169,7 @@ body::before {
   .sb-stat,
   .dashboard-grid .panel,
   .fab-main { transition: none !important; }
-  [data-theme="dark"] .sb-stat:hover,
+  .sb-stat:hover,
   [data-theme="dark"] .dashboard-grid .panel:hover {
     transform: none !important;
     box-shadow: none !important;
@@ -4437,33 +4358,137 @@ body::before {
 }
 @media (max-width: 700px) { .quick-tiles { grid-template-columns: repeat(2, 1fr); } }
 
+/* ── Stat tiles — telemetry console cards ──
+   Layered surface: hover sheen → corner glow → warm gradient base.
+   Dot-matrix texture and gradient hairline carry the tech signal;
+   the glass inner highlight and colored hover glow carry the luxury. */
 .sb-stat {
-  border-radius: 16px;
-  padding: 1.2rem 1.25rem 1rem;
-  display: flex; flex-direction: column; gap: 0.2rem;
-  border: 1.5px solid rgba(0,0,0,0.06);
-  background: var(--surface, #fff);
+  --stat-color: var(--primary);
+  --sheen: rgba(255,255,255,0.40);
+  --edge-highlight: rgba(255,255,255,0.60);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 1.1rem 1.25rem 0.95rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(115deg, transparent 42%, var(--sheen) 50%, transparent 58%) no-repeat,
+    radial-gradient(120% 95% at 100% 0%, color-mix(in srgb, var(--stat-color) 8%, transparent) 0%, transparent 55%),
+    linear-gradient(165deg, color-mix(in srgb, var(--stat-color) 5%, var(--surface-raised)) 0%, var(--surface-raised) 52%);
+  background-size: 230% 100%, 100% 100%, 100% 100%;
+  background-position: 135% 0, 0 0, 0 0;
+  box-shadow:
+    var(--shadow-ios-sm),
+    inset 0 1px 0 var(--edge-highlight);
+  transition:
+    transform 0.18s var(--ease-ios),
+    box-shadow 0.18s var(--ease-ios),
+    border-color 0.18s,
+    background-position 0.6s var(--ease-ios);
 }
+
+[data-theme="dark"] .sb-stat {
+  --sheen: rgba(255,255,255,0.06);
+  --edge-highlight: rgba(255,255,255,0.05);
+}
+
+.sb-stat--blue  { --stat-color: #0A84FF; }
+.sb-stat--amber { --stat-color: #FF9F0A; }
+.sb-stat--green { --stat-color: #30D158; }
+.sb-stat--red   { --stat-color: #FF453A; }
+
+/* Gradient hairline along the top — telemetry accent */
+.sb-stat::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--stat-color) 0%,
+    color-mix(in srgb, var(--stat-color) 35%, transparent) 55%,
+    transparent 100%
+  );
+}
+
+/* Dot-matrix texture fading out of the top-right corner */
+.sb-stat::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--stat-color) 32%, transparent) 1px,
+    transparent 1.3px
+  );
+  background-size: 11px 11px;
+  -webkit-mask-image: radial-gradient(130% 120% at 100% 0%, #000 0%, transparent 40%);
+  mask-image: radial-gradient(130% 120% at 100% 0%, #000 0%, transparent 40%);
+  pointer-events: none;
+}
+
+.sb-stat:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--stat-color) 32%, var(--line));
+  background-position: -35% 0, 0 0, 0 0;
+  box-shadow:
+    var(--shadow-ios-lg),
+    0 10px 26px -14px color-mix(in srgb, var(--stat-color) 45%, transparent),
+    inset 0 1px 0 var(--edge-highlight);
+}
+
+.sb-stat-icon {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 0.55rem;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--stat-color) 16%, transparent),
+    color-mix(in srgb, var(--stat-color) 8%, transparent)
+  );
+  color: var(--stat-color);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--stat-color) 26%, transparent),
+    0 1px 4px color-mix(in srgb, var(--stat-color) 14%, transparent);
+}
+
 .sb-stat strong {
   font-size: 2rem;
   font-weight: 700;
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--stat-color);
+  text-shadow: 0 1px 16px color-mix(in srgb, var(--stat-color) 22%, transparent);
 }
-.sb-stat span { font-size: 0.78rem; color: var(--ink-muted, #9a9080); }
-.sb-stat-icon {
-  width: 32px; height: 32px; border-radius: 9px;
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 0.5rem;
+
+.sb-stat > span {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--ink-muted);
 }
-.sb-stat--blue  .sb-stat-icon { background: rgba(10,132,255,0.12);  color: #0A84FF; }
-.sb-stat--amber .sb-stat-icon { background: rgba(255,159,10,0.12);  color: #FF9F0A; }
-.sb-stat--green .sb-stat-icon { background: rgba(48,209,88,0.12);   color: #30D158; }
-.sb-stat--red   .sb-stat-icon { background: rgba(255,69,58,0.12);   color: #FF453A; }
-.sb-stat--blue  strong { color: #0A84FF; }
-.sb-stat--amber strong { color: #FF9F0A; }
-.sb-stat--green strong { color: #30D158; }
-.sb-stat--red   strong { color: #FF453A; }
+
+/* Trend readout — monospace footer line */
+.sb-stat-trend {
+  margin-top: 0.6rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--line-soft);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.64rem;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+.sb-stat-trend:empty { display: none; }
+.sb-stat-trend.up { color: var(--sage); }
+
+@media (prefers-reduced-motion: reduce) {
+  .sb-stat { transition: none; }
+  .sb-stat:hover { transform: none; background-position: 135% 0, 0 0, 0 0; }
+}
 
 /* ── Greeting date/time — larger ────────────────────────────── */
 .greeting-heading { font-size: 1.6rem; font-weight: 700; margin: 0 0 0.2rem; }
