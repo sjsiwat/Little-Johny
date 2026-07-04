@@ -4683,3 +4683,226 @@ body::before {
   .hp-line-qr-perks { align-items: flex-start; text-align: left; }
   .hp-line-qr-card { min-width: unset; width: 100%; max-width: 280px; margin: 0 auto; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   FULL-PAGE A4 DOCUMENT EDITOR (Word-like) — .doc-*
+   ══════════════════════════════════════════════════════════════ */
+.doc-editor {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; flex-direction: column;
+  background: var(--bg);
+  animation: docFadeIn 160ms var(--ease-ios);
+}
+.doc-editor[hidden] { display: none; }
+@keyframes docFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── Top bar (dark frosted shell) ── */
+.doc-topbar {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.5rem 0.9rem;
+  background: var(--shell-bg);
+  backdrop-filter: blur(var(--shell-blur));
+  -webkit-backdrop-filter: blur(var(--shell-blur));
+  border-bottom: 1px solid var(--shell-border);
+  flex-shrink: 0;
+}
+.doc-topbar-back {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; flex-shrink: 0;
+  border: none; border-radius: var(--radius-sm);
+  background: transparent; color: var(--on-shell); cursor: pointer;
+  transition: background var(--t-fast);
+}
+.doc-topbar-back:hover { background: rgba(255,255,255,0.12); }
+.doc-title {
+  flex: 1; min-width: 0;
+  background: transparent; border: none;
+  color: var(--on-shell); font-family: inherit;
+  font-size: 1rem; font-weight: 700; padding: 0.3rem 0.2rem;
+}
+.doc-title::placeholder { color: var(--on-shell-muted); font-weight: 500; }
+.doc-title:focus { outline: none; }
+.doc-topbar-actions { display: flex; align-items: center; gap: 0.7rem; flex-shrink: 0; }
+.doc-status { color: var(--on-shell-muted); font-size: 0.72rem; white-space: nowrap; }
+.doc-btn {
+  border: none; border-radius: var(--radius-sm);
+  padding: 0.42rem 0.9rem; font-family: inherit; font-size: 0.8rem; font-weight: 600;
+  cursor: pointer; transition: opacity var(--t-fast), background var(--t-fast);
+}
+.doc-btn--primary { background: var(--primary); color: #fff; }
+.doc-btn--primary:hover { opacity: 0.9; }
+
+/* ── Toolbar (light workspace ribbon) ── */
+.doc-toolbar {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 0.2rem;
+  padding: 0.4rem 0.75rem;
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-ios-sm);
+  flex-shrink: 0;
+}
+.doc-tb-group { display: flex; align-items: center; gap: 0.15rem; }
+.doc-tb-sep { width: 1px; height: 20px; background: var(--border); margin: 0 0.35rem; }
+.doc-tb-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 30px; height: 30px; padding: 0 0.35rem;
+  border: 1px solid transparent; border-radius: var(--radius-sm);
+  background: transparent; color: var(--ink);
+  font-family: inherit; font-size: 0.92rem; line-height: 1; cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+}
+.doc-tb-btn:hover { background: var(--surface-soft); }
+.doc-tb-btn.is-active {
+  background: var(--primary-soft); border-color: var(--primary); color: var(--primary);
+}
+.doc-tb-btn b, .doc-tb-btn i, .doc-tb-btn u, .doc-tb-btn s { font-style: normal; }
+.doc-tb-btn i { font-style: italic; }
+
+.doc-select {
+  height: 30px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface-raised); color: var(--ink);
+  font-family: inherit; font-size: 0.8rem; padding: 0 0.4rem; cursor: pointer;
+  transition: border-color var(--t-fast);
+}
+.doc-select:focus { outline: none; border-color: var(--primary); }
+.doc-select--font { width: 130px; }
+.doc-select--size { width: 62px; }
+.doc-select--block { width: 96px; }
+
+/* ── Color buttons + popover ── */
+.doc-color-wrap { position: relative; }
+.doc-color-btn { flex-direction: column; gap: 1px; }
+.doc-color-glyph { font-weight: 800; font-size: 0.82rem; line-height: 1; }
+.doc-color-glyph--hl { font-size: 0.78rem; }
+.doc-color-bar { width: 17px; height: 3px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.08); }
+.doc-color-pop {
+  position: absolute; top: calc(100% + 6px); left: 0; z-index: 10;
+  width: 196px; padding: 0.65rem;
+  background: var(--surface-raised); border: 1px solid var(--border);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-ios-lg);
+}
+.doc-color-pop[hidden] { display: none; }
+.doc-color-pop-label {
+  font-size: 0.68rem; font-weight: 600; color: var(--ink-muted);
+  text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 0.4rem;
+}
+.doc-swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.35rem; }
+.doc-swatch {
+  width: 100%; aspect-ratio: 1; border-radius: 5px;
+  border: 1px solid rgba(0,0,0,0.15); cursor: pointer; padding: 0;
+  transition: transform var(--t-fast);
+}
+.doc-swatch:hover { transform: scale(1.12); }
+.doc-swatch--none {
+  background: #fff;
+  background-image: linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%),
+                    linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%);
+  background-size: 8px 8px; background-position: 0 0, 4px 4px;
+}
+.doc-color-custom {
+  display: flex; align-items: center; gap: 0.5rem; margin-top: 0.6rem;
+  padding-top: 0.6rem; border-top: 1px solid var(--border);
+}
+.doc-color-custom input[type="color"] {
+  width: 34px; height: 28px; padding: 0; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); background: none; cursor: pointer;
+}
+.doc-color-custom .doc-btn {
+  padding: 0.32rem 0.6rem; font-size: 0.72rem;
+  background: var(--surface-soft); color: var(--ink);
+}
+.doc-color-custom .doc-btn:hover { background: var(--border); }
+
+/* ── Canvas + A4 page ── */
+.doc-canvas {
+  flex: 1; overflow: auto;
+  padding: 2rem 1rem 4rem;
+  display: flex; justify-content: center; align-items: flex-start;
+}
+.doc-page {
+  position: relative;
+  width: 794px; max-width: 100%; min-height: 1123px;
+  box-sizing: border-box;
+  padding: 76px 72px;
+  background: #ffffff; color: #1a1a1a;
+  box-shadow: var(--shadow-sketch);
+  border-radius: 2px;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px; line-height: 1.6;
+  overflow-wrap: break-word;
+}
+.doc-page:focus { outline: none; }
+.doc-page:empty::before {
+  content: "เริ่มพิมพ์เอกสารของคุณที่นี่…";
+  color: #b8b8b8;
+}
+.doc-page p { margin: 0 0 0.6em; }
+.doc-page h1 { font-size: 2em; font-weight: 700; margin: 0.4em 0 0.3em; }
+.doc-page h2 { font-size: 1.5em; font-weight: 700; margin: 0.4em 0 0.3em; }
+.doc-page h3 { font-size: 1.2em; font-weight: 700; margin: 0.4em 0 0.3em; }
+.doc-page blockquote {
+  margin: 0.5em 0; padding: 0.2em 0 0.2em 1em;
+  border-left: 3px solid var(--primary); color: #555;
+}
+.doc-page ul, .doc-page ol { margin: 0 0 0.6em; padding-left: 1.6em; }
+.doc-page a { color: var(--primary); }
+
+/* ── Free-floating draggable / resizable images ── */
+.doc-img {
+  position: absolute; cursor: move; user-select: none;
+  line-height: 0;
+}
+.doc-img img {
+  display: block; width: 100%; height: auto;
+  border-radius: 2px; pointer-events: none; -webkit-user-drag: none;
+}
+.doc-img.is-selected { outline: 2px solid var(--primary); outline-offset: 1px; }
+.doc-img-handle {
+  position: absolute; right: -7px; bottom: -7px;
+  width: 13px; height: 13px; border-radius: 50%;
+  background: var(--primary); border: 2px solid #fff;
+  cursor: nwse-resize; display: none; z-index: 2;
+}
+.doc-img.is-selected .doc-img-handle { display: block; }
+.doc-img-del {
+  position: absolute; right: -10px; top: -10px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--accent); color: #fff; border: 2px solid #fff;
+  display: none; align-items: center; justify-content: center;
+  font-size: 13px; line-height: 1; cursor: pointer; z-index: 2; padding: 0;
+}
+.doc-img.is-selected .doc-img-del { display: flex; }
+
+/* ── Note-modal expand button ── */
+.note-modal-expand-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  border: 1px solid var(--primary); border-radius: var(--radius-sm);
+  padding: 0.4rem 0.7rem; margin-right: auto;
+  background: var(--primary-soft); color: var(--primary);
+  font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+  transition: background var(--t-fast);
+}
+.note-modal-expand-btn:hover { background: color-mix(in srgb, var(--primary) 18%, transparent); }
+
+@media (max-width: 640px) {
+  .doc-canvas { padding: 1rem 0.5rem 3rem; }
+  .doc-page { padding: 40px 28px; min-height: 80vh; }
+  .doc-select--font { width: 96px; }
+  .doc-toolbar { gap: 0.15rem; padding: 0.35rem 0.5rem; }
+  .doc-tb-sep { margin: 0 0.15rem; }
+}
+
+/* New-document (A4) button in the Notes editor actions */
+.note-newdoc-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  min-height: 2.2rem; padding: 0 0.85rem; white-space: nowrap;
+  border-radius: 999px; border: 1px solid var(--primary);
+  background: var(--primary-soft); color: var(--primary);
+  font-family: var(--font-body); font-weight: 600; font-size: 0.83rem;
+  transition: background var(--t-fast), transform var(--t-fast);
+}
+.note-newdoc-btn:hover {
+  background: color-mix(in srgb, var(--primary) 16%, transparent);
+  transform: translateY(-1px);
+}
+.editor-actions #noteTags { flex: 1; }

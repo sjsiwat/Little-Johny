@@ -944,6 +944,7 @@ function renderNotes() {
     .map(note => {
       const tags = note.tags ? note.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
       const openAttr = note._isKVLine ? "" : ` data-open-note="${note.id}" role="button" tabindex="0"`;
+      const preview = notePlainText(note.body);
       return `
         <article class="note-card${note._isKVLine ? "" : " note-card--clickable"}" data-note-id="${note.id}"${openAttr}>
           <div class="note-card-head">
@@ -952,7 +953,7 @@ function renderNotes() {
               <button class="note-card-act note-card-act--del" type="button" data-delete-note="${note.id}" title="ลบโน้ต">×</button>
             </div>
           </div>
-          ${note.body ? `<p class="note-card-body">${escapeHtml(note.body.slice(0,140))}${note.body.length>140?'…':''}</p>` : ''}
+          ${preview ? `<p class="note-card-body">${escapeHtml(preview.slice(0,140))}${preview.length>140?'…':''}</p>` : ''}
           <div class="note-card-foot">
             ${tags.map(t => `<span class="tli-label" style="--lc:#5a8fa8">${escapeHtml(t)}</span>`).join('')}
             <span class="note-card-date">${relativeTime(note.createdAt)}</span>
@@ -1237,9 +1238,19 @@ function relativeTime(ts) {
 
 const ICON_NOTE_DOC = '<svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 1.5h5.5L11.5 4.5V12a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1V2.5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M8.5 1.5v3h3" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M5 8h4M5 10.2h2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>';
 
+/* Strip rich-text/HTML from a note body → plain text for card previews. */
+function notePlainText(body) {
+  if (!body) return "";
+  if (!/<[a-z!/][\s\S]*>/i.test(body)) return body.replace(/\s+/g, " ").trim();
+  const tmp = document.createElement("div");
+  tmp.innerHTML = body;
+  tmp.querySelectorAll(".doc-img, .doc-img-handle, .doc-img-del, img").forEach(el => el.remove());
+  return (tmp.textContent || "").replace(/\s+/g, " ").trim();
+}
+
 function renderSimpleNote(note) {
   const tags = note.tags ? note.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
-  const preview = (note.body || "").replace(/\s+/g, " ").trim();
+  const preview = notePlainText(note.body);
   const openAttr = note._isKVLine ? "" : ` data-open-note="${note.id}"`;
   return `
     <button class="dash-note-item" type="button"${openAttr}>
@@ -1639,6 +1650,345 @@ document.getElementById("noteForm").addEventListener("submit", (event) => {
   renderAfterNote();
   showToast(`บันทึกโน้ต "${title}" แล้ว`);
 });
+
+/* ══════════════════════════════════════════════════════════════
+   DOC EDITOR — full-page A4 rich-text editor (Word-like)
+   Body is stored as HTML in note.body. Backward compatible with
+   plain-text notes; card previews strip HTML via notePlainText().
+   ══════════════════════════════════════════════════════════════ */
+const DOC_FONTS = [
+  ["ค่าเริ่มต้น",       "system-ui, -apple-system, 'Segoe UI', sans-serif"],
+  ["Tahoma",           "Tahoma, 'Leelawadee UI', sans-serif"],
+  ["Arial",            "Arial, Helvetica, sans-serif"],
+  ["Verdana",          "Verdana, Geneva, sans-serif"],
+  ["Trebuchet MS",     "'Trebuchet MS', sans-serif"],
+  ["Georgia",          "Georgia, serif"],
+  ["Times New Roman",  "'Times New Roman', Times, serif"],
+  ["Courier New",      "'Courier New', monospace"],
+  ["Comic Sans",       "'Comic Sans MS', cursive"],
+  ["Sarabun",          "'Sarabun', 'TH Sarabun New', sans-serif"],
+  ["Angsana",          "'Angsana New', 'AngsanaUPC', serif"],
+];
+const DOC_SIZES = [10, 11, 12, 13, 14, 16, 18, 20, 24, 28, 32, 36, 48, 60, 72];
+const DOC_TEXT_SWATCHES = ["#1a1a1a","#fe6e00","#fb2c36","#edb200","#00c758","#3080ff","#8e44ad","#5a8fa8","#795548","#607d8b","#e91e63","#ffffff"];
+const DOC_HL_SWATCHES   = ["#fff3b0","#ffd6a5","#caffbf","#a0e7e5","#bdb2ff","#ffc6ff","#ffadad","#d0f4de","#ffe066","#c1fba4","#9bf6ff","#e2e2e2"];
+
+let _docEditId = null;
+let _docSelectedImg = null;
+let _docDirty = false;
+let _docBuilt = false;
+let _docRange = null;
+let _docSaveTimer = null;
+const _docPopRender = {};
+
+const docEditor  = document.getElementById("docEditor");
+const docPage    = document.getElementById("docPage");
+const docTitleEl = document.getElementById("docTitle");
+const docToolbar = document.getElementById("docToolbar");
+const docStatus  = document.getElementById("docStatus");
+
+/* ── Selection save / restore (toolbar interactions blur the editor) ── */
+function docSaveSel() {
+  const s = getSelection();
+  if (s && s.rangeCount && docPage.contains(s.anchorNode)) _docRange = s.getRangeAt(0).cloneRange();
+}
+function docRestoreSel() {
+  if (!_docRange) return;
+  const s = getSelection();
+  s.removeAllRanges();
+  s.addRange(_docRange);
+}
+function docSetStatus(txt) { if (docStatus) docStatus.textContent = txt; }
+function docMarkDirty() {
+  _docDirty = true;
+  docSetStatus("กำลังแก้ไข…");
+  clearTimeout(_docSaveTimer);
+  _docSaveTimer = setTimeout(() => docSaveNow(false), 1200);
+}
+
+/* ── Command helpers ── */
+function docExec(cmd, val) {
+  docPage.focus();
+  document.execCommand("styleWithCSS", false, true);
+  document.execCommand(cmd, false, val);
+  docMarkDirty();
+}
+function docApply(fn) {
+  docPage.focus();
+  docRestoreSel();
+  document.execCommand("styleWithCSS", false, true);
+  fn();
+  docSaveSel();
+  docMarkDirty();
+}
+function docSetFontSize(px) {
+  // fontSize only supports 1–7; emit <font size="7"> then rewrite to exact px.
+  // This requires styleWithCSS OFF (CSS mode emits keyword sizes like "xxx-large").
+  document.execCommand("styleWithCSS", false, false);
+  document.execCommand("fontSize", false, "7");
+  docPage.querySelectorAll('font[size="7"]').forEach(f => {
+    f.removeAttribute("size");
+    f.style.fontSize = px + "px";
+  });
+  document.execCommand("styleWithCSS", false, true);
+}
+function docUpdateToolbar() {
+  ["bold","italic","underline","strikeThrough","justifyLeft","justifyCenter","justifyRight","justifyFull","insertUnorderedList","insertOrderedList"]
+    .forEach(cmd => {
+      const btn = docToolbar.querySelector(`[data-cmd="${cmd}"]`);
+      if (btn) { try { btn.classList.toggle("is-active", document.queryCommandState(cmd)); } catch {} }
+    });
+}
+
+/* ── Colour swatches (persist frequently-used colours) ── */
+function docSwatchKey(kind) { return kind === "text" ? "johny-doc-text-swatches" : "johny-doc-hl-swatches"; }
+function docLoadSwatches(kind) {
+  try { const s = JSON.parse(localStorage.getItem(docSwatchKey(kind))); if (Array.isArray(s) && s.length) return s; } catch {}
+  return (kind === "text" ? DOC_TEXT_SWATCHES : DOC_HL_SWATCHES).slice();
+}
+function docAddSwatch(kind, color) {
+  const arr = [color, ...docLoadSwatches(kind).filter(c => c.toLowerCase() !== color.toLowerCase())].slice(0, 12);
+  localStorage.setItem(docSwatchKey(kind), JSON.stringify(arr));
+  _docPopRender[kind]?.();
+}
+function docCloseAllPops() { docToolbar.querySelectorAll(".doc-color-pop").forEach(p => p.hidden = true); }
+function docApplyColor(kind, color, bar, pop) {
+  docPage.focus();
+  docRestoreSel();
+  document.execCommand("styleWithCSS", false, true);
+  if (kind === "text") {
+    document.execCommand("foreColor", false, color);
+  } else if (!document.execCommand("hiliteColor", false, color)) {
+    document.execCommand("backColor", false, color);
+  }
+  if (color !== "transparent" && bar) bar.style.background = color;
+  docSaveSel();
+  docMarkDirty();
+  pop.hidden = true;
+}
+function buildColorPop(kind, wrapId, barId) {
+  const wrap = document.getElementById(wrapId);
+  const bar  = document.getElementById(barId);
+  const toggle = wrap.querySelector(".doc-color-btn");
+  const pop = document.createElement("div");
+  pop.className = "doc-color-pop";
+  pop.hidden = true;
+  pop.innerHTML =
+    `<div class="doc-color-pop-label">${kind === "text" ? "สีตัวอักษร" : "สีไฮไลท์"}</div>` +
+    `<div class="doc-swatches"></div>` +
+    `<div class="doc-color-custom"><input type="color" value="${kind === "text" ? "#fe6e00" : "#fff3b0"}"><button type="button" class="doc-btn">ใช้สีนี้ + บันทึก</button></div>`;
+  wrap.appendChild(pop);
+  const grid    = pop.querySelector(".doc-swatches");
+  const custom  = pop.querySelector('input[type="color"]');
+  const applyBtn = pop.querySelector(".doc-btn");
+  const render = () => {
+    grid.innerHTML = "";
+    if (kind === "hl") {
+      const none = document.createElement("button");
+      none.type = "button"; none.className = "doc-swatch doc-swatch--none"; none.title = "ไม่มีไฮไลท์";
+      none.addEventListener("click", () => docApplyColor(kind, "transparent", bar, pop));
+      grid.appendChild(none);
+    }
+    docLoadSwatches(kind).forEach(c => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "doc-swatch"; b.style.background = c; b.title = c;
+      b.addEventListener("click", () => docApplyColor(kind, c, bar, pop));
+      grid.appendChild(b);
+    });
+  };
+  _docPopRender[kind] = render;
+  render();
+  applyBtn.addEventListener("mousedown", e => e.preventDefault());
+  applyBtn.addEventListener("click", () => { docApplyColor(kind, custom.value, bar, pop); docAddSwatch(kind, custom.value); });
+  toggle.addEventListener("click", e => {
+    e.stopPropagation();
+    const willOpen = pop.hidden;
+    docCloseAllPops();
+    if (willOpen) { docSaveSel(); pop.hidden = false; }
+  });
+}
+
+/* ── Floating image drag / resize / delete ── */
+function docHydrateImages() {
+  docPage.querySelectorAll(".doc-img").forEach(w => {
+    w.setAttribute("contenteditable", "false");
+    const img = w.querySelector("img");
+    if (img) img.setAttribute("draggable", "false");
+    if (!w.querySelector(".doc-img-handle")) {
+      const h = document.createElement("span"); h.className = "doc-img-handle"; w.appendChild(h);
+      const d = document.createElement("button"); d.type = "button"; d.className = "doc-img-del"; d.textContent = "×"; w.appendChild(d);
+    }
+  });
+}
+function docSelectImg(w) {
+  docDeselectImg();
+  w.classList.add("is-selected");
+  w.setAttribute("tabindex", "-1");
+  _docSelectedImg = w;
+  w.focus({ preventScroll: true });
+}
+function docDeselectImg() {
+  if (_docSelectedImg) _docSelectedImg.classList.remove("is-selected");
+  _docSelectedImg = null;
+}
+function docStartDrag(wrap, e) {
+  const sx = e.clientX, sy = e.clientY;
+  const sl = parseFloat(wrap.style.left) || 0, st = parseFloat(wrap.style.top) || 0;
+  const move = ev => {
+    let nl = sl + (ev.clientX - sx), nt = st + (ev.clientY - sy);
+    nl = Math.max(0, Math.min(nl, docPage.clientWidth  - wrap.offsetWidth));
+    nt = Math.max(0, Math.min(nt, docPage.clientHeight - wrap.offsetHeight));
+    wrap.style.left = nl + "px"; wrap.style.top = nt + "px";
+  };
+  const up = () => { document.removeEventListener("pointermove", move); document.removeEventListener("pointerup", up); docMarkDirty(); };
+  document.addEventListener("pointermove", move); document.addEventListener("pointerup", up);
+}
+function docStartResize(wrap, e) {
+  const sx = e.clientX, sw = wrap.offsetWidth;
+  const move = ev => {
+    const nw = Math.max(48, Math.min(sw + (ev.clientX - sx), docPage.clientWidth));
+    wrap.style.width = nw + "px";
+  };
+  const up = () => { document.removeEventListener("pointermove", move); document.removeEventListener("pointerup", up); docMarkDirty(); };
+  document.addEventListener("pointermove", move); document.addEventListener("pointerup", up);
+}
+function docInsertImage(src) {
+  const w = document.createElement("div");
+  w.className = "doc-img";
+  w.setAttribute("contenteditable", "false");
+  w.style.left  = "56px";
+  w.style.top   = Math.max(24, (docEditor.querySelector(".doc-canvas").scrollTop) + 40) + "px";
+  w.style.width = "280px";
+  const img = document.createElement("img");
+  img.src = src; img.setAttribute("draggable", "false");
+  w.appendChild(img);
+  docPage.appendChild(w);
+  docHydrateImages();
+  docSelectImg(w);
+  docMarkDirty();
+}
+
+/* ── Serialise / open / close / save ── */
+function docCleanHTML() {
+  const clone = docPage.cloneNode(true);
+  clone.querySelectorAll(".doc-img-handle, .doc-img-del").forEach(e => e.remove());
+  clone.querySelectorAll(".doc-img").forEach(w => { w.classList.remove("is-selected"); w.removeAttribute("tabindex"); });
+  return clone.innerHTML;
+}
+function buildDocOnce() {
+  if (_docBuilt) return;
+  _docBuilt = true;
+  const fontSel = document.getElementById("docFont");
+  const sizeSel = document.getElementById("docSize");
+  DOC_FONTS.forEach(([label, val]) => { const o = document.createElement("option"); o.textContent = label; o.value = val; fontSel.appendChild(o); });
+  DOC_SIZES.forEach(px => { const o = document.createElement("option"); o.textContent = px; o.value = px; if (px === 16) o.selected = true; sizeSel.appendChild(o); });
+  buildColorPop("text", "docTextColorWrap", "docTextColorBar");
+  buildColorPop("hl",   "docHiliteWrap",    "docHiliteBar");
+
+  // Keep selection alive when pressing toolbar buttons / swatches / colour toggles
+  docToolbar.addEventListener("mousedown", e => {
+    if (e.target.closest(".doc-tb-btn[data-cmd], .doc-swatch, .doc-color-btn")) e.preventDefault();
+  });
+  docToolbar.addEventListener("click", e => {
+    const cmdBtn = e.target.closest(".doc-tb-btn[data-cmd]");
+    if (cmdBtn) { docExec(cmdBtn.dataset.cmd); docUpdateToolbar(); }
+  });
+  fontSel.addEventListener("change", () => docApply(() => document.execCommand("fontName", false, fontSel.value || "system-ui")));
+  sizeSel.addEventListener("change", () => docApply(() => docSetFontSize(sizeSel.value)));
+  document.getElementById("docBlock").addEventListener("change", e => { docApply(() => document.execCommand("formatBlock", false, e.target.value)); e.target.value = "p"; });
+  document.getElementById("docInsertImg").addEventListener("click", () => document.getElementById("docImgInput").click());
+  document.getElementById("docImgInput").addEventListener("change", e => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => docInsertImage(reader.result);
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  });
+
+  // Image pointer gestures (event delegation on the page)
+  docPage.addEventListener("pointerdown", e => {
+    if (e.target.closest(".doc-img-del"))   { e.preventDefault(); e.target.closest(".doc-img").remove(); docDeselectImg(); docMarkDirty(); return; }
+    if (e.target.closest(".doc-img-handle")){ e.preventDefault(); docStartResize(e.target.closest(".doc-img"), e); return; }
+    const wrap = e.target.closest(".doc-img");
+    if (wrap) { e.preventDefault(); docSelectImg(wrap); docStartDrag(wrap, e); return; }
+    docDeselectImg();
+  });
+  docPage.addEventListener("input", docMarkDirty);
+  docTitleEl.addEventListener("input", docMarkDirty);
+
+  docEditor.addEventListener("keydown", e => {
+    if (e.key === "Escape") { e.preventDefault(); closeDocEditor(); return; }
+    if ((e.key === "Delete" || e.key === "Backspace") && _docSelectedImg &&
+        (e.target === _docSelectedImg || _docSelectedImg.contains(e.target))) {
+      e.preventDefault(); _docSelectedImg.remove(); docDeselectImg(); docMarkDirty();
+    }
+  });
+  docEditor.addEventListener("click", e => { if (!e.target.closest(".doc-color-wrap")) docCloseAllPops(); });
+  document.getElementById("docSave").addEventListener("click", () => docSaveNow(true));
+  document.getElementById("docClose").addEventListener("click", closeDocEditor);
+}
+
+function openDocEditor(noteId) {
+  const note = state.notes.find(n => n.id === noteId);
+  if (!note || note._isKVLine) return;
+  buildDocOnce();
+  _docEditId = noteId;
+  _docDirty = false;
+  _docRange = null;
+  docTitleEl.value = note.title || "";
+  const body = note.body || "";
+  docPage.innerHTML = /<[a-z!/][\s\S]*>/i.test(body) ? body : escapeHtml(body).replace(/\n/g, "<br>");
+  docHydrateImages();
+  docSetStatus("");
+  docEditor.hidden = false;
+  docEditor.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+  setTimeout(() => docPage.focus(), 60);
+}
+function openDocEditorNew() {
+  const id = crypto.randomUUID();
+  state.notes.unshift({ id, title: "", body: "", tags: "", createdAt: Date.now() });
+  openDocEditor(id);
+  setTimeout(() => docTitleEl.focus(), 70);
+}
+function docSaveNow(withToast) {
+  if (!_docEditId) return;
+  const title = docTitleEl.value.trim() || "เอกสารไม่มีชื่อ";
+  const body  = docCleanHTML();
+  state.notes = state.notes.map(n => n.id === _docEditId ? { ...n, title, body } : n);
+  _docDirty = false;
+  docSetStatus("บันทึกแล้ว");
+  renderNotes();
+  renderDashboard();
+  saveState();
+  if (withToast) showToast(`บันทึกเอกสาร "${title}" แล้ว`);
+}
+function closeDocEditor() {
+  clearTimeout(_docSaveTimer);
+  if (_docDirty) docSaveNow(false);
+  docCloseAllPops();
+  docDeselectImg();
+  docEditor.hidden = true;
+  docEditor.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+  _docEditId = null;
+}
+
+/* Track caret so toolbar reflects state & colour/font apply to the right range */
+document.addEventListener("selectionchange", () => {
+  if (docEditor.hidden) return;
+  const s = getSelection();
+  if (s && s.rangeCount && docPage.contains(s.anchorNode)) { _docRange = s.getRangeAt(0).cloneRange(); docUpdateToolbar(); }
+});
+
+/* Entry points */
+document.getElementById("noteModalExpand")?.addEventListener("click", () => {
+  const id = _noteModalEditId;
+  closeNoteModal();
+  if (id) openDocEditor(id);
+});
+document.getElementById("noteNewDoc")?.addEventListener("click", openDocEditorNew);
 
 document.getElementById("expenseDate").value = getTodayKey();
 document.getElementById("expenseForm").addEventListener("submit", (event) => {

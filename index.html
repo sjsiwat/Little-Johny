@@ -839,6 +839,10 @@
                 type="text"
                 placeholder="tags เช่น work, idea"
               />
+              <button type="button" id="noteNewDoc" class="note-newdoc-btn" title="สร้างเอกสารแบบเต็มหน้า A4">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 1.5h5L11.5 5v7.5a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1V2.5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 1.5V5h3.5" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                เอกสาร A4
+              </button>
               <button type="submit">บันทึกโน้ต</button>
             </div>
           </form>
@@ -996,12 +1000,88 @@
         <div class="task-modal-footer">
           <button type="button" class="task-modal-delete-btn" id="noteModalDelete">ลบโน้ต</button>
           <div class="task-modal-footer-right">
+            <button type="button" class="note-modal-expand-btn" id="noteModalExpand" title="แก้ไขแบบเต็มหน้า A4">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 5V2h3M12 5V2H9M2 9v3h3M12 9v3H9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              แก้ไขเต็มหน้า
+            </button>
             <button type="button" class="task-modal-cancel-btn" id="noteModalCancel">ยกเลิก</button>
             <button type="submit" class="task-modal-save-btn">บันทึก</button>
           </div>
         </div>
       </form>
     </dialog>
+
+    <!-- ══ Full-page A4 document editor (Word-like) ══ -->
+    <div class="doc-editor" id="docEditor" hidden aria-hidden="true" role="dialog" aria-label="แก้ไขเอกสาร">
+      <div class="doc-topbar">
+        <button type="button" class="doc-topbar-back" id="docClose" aria-label="ปิด">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <input id="docTitle" class="doc-title" type="text" placeholder="ชื่อเอกสาร" maxlength="160" autocomplete="off" />
+        <div class="doc-topbar-actions">
+          <span class="doc-status" id="docStatus"></span>
+          <button type="button" class="doc-btn doc-btn--primary" id="docSave">บันทึก</button>
+        </div>
+      </div>
+
+      <div class="doc-toolbar" id="docToolbar">
+        <div class="doc-tb-group">
+          <select class="doc-select doc-select--font" id="docFont" title="แบบอักษร"></select>
+          <select class="doc-select doc-select--size" id="docSize" title="ขนาดตัวอักษร"></select>
+        </div>
+        <span class="doc-tb-sep"></span>
+        <div class="doc-tb-group">
+          <button type="button" class="doc-tb-btn" data-cmd="bold" title="ตัวหนา (Ctrl+B)"><b>B</b></button>
+          <button type="button" class="doc-tb-btn" data-cmd="italic" title="ตัวเอียง (Ctrl+I)"><i>I</i></button>
+          <button type="button" class="doc-tb-btn" data-cmd="underline" title="ขีดเส้นใต้ (Ctrl+U)"><u>U</u></button>
+          <button type="button" class="doc-tb-btn" data-cmd="strikeThrough" title="ขีดฆ่า"><s>S</s></button>
+        </div>
+        <span class="doc-tb-sep"></span>
+        <div class="doc-tb-group">
+          <div class="doc-color-wrap" id="docTextColorWrap">
+            <button type="button" class="doc-tb-btn doc-color-btn" id="docTextColorBtn" title="สีตัวอักษร">
+              <span class="doc-color-glyph">A</span>
+              <span class="doc-color-bar" id="docTextColorBar" style="background:#fe6e00"></span>
+            </button>
+          </div>
+          <div class="doc-color-wrap" id="docHiliteWrap">
+            <button type="button" class="doc-tb-btn doc-color-btn" id="docHiliteBtn" title="ไฮไลท์">
+              <span class="doc-color-glyph doc-color-glyph--hl">✎</span>
+              <span class="doc-color-bar" id="docHiliteBar" style="background:#fff3b0"></span>
+            </button>
+          </div>
+        </div>
+        <span class="doc-tb-sep"></span>
+        <div class="doc-tb-group">
+          <button type="button" class="doc-tb-btn" data-cmd="justifyLeft" title="ชิดซ้าย"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 4h11M2 7.5h7M2 11h9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+          <button type="button" class="doc-tb-btn" data-cmd="justifyCenter" title="กึ่งกลาง"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 4h11M4 7.5h7M3 11h9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+          <button type="button" class="doc-tb-btn" data-cmd="justifyRight" title="ชิดขวา"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 4h11M6 7.5h7M4 11h9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+          <button type="button" class="doc-tb-btn" data-cmd="justifyFull" title="เต็มแนว"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 4h11M2 7.5h11M2 11h11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+        </div>
+        <span class="doc-tb-sep"></span>
+        <div class="doc-tb-group">
+          <button type="button" class="doc-tb-btn" data-cmd="insertUnorderedList" title="รายการหัวข้อ"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M5 4h8M5 7.5h8M5 11h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="2.2" cy="4" r="1.1" fill="currentColor"/><circle cx="2.2" cy="7.5" r="1.1" fill="currentColor"/><circle cx="2.2" cy="11" r="1.1" fill="currentColor"/></svg></button>
+          <button type="button" class="doc-tb-btn" data-cmd="insertOrderedList" title="รายการตัวเลข"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M5 4h8M5 7.5h8M5 11h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><text x="0.5" y="5.5" font-size="4.5" fill="currentColor">1</text><text x="0.5" y="9" font-size="4.5" fill="currentColor">2</text><text x="0.5" y="12.5" font-size="4.5" fill="currentColor">3</text></svg></button>
+          <select class="doc-select doc-select--block" id="docBlock" title="รูปแบบย่อหน้า">
+            <option value="p">ปกติ</option>
+            <option value="h1">หัวข้อใหญ่</option>
+            <option value="h2">หัวข้อรอง</option>
+            <option value="h3">หัวข้อย่อย</option>
+            <option value="blockquote">อ้างอิง</option>
+          </select>
+        </div>
+        <span class="doc-tb-sep"></span>
+        <div class="doc-tb-group">
+          <button type="button" class="doc-tb-btn" id="docInsertImg" title="แทรกรูปภาพ"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1.5" y="2.5" width="12" height="10" rx="1.3" stroke="currentColor" stroke-width="1.3"/><circle cx="5" cy="6" r="1.1" fill="currentColor"/><path d="M2 11l3.5-3.5 2.5 2.5 2-2 3 3" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button>
+          <button type="button" class="doc-tb-btn" data-cmd="removeFormat" title="ล้างการจัดรูปแบบ"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M4 3h8M6.5 3L5 12M9 9l3 3M12 9l-3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+        </div>
+      </div>
+
+      <div class="doc-canvas" id="docCanvas">
+        <div class="doc-page" id="docPage" contenteditable="true" spellcheck="false"></div>
+      </div>
+      <input type="file" id="docImgInput" accept="image/*" hidden />
+    </div>
 
     <!-- Floating Action Button -->
     <div class="fab-wrap" id="fabWrap">
