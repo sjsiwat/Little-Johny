@@ -1929,6 +1929,13 @@ function buildDocOnce() {
         return;
       }
     }
+    // Strip incoming formatting (fixed widths, white-space:pre, monospace blocks
+    // from copied code/tables) so pasted text can't blow out the A4 page width.
+    e.preventDefault();
+    const text = e.clipboardData.getData("text/plain");
+    if (!text) return;
+    document.execCommand("insertHTML", false, escapeHtml(text).replace(/\n/g, "<br>"));
+    docMarkDirty();
   });
   docTitleEl.addEventListener("input", docMarkDirty);
 
