@@ -1915,6 +1915,21 @@ function buildDocOnce() {
     docDeselectImg();
   });
   docPage.addEventListener("input", docMarkDirty);
+  docPage.addEventListener("paste", e => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+      if (item.type.startsWith("image/")) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (!file) continue;
+        const reader = new FileReader();
+        reader.onload = () => docInsertImage(reader.result);
+        reader.readAsDataURL(file);
+        return;
+      }
+    }
+  });
   docTitleEl.addEventListener("input", docMarkDirty);
 
   docEditor.addEventListener("keydown", e => {
