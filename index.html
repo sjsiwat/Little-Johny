@@ -627,6 +627,7 @@
               <div class="auth-control-wrap">
                 <!-- Logged-in state -->
                 <div class="auth-control-row" id="authLoggedInRow" hidden>
+                  <span class="auth-user-email-topbar" id="authUserEmailTopbar"></span>
                   <span class="auth-online-status">
                     <span class="status-dot status-dot--online" id="syncDot"></span>
                     <span id="syncLabel">อยู่ในระบบ</span>
@@ -635,7 +636,6 @@
                     <span class="auth-btn-label">ออกจากระบบ</span>
                   </button>
                 </div>
-                <span class="auth-user-email-topbar" id="authUserEmailTopbar" hidden></span>
                 <!-- Guest state -->
                 <div class="auth-control-row" id="authGuestRow">
                   <button class="auth-dot-btn auth-dot-btn--login" id="authLoginBtn" type="button" aria-label="Log in">
@@ -1158,5 +1158,6 @@
     <script src="./auth.js?v=13"></script>
     <script src="./storage.js?v=13"></script>
     <script type="module" src="./app.js?v=13"></script>
+    <script src="./mascot.js?v=2"></script>
   </body>
 </html>

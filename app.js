@@ -2330,6 +2330,7 @@ document.addEventListener("click", (event) => {
     if (task) {
       const nowDone = isTaskDone(state.tasks.find((t) => t.id === toggleId));
       showToast(nowDone ? `เสร็จแล้ว: ${task.title}` : `เปิดงานอีกครั้ง: ${task.title}`);
+      if (nowDone) window.Johny?.celebrate(`เยี่ยม! เสร็จ "${task.title}" แล้ว 🎉`);
     }
   }
 

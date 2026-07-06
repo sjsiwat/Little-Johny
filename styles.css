@@ -349,7 +349,19 @@ body {
   background: var(--primary-strong) !important;
 }
 
-.topbar .auth-user-email-topbar { color: var(--on-shell-muted); }
+.topbar .auth-dot-btn--danger {
+  border-color: var(--shell-border) !important;
+  color: var(--on-shell-muted) !important;
+}
+.topbar .auth-dot-btn--danger:hover {
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  background: rgba(255,255,255,0.16) !important;
+}
+
+.topbar .auth-online-status { color: #4ade80; }
+
+.topbar .auth-user-email-topbar { color: var(--on-shell); font-weight: 600; }
 
 .topbar-right {
   display: flex;
@@ -365,15 +377,14 @@ body {
 
 .auth-control-wrap {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.2rem;
+  align-items: center;
+  gap: 0.6rem;
 }
 
 .auth-control-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 .auth-online-status {
@@ -391,12 +402,13 @@ body {
 
 .auth-user-email-topbar {
   font-family: var(--font-body);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: var(--ink-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 14rem;
+  max-width: 9rem;
 }
 
 /* Guest mode label — non-interactive text badge */
@@ -1046,11 +1058,11 @@ body::before {
   right: 1.5rem;
   padding: 0.78rem 1.3rem;
   border-radius: 999px;
-  border: 1px solid rgba(0,0,0,0.06);
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(20px) saturate(1.5);
-  -webkit-backdrop-filter: blur(20px) saturate(1.5);
-  color: var(--ink);
+  border: 1px solid var(--shell-border);
+  background: var(--shell-bg);
+  backdrop-filter: blur(var(--shell-blur)) saturate(1.5);
+  -webkit-backdrop-filter: blur(var(--shell-blur)) saturate(1.5);
+  color: var(--on-shell);
   font-family: var(--font-body);
   font-size: 0.88rem;
   font-weight: 500;
@@ -1062,7 +1074,7 @@ body::before {
 
 .app-toast--error {
   border-color: var(--accent);
-  color: var(--accent);
+  color: #ffb3b8;
 }
 
 @keyframes toast-in {
@@ -4935,3 +4947,192 @@ body::before {
   transform: translateY(-1px);
 }
 .editor-actions #noteTags { flex: 1; }
+
+/* ============================================================
+   JOHNY BUDDY — floating animated desk companion (mascot.js)
+   Frosted speech bubble, orange accents, pose-driven motion.
+   ============================================================ */
+.johny-buddy {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 180;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  pointer-events: none;
+  animation: johny-enter 0.5s var(--ease-spring) both;
+}
+.johny-buddy.is-dismissed { display: none; }
+
+/* Toasts stack above the buddy so nothing overlaps. */
+body.has-buddy .app-toast { bottom: 9rem; }
+
+.johny-buddy-body {
+  position: relative;
+  width: 122px;
+  height: 122px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+  display: grid;
+  place-items: end center;
+  transition: transform var(--t-fast) var(--ease-spring);
+}
+.johny-buddy-body:hover { transform: translateY(-3px) scale(1.04); }
+.johny-buddy-body:active { transform: translateY(0) scale(0.98); }
+.johny-buddy-body:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+  border-radius: var(--radius-lg);
+}
+
+.johny-buddy-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 24px rgba(0,0,0,0.28));
+  transition: filter var(--t-mid) var(--ease-ios);
+}
+
+/* Speech bubble — frosted dark shell, matches header/toast. */
+.johny-buddy-bubble {
+  max-width: 15rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 1rem 1rem 0.3rem 1rem;
+  border: 1px solid var(--shell-border);
+  background: var(--shell-bg);
+  backdrop-filter: blur(var(--shell-blur)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--shell-blur)) saturate(1.4);
+  color: var(--on-shell);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.35;
+  box-shadow: var(--shadow-sketch);
+  pointer-events: none;
+  transform-origin: bottom right;
+  opacity: 0;
+  transform: translateY(6px) scale(0.96);
+  transition: opacity 0.22s var(--ease-out-soft),
+              transform 0.22s var(--ease-spring);
+}
+.johny-buddy-bubble.is-in { opacity: 1; transform: translateY(0) scale(1); }
+.johny-buddy-bubble::after {
+  content: "";
+  position: absolute;
+  right: 26px;
+  bottom: -6px;
+  width: 12px;
+  height: 12px;
+  background: var(--shell-bg);
+  border-right: 1px solid var(--shell-border);
+  border-bottom: 1px solid var(--shell-border);
+  backdrop-filter: blur(var(--shell-blur));
+  transform: rotate(45deg);
+}
+
+/* Little dismiss affordance, appears on hover. */
+.johny-buddy-hide {
+  position: absolute;
+  top: 2px;
+  right: -2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: opacity var(--t-fast), color var(--t-fast), background var(--t-fast);
+}
+.johny-buddy:hover .johny-buddy-hide { opacity: 1; }
+.johny-buddy-hide:hover { color: var(--accent); background: var(--accent-soft); }
+
+/* Sleepy "z" — only while dozing. */
+.johny-buddy-zzz {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--primary);
+  opacity: 0;
+}
+.johny-buddy[data-state="sleeping"] .johny-buddy-zzz {
+  animation: johny-zzz 2.6s var(--ease-ios) infinite;
+}
+
+/* ── Pose-driven ambient motion ── */
+.johny-buddy[data-state="idle"]  .johny-buddy-img,
+.johny-buddy[data-state="wave"]  .johny-buddy-img {
+  animation: johny-breathe 3.4s ease-in-out infinite;
+}
+.johny-buddy[data-state="typing"] .johny-buddy-img {
+  animation: johny-nudge 0.6s ease-in-out infinite;
+}
+.johny-buddy[data-state="thinking"] .johny-buddy-img {
+  animation: johny-tilt 2.4s ease-in-out infinite;
+}
+.johny-buddy[data-state="happy"] .johny-buddy-img {
+  animation: johny-bounce 0.6s var(--ease-spring);
+}
+.johny-buddy[data-state="sleeping"] .johny-buddy-img {
+  animation: johny-doze 4s ease-in-out infinite;
+  filter: drop-shadow(0 10px 24px rgba(0,0,0,0.28)) saturate(0.85) brightness(0.96);
+}
+
+@keyframes johny-enter {
+  from { opacity: 0; transform: translateY(24px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes johny-breathe {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-4px) rotate(-1deg); }
+}
+@keyframes johny-nudge {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2px); }
+}
+@keyframes johny-tilt {
+  0%, 100% { transform: rotate(-2deg); }
+  50%      { transform: rotate(3deg); }
+}
+@keyframes johny-bounce {
+  0%   { transform: translateY(0) scale(1); }
+  35%  { transform: translateY(-16px) scale(1.06); }
+  60%  { transform: translateY(0) scale(0.97); }
+  80%  { transform: translateY(-6px) scale(1.02); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes johny-doze {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(2px) rotate(1deg); }
+}
+@keyframes johny-zzz {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.7); }
+  30%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(8px, -18px) scale(1.2); }
+}
+
+@media (max-width: 640px) {
+  .johny-buddy { right: 0.85rem; bottom: 0.85rem; }
+  .johny-buddy-body { width: 84px; height: 84px; }
+  .johny-buddy-bubble { max-width: 11rem; font-size: 0.78rem; }
+  body.has-buddy .app-toast { bottom: 6.75rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .johny-buddy, .johny-buddy .johny-buddy-img { animation: none !important; }
+  .johny-buddy-bubble { transition: opacity 0.2s ease; }
+}
