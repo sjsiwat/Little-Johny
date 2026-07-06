@@ -54,6 +54,13 @@
   --ease-out:    cubic-bezier(0.4, 0, 0.2, 1);
   --t-fast: 150ms;
   --t-mid:  200ms;
+
+  /* ── Motion tokens — dashboard entrance/count-up system ── */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 150ms;
+  --dur-med:  300ms;
+  --dur-slow: 500ms;
 }
 
 [data-theme="dark"] {
@@ -2122,6 +2129,28 @@ body::before {
 /* ── 9. Dashboard grid hierarchy ── */
 .dashboard-grid { gap: 1rem; }
 .dash-notes-panel    { grid-column: span 2; }
+
+/* ── 9b. MOTION — dashboard entrance stagger ──
+   Applied once by runDashboardEntranceOnce() in app.js, after the stat
+   cards and widget panels have real data rendered into them. JS sets
+   animation-delay per element to build the stagger; only opacity and
+   transform are animated. ── */
+@keyframes dash-entrance-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.sb-stat.dash-stagger-in,
+.panel.dash-stagger-in {
+  animation: dash-entrance-in var(--dur-med) var(--ease-out-soft) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sb-stat.dash-stagger-in,
+  .panel.dash-stagger-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
 
 /* ── 10. Calendar ── */
 

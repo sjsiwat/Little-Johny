@@ -537,6 +537,17 @@ function renderDashboard() {
 
   renderExpenseBars();
   renderWeeklyReviewDash();
+
+  // Real data is in the DOM at this point — safe to kick off the
+  // one-time entrance stagger + count-up (no-op after the first call).
+  runDashboardEntranceOnce({
+    total: state.tasks.length,
+    open: openTasks.length,
+    done: doneTasks.length,
+    expense: state.expenses
+      .filter((e) => e.date === todayKey)
+      .reduce((sum, e) => sum + Number(e.amount), 0),
+  });
 }
 
 function renderExpenseBars() {
@@ -599,6 +610,67 @@ function renderWeeklyReviewDash() {
         <span>โน้ตเดือนนี้</span>
       </div>
     </div>`;
+}
+
+/* ════════════════════════════════════════════════════════════
+   MOTION — dashboard entrance stagger + number count-up.
+   Pure presentation layer: only reads state already rendered by
+   renderShell()/renderDashboard(), never touches Supabase/storage.
+   Runs once per session, the first time real data is on screen.
+   ════════════════════════════════════════════════════════════ */
+
+let _dashEntranceStarted = false;
+
+function prefersReducedMotion() {
+  return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+}
+
+// Numeric twin of the --ease-out-soft CSS curve (CSS easing can't
+// interpolate a text node, so the count-up paces itself with this).
+function easeOutSoft(t) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
+function countUpNumber(el, target, { duration = 600, format = (n) => String(n) } = {}) {
+  if (!el) return;
+  if (prefersReducedMotion() || target === 0) {
+    el.textContent = format(target);
+    return;
+  }
+  const start = performance.now();
+  function tick(now) {
+    const t = Math.min(1, (now - start) / duration);
+    el.textContent = format(Math.round(target * easeOutSoft(t)));
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function runDashboardEntranceOnce(stats) {
+  if (_dashEntranceStarted) return;
+  _dashEntranceStarted = true;
+
+  if (!prefersReducedMotion()) {
+    const STAGGER_MS = 70;
+    const statCards = document.querySelectorAll(".quick-tiles .sb-stat");
+    const widgetCards = document.querySelectorAll(".dashboard-grid .panel");
+
+    statCards.forEach((card, i) => {
+      card.style.animationDelay = `${i * STAGGER_MS}ms`;
+      card.classList.add("dash-stagger-in");
+    });
+    widgetCards.forEach((card, i) => {
+      card.style.animationDelay = `${(statCards.length + i) * STAGGER_MS}ms`;
+      card.classList.add("dash-stagger-in");
+    });
+  }
+
+  countUpNumber(document.getElementById("sbStatTotal"), stats.total);
+  countUpNumber(document.getElementById("sbStatOpen"),  stats.open);
+  countUpNumber(document.getElementById("sbStatDone"),  stats.done);
+  countUpNumber(document.getElementById("sbStatExpense"), stats.expense, {
+    format: (n) => `฿${n.toLocaleString("th-TH")}`,
+  });
 }
 
 function renderReview() {
