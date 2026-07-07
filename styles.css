@@ -1018,8 +1018,10 @@ body::before {
    RESPONSIVE
    ============================================================ */
 @media (max-width: 960px) {
+  /* minmax(0,1fr): a bare 1fr means minmax(auto,1fr), letting wide
+     children (toolbars, calendar) expand the column past the viewport */
   .app-shell,
-  .app-shell.sidebar-collapsed { grid-template-columns: 1fr; }
+  .app-shell.sidebar-collapsed { grid-template-columns: minmax(0, 1fr); }
 
   /* Collapsed mode is a desktop concept — restore full nav on small screens */
   .app-shell.sidebar-collapsed .nav-link { justify-content: center; padding: 0 0.35rem; }
@@ -2272,7 +2274,7 @@ body::before {
   .dash-notes-panel { grid-column: span 2; }
 }
 @media (max-width: 780px) {
-  .app-shell { grid-template-columns: 1fr; }
+  .app-shell { grid-template-columns: minmax(0, 1fr); }
   .workspace { padding: 1rem; }
   .dashboard-grid { grid-template-columns: 1fr; }
   .dash-notes-panel { grid-column: span 1; }
@@ -5135,4 +5137,64 @@ body.has-buddy .app-toast { bottom: 9rem; }
 @media (prefers-reduced-motion: reduce) {
   .johny-buddy, .johny-buddy .johny-buddy-img { animation: none !important; }
   .johny-buddy-bubble { transition: opacity 0.2s ease; }
+}
+
+/* ============================================================
+   MOBILE FIXES — appended last so they win the cascade.
+   (Earlier calendar/topbar media rules sat ABOVE their base
+   styles in the file, so the base always overrode them.)
+   ============================================================ */
+@media (max-width: 780px) {
+  /* Calendar: stack the month grid over the day panel */
+  .cal-layout { flex-direction: column; }
+  .cal-side {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    padding: 1rem 0 0;
+  }
+
+  /* Shell header: compact — the quote eats half the screen */
+  .sidebar { padding: 0.85rem 1rem; }
+  .sidebar-quote { display: none; }
+  .nav-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.3rem; }
+  .nav-link { justify-content: flex-start; padding: 0.4rem 0.5rem; font-size: 0.78rem; }
+
+  /* Floating buddy collides with the FAB on small screens —
+     the greeting mascot still carries the pose reactions */
+  .johny-buddy { display: none; }
+  body.has-buddy .app-toast { bottom: 5.5rem; }
+
+  /* Final guard against stray horizontal overflow */
+  body { overflow-x: hidden; }
+
+  /* Greeting: let the date wrap instead of pushing the mascot out */
+  .tc-left { min-width: 0; }
+  .greeting-date { flex-wrap: wrap; }
+  .tc-mascot-img { width: 84px; }
+}
+
+@media (max-width: 500px) {
+  /* Topbar: keep title + controls on one wrapping row (an older
+     rule stacked it into a ragged column) */
+  .topbar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    padding: 0.6rem 0.85rem;
+    min-height: 0;
+  }
+  .topbar-right { margin-left: auto; }
+  .auth-user-email-topbar { max-width: 6.5rem; }
+
+  /* 6 nav items → 3×2 grid, not 2×3 */
+  .nav-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 500px) {
+  /* Task rows: let meta chips wrap under the title instead of clipping */
+  .tli-row { flex-wrap: wrap; }
+  .tli-title { flex-basis: 100%; white-space: normal; }
+  .tli-acts { opacity: 1; margin-left: auto; }
 }

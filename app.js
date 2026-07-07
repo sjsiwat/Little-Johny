@@ -2458,19 +2458,56 @@ async function onSignedIn(user) {
   const cloud = await Storage.loadCloud();
 
   if (cloud) {
-    // Merge: union of real-local + cloud, cloud items win on conflict.
-    // Demo items are stripped — they exist only in guest/unauthed mode.
-    function mergeItems(local, remote) {
-      const realLocal = (local || []).filter(i => !i._isDemo);
-      if (!remote || remote.length === 0) return realLocal;
-      const map = new Map(realLocal.map(i => [i.id, i]));
-      for (const item of remote) map.set(item.id, item);
-      return [...map.values()];
+    // Legacy onboarding seeds (pre-_isDemo era) leaked into localStorage /
+    // cloud on some devices. Fingerprint them by title so they can be
+    // purged everywhere — they are sample content, never user data.
+    const LEGACY_SEED_TITLES = new Set([
+      // tasks
+      "ออกแบบ dashboard ให้เห็นภาพรวมชีวิตใน 5 นาที",
+      "จดไอเดียสำหรับต่อ line secretary",
+      "ทดลองบันทึกรายจ่ายผ่านหน้า expenses",
+      // notes
+      "johny os คือพื้นที่รวม task, note, expense และเลขาส่วนตัว",
+      "phase 2: sync ข้ามเครื่องด้วย supabase",
+    ].map(t => t.toLowerCase()));
+    // Legacy expenses have generic titles — match title+amount to be safe.
+    const LEGACY_SEED_EXPENSES = new Set(["กาแฟทำงาน|75", "เดินทาง|120", "มื้อกลางวัน|95"]);
+    const isLegacySeed = (item, kind) => kind === 'expenses'
+      ? LEGACY_SEED_EXPENSES.has(`${item.title.trim()}|${item.amount}`)
+      : LEGACY_SEED_TITLES.has(item.title.trim().toLowerCase());
+
+    // Purge legacy seeds from the cloud immediately (targeted deletes) so
+    // they can't resurface on the next device that logs in.
+    for (const [table, items] of [["tasks", cloud.tasks], ["notes", cloud.notes], ["expenses", cloud.expenses]]) {
+      for (const item of items) {
+        if (isLegacySeed(item, table)) Storage.deleteRow(table, item.id);
+      }
+    }
+
+    // Merge: union of real-local + cloud, cloud items win on id conflict.
+    // Demo + legacy-seed items are stripped from both sides, then the
+    // union is deduped by content so the same item saved on two devices
+    // (different ids) collapses to one copy.
+    function mergeItems(local, remote, kind) {
+      const clean = arr => (arr || []).filter(i => !i._isDemo && !isLegacySeed(i, kind));
+      const map = new Map(clean(local).map(i => [i.id, i]));
+      for (const item of clean(remote)) map.set(item.id, item);
+      const seen = new Map(); // content signature → item (keep oldest createdAt)
+      for (const item of map.values()) {
+        const sig = kind === 'notes'
+          ? `${item.title.trim().toLowerCase()}|${(item.body || '').trim()}`
+          : kind === 'expenses'
+            ? `${item.title.trim().toLowerCase()}|${item.amount}|${item.date || ''}`
+            : `${item.title.trim().toLowerCase()}|${item.due || ''}`;
+        const prev = seen.get(sig);
+        if (!prev || item.createdAt < prev.createdAt) seen.set(sig, item);
+      }
+      return [...seen.values()];
     }
     const merged = {
-      tasks:    mergeItems(state.tasks,    cloud.tasks),
-      notes:    mergeItems(state.notes,    cloud.notes),
-      expenses: mergeItems(state.expenses, cloud.expenses),
+      tasks:    mergeItems(state.tasks,    cloud.tasks,    'tasks'),
+      notes:    mergeItems(state.notes,    cloud.notes,    'notes'),
+      expenses: mergeItems(state.expenses, cloud.expenses, 'expenses'),
     };
     state = { ...state, ...merged };
     showToast(merged.tasks.length > 0 ? `โหลดข้อมูลจาก cloud (${merged.tasks.length} งาน)` : "เชื่อมต่อแล้ว ✓");
