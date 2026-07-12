@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --grid-line: rgba(21, 19, 15, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  background-color: #f4f1ea;
+  color: #15130f;
+}
+
+/* Thin persistent column-grid lines, Swiss-poster style */
+.grid-lines {
+  background-image: linear-gradient(to right, var(--grid-line) 1px, transparent 1px);
+  background-size: calc(100% / 12) 100%;
+}
+
+.rule {
+  border-color: #dedace;
+}
+
+::selection {
+  background: #c23b22;
+  color: #f4f1ea;
+}
+
+:focus-visible {
+  outline: 2px solid #c23b22;
+  outline-offset: 3px;
+}

@@ -9,8 +9,6 @@ let toastTimer = null;
 let _noteModalEditId  = null;
 let _editingExpenseId = null;
 let _taskModalEditId  = null;
-let _taskView         = "list"; // "list" | "kanban"
-const _taskProgressMode = new Map(); // taskId → 'value' | 'pct'
 let _dragTaskId       = null;
 let _expensePeriod    = 'month'; // 'today' | 'month' | 'year' | 'all'
 
@@ -126,188 +124,54 @@ function getDeadlineInfo(due, done) {
 let _calYear  = new Date().getFullYear();
 let _calMonth = new Date().getMonth();
 let _calSelectedDate = null;
-function showToast(message, type = "success") {
+const TOAST_META = {
+  success: { label: "SUCCESS", cls: "app-toast--success" },
+  error:   { label: "ERROR",   cls: "app-toast--error" },
+  warning: { label: "WARNING", cls: "app-toast--warning" },
+  info:    { label: "INFO",    cls: "app-toast--info" },
+};
+
+function showToast(title, type = "success", description = "") {
   const existing = document.getElementById("app-toast");
   if (existing) existing.remove();
   if (toastTimer) clearTimeout(toastTimer);
+  const meta = TOAST_META[type] || TOAST_META.success;
   const toast = document.createElement("div");
   toast.id = "app-toast";
-  toast.className = `app-toast${type === "error" ? " app-toast--error" : ""}`;
+  toast.className = `app-toast ${meta.cls}`;
   toast.setAttribute("role", "status");
   toast.setAttribute("aria-live", "polite");
-  toast.textContent = message;
+  toast.innerHTML = `
+    <div class="app-toast-head">
+      <span class="app-toast-label"><span class="app-toast-dot"></span>${meta.label}</span>
+      <button class="app-toast-close" type="button" aria-label="ปิด">&times;</button>
+    </div>
+    <strong class="app-toast-title">${escapeHtml(title)}</strong>
+    ${description ? `<p class="app-toast-desc">${escapeHtml(description)}</p>` : ""}
+  `;
+  toast.querySelector(".app-toast-close").addEventListener("click", () => toast.remove());
   document.body.appendChild(toast);
-  toastTimer = setTimeout(() => toast.remove(), 3000);
-}
-
-function createDemoState() {
-  const d = (offsetDays) => {
-    const dt = new Date();
-    dt.setDate(dt.getDate() + offsetDays);
-    return dt.toISOString().slice(0, 10);
-  };
-  const ts = (offsetMin) => Date.now() - offsetMin * 60000;
-
-  return {
-    // ── Tasks ──────────────────────────────────────────────────
-    tasks: [
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "ออกแบบ Dashboard UI",
-        description: "วางโครงสร้างหน้า Dashboard ให้ครบทุก widget",
-        priority: "High", due: d(-5), status: "done",
-        labels: ["work"], createdAt: ts(500)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "ระบบ Login & Auth",
-        description: "Supabase Auth + guest mode",
-        priority: "Critical", due: d(-3), status: "done",
-        labels: ["work"], createdAt: ts(400)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "LINE Bot Integration",
-        description: "รับ command เพิ่มงาน/โน้ตผ่าน LINE",
-        priority: "Medium", due: d(7), status: "todo",
-        labels: ["work"], createdAt: ts(60)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "ออกกำลังกาย 30 นาที",
-        description: "",
-        priority: "Medium", due: d(-1), status: "done",
-        labels: ["personal"], createdAt: ts(300)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "อ่านหนังสือก่อนนอน",
-        description: "",
-        priority: "Low", due: d(0), status: "todo",
-        labels: ["personal"], createdAt: ts(120)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "ส่งสรุปรายงานประจำเดือน",
-        description: "รวบรวมข้อมูลรายจ่ายและรายรับ พร้อม slide สรุปให้ทีม",
-        priority: "Critical", due: d(0), status: "in_progress",
-        labels: ["urgent", "work"], createdAt: ts(20)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "ประชุม Product Review 14:00 น.",
-        description: "เตรียม slide deck และ demo ฟีเจอร์ใหม่ให้พร้อม",
-        priority: "High", due: d(0), status: "todo",
-        labels: ["meeting", "work"], createdAt: ts(5)
-      },
-    ],
-
-    // ── Notes ─────────────────────────────────────────────────
-    notes: [
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "ไอเดีย Feature Q3",
-        body: "• Reminder แจ้งเตือนก่อน deadline อัตโนมัติ\n• Export รายจ่ายเป็น PDF รายเดือน\n• Focus Timer เชื่อมกับ task โดยตรง\n• Weekly summary รายงานสรุปประจำสัปดาห์\n• Shortcut เพิ่มงานด้วยเสียง",
-        tags: "ไอเดีย, product, Q3",
-        createdAt: ts(10)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "สรุป Sprint Meeting 23 มิ.ย.",
-        body: "ปิด 3 feature ภายใน 2 สัปดาห์\n\n✅ เสร็จแล้ว: Login, Dashboard, Tasks CRUD\n🔄 กำลังทำ: Notes inline edit, Expenses chart\n⛔ Blocked: รอ design จาก UX team\n\nAction items:\n→ @Beam ส่ง mockup ภายใน พฤ. นี้\n→ @Me เขียน API spec ก่อน ศ.",
-        tags: "ประชุม, sprint, สรุป",
-        createdAt: ts(120)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "แรงบันดาลใจ",
-        body: "\"Done is better than perfect.\"\n— Mark Zuckerberg\n\n\"ความสำเร็จ คือผลรวมของความพยายามเล็กๆ น้อยๆ ที่ทำทุกวัน\"\n\n\"The secret of getting ahead is getting started.\"\n— Mark Twain",
-        tags: "แรงบันดาล, คำคม",
-        createdAt: ts(240)
-      }
-    ],
-
-    // ── Expenses ───────────────────────────────────────────────
-    expenses: [
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "กาแฟ Oat Latte",
-        amount: 95, category: "เครื่องดื่ม", date: d(0), createdAt: ts(30)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "ข้าวกลางวัน + น้ำ",
-        amount: 135, category: "อาหาร", date: d(0), createdAt: ts(90)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "BTS ไป-กลับ",
-        amount: 84, category: "เดินทาง", date: d(0), createdAt: ts(120)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "อาหารเย็น ชาบู",
-        amount: 380, category: "อาหาร", date: d(-1), createdAt: ts(300)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "ชาไข่มุก",
-        amount: 65, category: "เครื่องดื่ม", date: d(-1), createdAt: ts(360)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "Grab ไปห้าง",
-        amount: 120, category: "เดินทาง", date: d(-1), createdAt: ts(420)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "ค่ายา + วิตามิน",
-        amount: 350, category: "สุขภาพ", date: d(-3), createdAt: ts(600)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "เสื้อยืด Uniqlo",
-        amount: 590, category: "ช้อปปิ้ง", date: d(-3), createdAt: ts(660)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "Netflix รายเดือน",
-        amount: 419, category: "อื่นๆ", date: d(-8), createdAt: ts(1440)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "ค่าอินเทอร์เน็ตบ้าน",
-        amount: 599, category: "อินเทอร์เน็ต", date: d(-10), createdAt: ts(2000)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "ค่าอาหารเช้า + กาแฟ",
-        amount: 110, category: "อาหาร", date: d(-5), createdAt: ts(900)
-      },
-      {
-        id: crypto.randomUUID(), _isDemo: true,
-        title: "ออกกำลังกาย รายเดือน",
-        amount: 450, category: "สุขภาพ", date: d(-12), createdAt: ts(2400)
-      }
-    ],
-
-    logs: [
-      "ลองพิมพ์: เพิ่มงาน ประชุมทีมพรุ่งนี้ 10 โมง",
-      "ลองพิมพ์: จ่าย กาแฟ 95 เครื่องดื่ม",
-      "ลองพิมพ์: โน้ต ไอเดียใหม่สำหรับ project",
-      "Johny Memo พร้อมช่วยจัดระเบียบวันของคุณแล้ว"
-    ]
-  };
+  toastTimer = setTimeout(() => toast.remove(), 4000);
 }
 
 const defaultState = {
   theme: "light",
-  taskFilter: "open",
-  ...createDemoState()
+  tasks: [],
+  notes: [],
+  expenses: [],
+  logs: []
 };
 
+// True only when the synchronous init below actually pulled from LOCAL_KEY —
+// lets initAuth() know whether a confirmed-logged-out result needs to purge
+// a stale/expired cached account snapshot before the auth gate is shown.
+let _usedCachedLocal = Storage.hasAuthHint();
+
 let state = (() => {
-  const s = Storage.loadLocal(defaultState);
+  // Only trust cached account data if the last known state on this device
+  // was signed in. Otherwise (never logged in, logged out, or a stale/expired
+  // hint) start empty — the app requires login before any data exists.
+  const s = _usedCachedLocal ? Storage.loadLocal(defaultState) : defaultState;
   s.tasks = (s.tasks || []).map(t => ({
     description: "",
     labels: [],
@@ -379,10 +243,6 @@ function setView(viewName) {
 
 function render() {
   document.documentElement.dataset.theme = state.theme;
-  // Sync task filter chip active state with current state
-  document.querySelectorAll("[data-task-filter]").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.taskFilter === state.taskFilter);
-  });
   renderShell();
   renderDashboard();
   renderTasks();
@@ -647,22 +507,27 @@ function countUpNumber(el, target, { duration = 600, format = (n) => String(n) }
 }
 
 function runDashboardEntranceOnce(stats) {
-  if (_dashEntranceStarted) return;
-  _dashEntranceStarted = true;
+  // The stagger-in reveal is genuinely one-time, but the numbers themselves
+  // must stay live — later renders (post-login cloud replace, guest reset
+  // on sign-out, etc.) still need sbStat* to reflect the current state, not
+  // freeze at whatever was on screen during the very first paint.
+  if (!_dashEntranceStarted) {
+    _dashEntranceStarted = true;
 
-  if (!prefersReducedMotion()) {
-    const STAGGER_MS = 70;
-    const statCards = document.querySelectorAll(".quick-tiles .sb-stat");
-    const widgetCards = document.querySelectorAll(".dashboard-grid .panel");
+    if (!prefersReducedMotion()) {
+      const STAGGER_MS = 70;
+      const statCards = document.querySelectorAll(".quick-tiles .sb-stat");
+      const widgetCards = document.querySelectorAll(".dashboard-grid .panel");
 
-    statCards.forEach((card, i) => {
-      card.style.animationDelay = `${i * STAGGER_MS}ms`;
-      card.classList.add("dash-stagger-in");
-    });
-    widgetCards.forEach((card, i) => {
-      card.style.animationDelay = `${(statCards.length + i) * STAGGER_MS}ms`;
-      card.classList.add("dash-stagger-in");
-    });
+      statCards.forEach((card, i) => {
+        card.style.animationDelay = `${i * STAGGER_MS}ms`;
+        card.classList.add("dash-stagger-in");
+      });
+      widgetCards.forEach((card, i) => {
+        card.style.animationDelay = `${(statCards.length + i) * STAGGER_MS}ms`;
+        card.classList.add("dash-stagger-in");
+      });
+    }
   }
 
   countUpNumber(document.getElementById("sbStatTotal"), stats.total);
@@ -754,89 +619,8 @@ function renderReview() {
   }
 }
 
-function renderTaskListItem(task) {
-  const done     = isTaskDone(task);
-  const pColor   = PRIORITY_COLORS[task.priority] || '#8E8E93';
-  const hasTarget = task.target_value != null && Number(task.target_value) > 0;
-  const prog     = hasTarget ? Math.min(Math.round((Number(task.progress_value)||0)/Number(task.target_value)*100),100) : 0;
-  const progMode = _taskProgressMode.get(task.id) || 'value';
-  const progressLabel = progMode === 'pct'
-    ? `${prog}%`
-    : `${formatNum(task.progress_value)} / ${formatNum(task.target_value)}${task.target_unit ? ' '+escapeHtml(task.target_unit) : ''}`;
-
-  const labelChips = task.labels?.map(id => {
-    const l = TASK_LABELS.find(x => x.id === id);
-    return l ? `<span class="tli-label" style="--lc:${l.color}">${escapeHtml(l.name)}</span>` : '';
-  }).join('') || '';
-
-  const dueChip = (() => {
-    if (!task.due) return '';
-    const info = getDeadlineInfo(task.due, done);
-    if (!info) return `<span class="tli-due">${formatDate(task.due)}</span>`;
-    if (info.type === 'overdue') return `<span class="tli-due tli-due--overdue">เกิน ${info.days} วัน</span>`;
-    if (info.type === 'today')   return `<span class="tli-due tli-due--today">วันนี้</span>`;
-    if (info.type === 'soon')    return `<span class="tli-due tli-due--soon">อีก ${info.days} วัน</span>`;
-    return `<span class="tli-due">${formatDate(task.due)}</span>`;
-  })();
-
-  return `
-    <article class="tli${done ? ' tli--done' : ''}" data-task-id="${task.id}">
-      <div class="tli-row">
-        <button class="tli-check" type="button" data-toggle-task="${task.id}" aria-pressed="${done}" title="${done ? 'เปิดงานอีกครั้ง' : 'ทำเครื่องหมายเสร็จ'}">
-          ${done ? `<svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden="true"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>` : ''}
-        </button>
-        <span class="tli-dot" style="background:${done ? '#8E8E93' : pColor}"></span>
-        <span class="tli-title">${escapeHtml(task.title)}</span>
-        <span class="tli-badge" style="--bc:${pColor}18;--bt:${pColor}">${task.priority}</span>
-        ${labelChips}
-        ${dueChip}
-        <div class="tli-acts">
-          ${!done && !hasTarget ? `<button class="tli-act" type="button" data-add-progress="${task.id}" title="เพิ่ม Progress Bar" aria-label="เพิ่ม Progress Bar"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><rect x="1" y="6.5" width="1.5" height="3" rx="0.4" fill="currentColor" opacity=".4"/><rect x="3.5" y="3.5" width="1.5" height="6" rx="0.4" fill="currentColor" opacity=".7"/><rect x="6.5" y="1" width="1.5" height="8.5" rx="0.4" fill="currentColor"/></svg></button>` : ''}
-          <button class="tli-act" type="button" data-edit-task="${task.id}" title="แก้ไขงาน" aria-label="แก้ไขงาน">${ICON_EDIT}</button>
-          <button class="tli-act tli-act--del" type="button" data-delete-task="${task.id}" title="ลบงาน">×</button>
-        </div>
-      </div>
-      ${task.description ? `<p class="tli-desc">${escapeHtml(task.description)}</p>` : ''}
-      ${hasTarget ? `
-      <div class="tli-prog" style="--prog:${prog/100}">
-        <div class="tli-prog-track"><div class="tli-prog-fill" style="background:${pColor}"></div></div>
-        <span class="tli-prog-lbl">${progressLabel}</span>
-        <button class="tli-prog-mode" type="button" data-toggle-progress-mode="${task.id}" title="${progMode==='pct'?'แสดงค่าจริง':'แสดงเป็น %'}">${progMode==='pct'?'123':'%'}</button>
-        ${!done ? `<button class="tli-prog-log-btn" type="button" data-log-task="${task.id}">+ บันทึก</button>` : ''}
-        <button class="tli-prog-rm" type="button" data-remove-progress="${task.id}" title="ลบ Progress Bar">×</button>
-      </div>
-      <div class="tli-log-row" id="logRow-${task.id}" hidden>
-        <span class="tli-log-pfx">${escapeHtml(task.target_unit||'')}</span>
-        <input class="tli-log-inp" type="number" placeholder="เพิ่ม เช่น 500" min="0" step="any" data-log-input="${task.id}" />
-        <button class="tli-log-ok" type="button" data-log-confirm="${task.id}">บันทึก</button>
-        <button class="tli-log-x" type="button" data-log-cancel="${task.id}">ยกเลิก</button>
-      </div>` : (!done ? `
-      <div class="tli-addprog-row" id="addProgRow-${task.id}" hidden>
-        <input class="tli-log-inp" type="number" placeholder="เป้าหมาย เช่น 10000" min="0" step="any" data-quick-target="${task.id}" />
-        <input class="tli-log-inp tli-log-unit-inp" type="text" placeholder="หน่วย เช่น บาท วัน ครั้ง" maxlength="20" data-quick-unit="${task.id}" />
-        <button class="tli-log-ok" type="button" data-quick-confirm="${task.id}">เพิ่ม</button>
-        <button class="tli-log-x" type="button" data-quick-cancel="${task.id}">ยกเลิก</button>
-      </div>` : '')}
-    </article>`;
-}
-
 function renderTasks() {
-  if (_taskView === "kanban") { renderKanban(); return; }
-
-  const filtered = state.tasks.filter((task) => {
-    if (state.taskFilter === "open") return !isTaskDone(task);
-    if (state.taskFilter === "done") return isTaskDone(task);
-    return true;
-  }).sort((a, b) => {
-    if (a.due && b.due) return a.due.localeCompare(b.due);
-    if (a.due) return -1;
-    if (b.due) return 1;
-    return PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority];
-  });
-
-  document.getElementById("taskList").innerHTML = filtered.length
-    ? filtered.map(task => renderTaskListItem(task)).join("")
-    : emptyState("ยังไม่มีงานในมุมมองนี้", "tasks", "เพิ่มงาน");
+  renderKanban();
 }
 
 function renderKanban() {
@@ -1356,84 +1140,33 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-/* ── Homepage ↔ App routing ── */
-let _inApp = false; // true once user enters the app (guest or signed in)
+/* ── Auth gate ↔ App routing ──
+   The Dashboard requires a signed-in session — there is no guest/demo mode.
+   Marketing/landing content now lives on the site/ (Next.js) app; this app
+   only ever shows either the auth gate or the authenticated workspace. ── */
 let _syncedUserId = null; // guard against double onSignedIn (Auth.init + onChange race)
 
 function showApp() {
-  _inApp = true;
-  document.getElementById("homepage")?.style.setProperty("display", "none");
+  document.getElementById("authGate")?.style.setProperty("display", "none");
   document.querySelector(".app-shell")?.style.removeProperty("display");
-  document.getElementById("fabWrap")?.style.removeProperty("display");
   if (!_clockInterval) _clockInterval = setInterval(updateClock, 1000);
 }
 
-function showHomepage() {
-  _inApp = false;
-  document.getElementById("homepage")?.style.removeProperty("display");
+function showAuthGate() {
+  document.getElementById("authGate")?.style.removeProperty("display");
   document.querySelector(".app-shell")?.style.setProperty("display", "none");
-  document.getElementById("fabWrap")?.style.setProperty("display", "none");
   clearInterval(_clockInterval);
   _clockInterval = null;
 }
 
-function freshDemoState() {
-  return { theme: state.theme || "light", taskFilter: "open", ...createDemoState() };
-}
-
-function renderHomepageDemo() {
-  const demo = freshDemoState();
-
-  // Stats
-  const total   = demo.tasks.length;
-  const pending = demo.tasks.filter(t => t.status !== 'done').length;
-  const done    = demo.tasks.filter(t => t.status === 'done').length;
-  const monthExp = demo.expenses.reduce((s, e) => s + e.amount, 0);
-
-  const $ = id => document.getElementById(id);
-  if ($('hpDemoStatAll'))     $('hpDemoStatAll').textContent     = total;
-  if ($('hpDemoStatPending')) $('hpDemoStatPending').textContent = pending;
-  if ($('hpDemoStatDone'))    $('hpDemoStatDone').textContent    = done;
-  if ($('hpDemoStatExpense')) $('hpDemoStatExpense').textContent = `฿${monthExp.toLocaleString()}`;
-
-  // Focus list: top open tasks by priority
-  const open = demo.tasks
-    .filter(t => t.status !== 'done')
-    .sort((a, b) => (PRIORITY_RANK[a.priority] ?? 9) - (PRIORITY_RANK[b.priority] ?? 9))
-    .slice(0, 5);
-
-  const focusEl = $('hpDemoFocus');
-  if (focusEl) {
-    focusEl.innerHTML = open.map(t => `
-      <li class="hp-demo-task-item">
-        <span class="hp-demo-task-dot" style="background:${PRIORITY_COLORS[t.priority] || '#8E8E93'}"></span>
-        <span class="hp-demo-task-name">${t.title}</span>
-        <span class="hp-demo-task-tag">${t.priority}</span>
-      </li>`).join('');
-  }
-
-  // Expense bars: top categories
-  const CAT_COLOR = {
-    "อาหาร": "#FF9F0A", "เครื่องดื่ม": "#64D2FF", "เดินทาง": "#BF5AF2",
-    "น้ำมัน": "#FF9F0A", "ค่าไฟ": "#FF6B6B", "สุขภาพ": "#30D158",
-    "ช้อปปิ้ง": "#FF6B6B", "อินเทอร์เน็ต": "#0A84FF", "อื่นๆ": "#8E8E93",
-  };
-  const catTotals = {};
-  demo.expenses.forEach(e => { catTotals[e.category] = (catTotals[e.category] || 0) + e.amount; });
-  const maxAmt = Math.max(...Object.values(catTotals), 1);
-  const topCats = Object.entries(catTotals).sort((a, b) => b[1] - a[1]).slice(0, 5);
-
-  const barsEl = $('hpDemoBars');
-  if (barsEl) {
-    barsEl.innerHTML = topCats.map(([cat, amt]) => `
-      <div class="hp-demo-bar-row">
-        <span class="hp-demo-bar-label">${cat}</span>
-        <div class="hp-demo-bar-track">
-          <div class="hp-demo-bar-fill" style="width:${(amt / maxAmt * 100).toFixed(1)}%;background:${CAT_COLOR[cat] || '#8E8E93'}"></div>
-        </div>
-        <span class="hp-demo-bar-amt">฿${amt.toLocaleString()}</span>
-      </div>`).join('');
-  }
+// Clears any cached account snapshot and resets to an empty state. Called on
+// sign-out and whenever the async session check finds no active user but a
+// stale/expired cached snapshot was optimistically loaded from localStorage.
+function clearToLoggedOut() {
+  Storage.setAuthHint(false);
+  Storage.clearLocal();
+  state = { theme: state.theme || "light", tasks: [], notes: [], expenses: [], logs: [] };
+  render();
 }
 
 function addTask(title, priority = "Medium", due = "", status = "todo", description = "", labels = [], targetValue = null, targetUnit = "") {
@@ -1566,39 +1299,6 @@ document.getElementById("themeToggle").addEventListener("click", () => {
   btn.addEventListener("click", runCmd);
   input.addEventListener("keydown", e => { if (e.key === "Enter") runCmd(); });
 })();
-
-/* ── Task filter chips ── */
-document.querySelectorAll("[data-task-filter]").forEach((button) => {
-  button.addEventListener("click", () => {
-    state.taskFilter = button.dataset.taskFilter;
-    document.querySelectorAll("[data-task-filter]").forEach((item) => {
-      item.classList.toggle("active", item === button);
-    });
-    renderTasks();
-  });
-});
-
-/* ── Task view toggle (list / kanban) ── */
-document.getElementById("taskViewToggle")?.addEventListener("click", () => {
-  _taskView = _taskView === "list" ? "kanban" : "list";
-  const listView   = document.getElementById("taskListView");
-  const kanbanView = document.getElementById("taskKanbanView");
-  const iconList   = document.getElementById("iconViewList");
-  const iconKanban = document.getElementById("iconViewKanban");
-  if (_taskView === "kanban") {
-    listView.hidden   = true;
-    kanbanView.hidden = false;
-    if (iconList)   iconList.hidden   = true;
-    if (iconKanban) iconKanban.hidden = false;
-    renderKanban();
-  } else {
-    listView.hidden   = false;
-    kanbanView.hidden = true;
-    if (iconList)   iconList.hidden   = false;
-    if (iconKanban) iconKanban.hidden = true;
-    renderTasks();
-  }
-});
 
 /* ── Open add task modal ── */
 document.getElementById("openAddTask")?.addEventListener("click", () => openTaskModal());
@@ -2217,92 +1917,6 @@ document.addEventListener("click", (event) => {
     return;
   }
 
-  // Progress log: toggle input row
-  const logTaskId = target.closest("[data-log-task]")?.dataset.logTask;
-  if (logTaskId) {
-    const row = document.getElementById(`logRow-${logTaskId}`);
-    if (row) {
-      row.hidden = !row.hidden;
-      if (!row.hidden) row.querySelector(`[data-log-input]`)?.focus();
-    }
-    return;
-  }
-  const logCancelId = target.closest("[data-log-cancel]")?.dataset.logCancel;
-  if (logCancelId) {
-    const row = document.getElementById(`logRow-${logCancelId}`);
-    if (row) { row.hidden = true; const inp = row.querySelector(`[data-log-input]`); if (inp) inp.value = ""; }
-    return;
-  }
-  const logConfirmId = target.closest("[data-log-confirm]")?.dataset.logConfirm;
-  if (logConfirmId) {
-    const row   = document.getElementById(`logRow-${logConfirmId}`);
-    const input = row?.querySelector(`[data-log-input]`);
-    const amount = Number(input?.value);
-    if (!amount || amount <= 0) return;
-    state.tasks = state.tasks.map(t =>
-      t.id === logConfirmId
-        ? { ...t, progress_value: (Number(t.progress_value) || 0) + amount }
-        : t
-    );
-    const task = state.tasks.find(t => t.id === logConfirmId);
-    showToast(`บันทึก +${formatNum(amount)} ${task?.target_unit || ""} แล้ว`);
-    saveState(); renderTasks();
-    return;
-  }
-
-  // Toggle % / value display
-  const toggleModeId = target.closest("[data-toggle-progress-mode]")?.dataset.toggleProgressMode;
-  if (toggleModeId) {
-    const cur = _taskProgressMode.get(toggleModeId) || 'value';
-    _taskProgressMode.set(toggleModeId, cur === 'value' ? 'pct' : 'value');
-    renderTasks();
-    return;
-  }
-
-  // Remove progress bar
-  const removeProg = target.closest("[data-remove-progress]")?.dataset.removeProgress;
-  if (removeProg) {
-    state.tasks = state.tasks.map(t =>
-      t.id === removeProg ? { ...t, target_value: null, target_unit: "", progress_value: 0 } : t
-    );
-    _taskProgressMode.delete(removeProg);
-    showToast("ลบ Progress Bar แล้ว");
-    saveState(); renderTasks();
-    return;
-  }
-
-  // Add progress bar quick-add: show inline form
-  const addProgId = target.closest("[data-add-progress]")?.dataset.addProgress;
-  if (addProgId) {
-    const row = document.getElementById(`addProgRow-${addProgId}`);
-    if (row) {
-      row.hidden = !row.hidden;
-      if (!row.hidden) row.querySelector(`[data-quick-target]`)?.focus();
-    }
-    return;
-  }
-  // Quick-add cancel
-  const quickCancelId = target.closest("[data-quick-cancel]")?.dataset.quickCancel;
-  if (quickCancelId) {
-    const row = document.getElementById(`addProgRow-${quickCancelId}`);
-    if (row) row.hidden = true;
-    return;
-  }
-  // Quick-add confirm
-  const quickConfirmId = target.closest("[data-quick-confirm]")?.dataset.quickConfirm;
-  if (quickConfirmId) {
-    const row        = document.getElementById(`addProgRow-${quickConfirmId}`);
-    const targetVal  = Number(row?.querySelector(`[data-quick-target]`)?.value);
-    const targetUnit = row?.querySelector(`[data-quick-unit]`)?.value.trim() || "";
-    if (!targetVal || targetVal <= 0) { showToast("กรุณาใส่เป้าหมายที่มากกว่า 0"); return; }
-    state.tasks = state.tasks.map(t =>
-      t.id === quickConfirmId ? { ...t, target_value: targetVal, target_unit: targetUnit, progress_value: 0 } : t
-    );
-    showToast(`เพิ่ม Progress Bar แล้ว (เป้าหมาย ${formatNum(targetVal)} ${targetUnit})`);
-    saveState(); renderTasks();
-    return;
-  }
-
 
   if (openNoteId && !target.closest("[data-delete-note]")) {
     openNoteModal(openNoteId);
@@ -2363,30 +1977,6 @@ document.addEventListener("click", (event) => {
 
 });
 
-document.addEventListener("keydown", (e) => {
-  if (e.target.matches("input, textarea, select")) return;
-  if (e.metaKey || e.ctrlKey || e.altKey) return;
-
-  const viewKeys = { "1": "dashboard", "2": "tasks", "3": "notes", "4": "expenses", "5": "calendar", "6": "review" };
-  if (viewKeys[e.key]) {
-    e.preventDefault();
-    setView(viewKeys[e.key]);
-    return;
-  }
-
-  if (e.key === "n" || e.key === "N") {
-    e.preventDefault();
-    const activeView = document.querySelector(".view.active");
-    const firstInput = activeView?.querySelector('input[type="text"], input[type="number"], textarea');
-    if (firstInput) { firstInput.focus(); firstInput.select(); }
-    return;
-  }
-
-  if (e.key === "Escape") {
-    document.activeElement?.blur();
-  }
-});
-
 /* ── Sidebar toggle — restore persisted state ── */
 (function() {
   const shell = document.querySelector(".app-shell");
@@ -2421,24 +2011,19 @@ function updateSyncStatus(status, errMsg) {
   }
   if (status === 'error') {
     const msg = errMsg ? `sync error: ${errMsg}` : 'บันทึกไม่สำเร็จ — เปิด Console (F12) ดู [storage] error';
-    showToast(msg, 6000);
+    showToast(msg, "error");
   }
 }
 
 
 
 function updateAuthBar(user) {
-  const loggedInRow = document.getElementById("authLoggedInRow");
-  const guestRow    = document.getElementById("authGuestRow");
-  const emailEl     = document.getElementById("authUserEmailTopbar");
-  const subtitle    = document.getElementById("brandSubtitle");
-
-  if (loggedInRow) loggedInRow.hidden = !user;
-  if (guestRow)    guestRow.hidden = !!user;
+  const emailEl  = document.getElementById("authUserEmailTopbar");
+  const subtitle = document.getElementById("brandSubtitle");
 
   const lineInfo = Auth.getLineInfo();
-  const displayLabel = lineInfo?.displayName || (user ? 'LINE User' : '');
-  if (emailEl) { emailEl.textContent = displayLabel; emailEl.hidden = !user; }
+  const displayLabel = lineInfo?.displayName || user?.email || (user ? 'Signed in' : '');
+  if (emailEl) emailEl.textContent = displayLabel;
   if (subtitle) subtitle.textContent = user ? (lineInfo?.displayName || 'Connected') : 'Personal workspace';
 }
 
@@ -2446,6 +2031,7 @@ async function onSignedIn(user) {
   // Guard: prevent double-execution for the same user (Auth.init + onChange can both fire)
   if (_syncedUserId === user.id) return;
   _syncedUserId = user.id;
+  Storage.setAuthHint(true);
 
   showApp();
   updateAuthBar(user);
@@ -2484,33 +2070,26 @@ async function onSignedIn(user) {
       }
     }
 
-    // Merge: union of real-local + cloud, cloud items win on id conflict.
-    // Demo + legacy-seed items are stripped from both sides, then the
-    // union is deduped by content so the same item saved on two devices
-    // (different ids) collapses to one copy.
-    function mergeItems(local, remote, kind) {
-      const clean = arr => (arr || []).filter(i => !i._isDemo && !isLegacySeed(i, kind));
-      const map = new Map(clean(local).map(i => [i.id, i]));
-      for (const item of clean(remote)) map.set(item.id, item);
-      const seen = new Map(); // content signature → item (keep oldest createdAt)
-      for (const item of map.values()) {
-        const sig = kind === 'notes'
-          ? `${item.title.trim().toLowerCase()}|${(item.body || '').trim()}`
-          : kind === 'expenses'
-            ? `${item.title.trim().toLowerCase()}|${item.amount}|${item.date || ''}`
-            : `${item.title.trim().toLowerCase()}|${item.due || ''}`;
-        const prev = seen.get(sig);
-        if (!prev || item.createdAt < prev.createdAt) seen.set(sig, item);
-      }
-      return [...seen.values()];
-    }
-    const merged = {
-      tasks:    mergeItems(state.tasks,    cloud.tasks,    'tasks'),
-      notes:    mergeItems(state.notes,    cloud.notes,    'notes'),
-      expenses: mergeItems(state.expenses, cloud.expenses, 'expenses'),
+    // Merge cloud with any local-only items (edits/creates made on this
+    // device that haven't reached the cloud's debounced sync yet — there is
+    // no more guest/demo data that could leak in here, since the app
+    // requires login before any item can be created). Cloud wins on id
+    // conflicts; anything local-only that isn't a legacy seed is kept so it
+    // still gets pushed up on the next save.
+    const clean = (arr, kind) => (arr || []).filter(i => !isLegacySeed(i, kind));
+    const merge = (localArr, cloudArr, kind) => {
+      const cloudClean = clean(cloudArr, kind);
+      const cloudIds = new Set(cloudClean.map(i => i.id));
+      const localOnly = clean(localArr, kind).filter(i => !cloudIds.has(i.id));
+      return [...cloudClean, ...localOnly];
     };
-    state = { ...state, ...merged };
-    showToast(merged.tasks.length > 0 ? `โหลดข้อมูลจาก cloud (${merged.tasks.length} งาน)` : "เชื่อมต่อแล้ว ✓");
+    state = {
+      ...state,
+      tasks:    merge(state.tasks,    cloud.tasks,    'tasks'),
+      notes:    merge(state.notes,    cloud.notes,    'notes'),
+      expenses: merge(state.expenses, cloud.expenses, 'expenses'),
+    };
+    showToast(state.tasks.length > 0 ? `โหลดข้อมูลจาก cloud (${state.tasks.length} งาน)` : "เชื่อมต่อแล้ว ✓");
     saveState();
     render();
   }
@@ -2518,22 +2097,35 @@ async function onSignedIn(user) {
   updateSyncStatus('idle');
 }
 
-/* ── Auth modal helpers — module-scope so homepage buttons can call openAuthModal() directly ── */
-const _authModal         = document.getElementById("authModal");
-const _authLoginPanel    = document.getElementById("authLoginPanel");
-const _authSignedInPanel = document.getElementById("authSignedInPanel");
-
-function _showAuthPanel(name) {
-  [_authLoginPanel, _authSignedInPanel].forEach(p => { if (p) p.hidden = true; });
-  if (name === 'login'    && _authLoginPanel)    _authLoginPanel.hidden    = false;
-  if (name === 'signedIn' && _authSignedInPanel) _authSignedInPanel.hidden = false;
-}
+/* ── Account modal helpers (topbar "account" button while signed in) ── */
+const _authModal = document.getElementById("authModal");
 
 function openAuthModal() {
-  const errEl = document.getElementById('authError');
-  if (errEl) { errEl.textContent = ''; errEl.hidden = true; }
-  _showAuthPanel(Auth.isLoggedIn() ? 'signedIn' : 'login');
   _authModal.showModal();
+}
+
+/* ── Auth gate helpers (LINE + email/password login and signup) ── */
+function setGateTab(tab) {
+  document.getElementById("gateTabLogin")?.classList.toggle("active", tab === "login");
+  document.getElementById("gateTabSignup")?.classList.toggle("active", tab === "signup");
+  document.getElementById("gateTabLogin")?.setAttribute("aria-selected", tab === "login");
+  document.getElementById("gateTabSignup")?.setAttribute("aria-selected", tab === "signup");
+  const loginForm = document.getElementById("gateLoginForm");
+  const signupForm = document.getElementById("gateSignupForm");
+  if (loginForm)  loginForm.hidden  = tab !== "login";
+  if (signupForm) signupForm.hidden = tab !== "signup";
+}
+
+function showGateError(message) {
+  const errEl = document.getElementById("gateError");
+  if (!errEl) return;
+  errEl.textContent = message;
+  errEl.hidden = false;
+}
+
+function clearGateError() {
+  const errEl = document.getElementById("gateError");
+  if (errEl) { errEl.textContent = ""; errEl.hidden = true; }
 }
 
 async function initAuth() {
@@ -2542,30 +2134,64 @@ async function initAuth() {
   const authErr = urlParams.get('auth_error');
   if (authErr) {
     history.replaceState(null, '', location.pathname + location.hash);
-    showToast(`เข้าสู่ระบบไม่สำเร็จ: ${authErr}`, 4000);
+    showToast(`เข้าสู่ระบบไม่สำเร็จ: ${authErr}`, "error");
   }
 
-  /* ── Modal wiring ── */
-  document.getElementById("authLoginBtn")?.addEventListener("click", openAuthModal);
-  document.getElementById("authModalClose")?.addEventListener("click", () => _authModal.close());
+  /* ── ?auth=signup (from site/'s Sign Up page) opens straight on the signup tab ── */
+  if (urlParams.get('auth') === 'signup') {
+    history.replaceState(null, '', location.pathname + location.hash);
+    setGateTab('signup');
+  }
+
+  /* ── Account modal wiring ── */
+  document.getElementById("authAccountBtn")?.addEventListener("click", openAuthModal);
   _authModal.addEventListener("click", e => { if (e.target === _authModal) _authModal.close(); });
   _authModal.addEventListener("click", e => { if (e.target.closest("[data-auth-close]")) _authModal.close(); });
 
-  document.getElementById("authLineLoginBtn")?.addEventListener("click", () => Auth.signInWithLine());
-
-  document.getElementById("authLogoutTopBtn")?.addEventListener("click", async () => {
-    await Auth.signOut();
-    state = Storage.loadLocal(defaultState);
-    render();
-    showHomepage();
+  document.getElementById("authLogoutTopBtn")?.addEventListener("click", () => Auth.signOut());
+  document.getElementById("authLogoutModalBtn")?.addEventListener("click", () => {
+    _authModal.close();
+    Auth.signOut();
   });
 
-  document.getElementById("authLogoutModalBtn")?.addEventListener("click", async () => {
-    await Auth.signOut();
-    state = Storage.loadLocal(defaultState);
-    render();
-    _authModal.close();
-    showHomepage();
+  /* ── Auth gate wiring ── */
+  document.getElementById("gateLineLoginBtn")?.addEventListener("click", () => Auth.signInWithLine());
+  document.getElementById("gateTabLogin")?.addEventListener("click", () => setGateTab("login"));
+  document.getElementById("gateTabSignup")?.addEventListener("click", () => setGateTab("signup"));
+
+  document.getElementById("gateLoginForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearGateError();
+    const email = document.getElementById("gateLoginEmail").value.trim();
+    const password = document.getElementById("gateLoginPassword").value;
+    try {
+      await Auth.signInWithPassword(email, password);
+      // onSignedIn() runs via the SIGNED_IN event fired by Auth.onChange() below.
+    } catch (err) {
+      showGateError(err.message || "เข้าสู่ระบบไม่สำเร็จ");
+    }
+  });
+
+  document.getElementById("gateSignupForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearGateError();
+    const email = document.getElementById("gateSignupEmail").value.trim();
+    const password = document.getElementById("gateSignupPassword").value;
+    const confirm = document.getElementById("gateSignupConfirm").value;
+    if (password !== confirm) {
+      showGateError("รหัสผ่านไม่ตรงกัน");
+      return;
+    }
+    try {
+      const data = await Auth.signUp(email, password);
+      if (!data.session) {
+        showToast("สมัครสมาชิกสำเร็จ — โปรดยืนยันอีเมลก่อนเข้าสู่ระบบ", "success");
+      }
+      // If email confirmation is disabled, Auth.signUp() already started a
+      // session and the SIGNED_IN event from Auth.onChange() below takes over.
+    } catch (err) {
+      showGateError(err.message || "สมัครสมาชิกไม่สำเร็จ");
+    }
   });
 
   /* ── Async init ── */
@@ -2573,8 +2199,11 @@ async function initAuth() {
   updateAuthBar(user);
   if (user) {
     onSignedIn(user);
-  } else if (!_inApp) {
-    showHomepage();
+  } else {
+    // Only force a purge if the sync init actually trusted a cached local
+    // snapshot (stale/expired hint) — a fresh visitor's state is already empty.
+    if (_usedCachedLocal) clearToLoggedOut();
+    showAuthGate();
   }
 
   Auth.onChange((event, u) => {
@@ -2582,21 +2211,12 @@ async function initAuth() {
     if (event === "SIGNED_IN")  onSignedIn(u);
     if (event === "SIGNED_OUT") {
       _syncedUserId = null;
-      showToast("ออกจากระบบแล้ว — ข้อมูล local ยังอยู่");
-      showHomepage();
+      clearToLoggedOut();
+      showAuthGate();
+      showToast("ออกจากระบบแล้ว");
     }
   });
 }
-
-/* ── Homepage button wiring ──
-   hpNavLoginBtn / hpLoginBtn: open auth modal (dialog goes to top-layer,
-   visible even while app-shell is display:none)
-   hpGuestBtn / hpFooterGuestBtn: enter guest mode instantly ── */
-document.getElementById("hpNavLoginBtn")?.addEventListener("click", openAuthModal);
-document.getElementById("hpLoginBtn")?.addEventListener("click", openAuthModal);
-document.getElementById("hpFooterLoginBtn")?.addEventListener("click", openAuthModal);
-
-renderHomepageDemo();
 
 Storage.onSyncChange(updateSyncStatus);
 window.addEventListener('online',  () => updateSyncStatus('idle'));

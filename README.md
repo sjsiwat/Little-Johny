@@ -20,7 +20,7 @@ Little Johny started as a local-only productivity PWA and has grown into a **LIN
 | Module | Highlights |
 |---|---|
 | **Dashboard** | Task summary, recent notes, expense overview, quick actions |
-| **Tasks** | List + **Kanban** views · Priority · Due dates · Labels · Numeric progress tracking (e.g. 3/10 km) |
+| **Tasks** | **Kanban** board (todo / in progress / review / done) · Priority · Due dates · Labels · Drag-and-drop |
 | **Notes** | Freeform notes with tags — create, edit, and sync from web or LINE |
 | **Calendar** | Month view of tasks and due dates |
 | **Review** | Daily / weekly summaries — tasks done, overdue, notes, spending |
@@ -28,7 +28,7 @@ Little Johny started as a local-only productivity PWA and has grown into a **LIN
 | **Johny Buddy** 🐱 | Animated mascot companion — waves hello, celebrates finished tasks, thinks while syncing, sleeps late at night |
 | **Cloud Sync** | Supabase-backed, offline-first with sync status indicator, safe deletes, empty-state wipe protection |
 | **PWA** | Installable, offline cache via service worker, custom icons + manifest |
-| **UI** | Warm light workspace + dark frosted shell, orange accent (see `DESIGN.md`) · FAB quick actions · Fully responsive |
+| **UI** | Warm paper workspace, no dark shell, one accent blue (see `DESIGN.md`) · FAB quick actions · Fully responsive |
 
 ---
 
@@ -112,7 +112,7 @@ little-johny/
 ├── PRODUCT.md               # Vision, features, roadmap
 ├── DESIGN.md                # Design system — source of truth for all UI
 │
-└── .agents/skills/impeccable/  # AI dev rules (UX review, frontend quality)
+└── .claude/skills/impeccable/  # AI dev rules (UX review, frontend quality)
 ```
 
 ---
@@ -215,7 +215,7 @@ LINE Messaging API → Cloudflare Worker (Hono) → Supabase REST API
 - `storage.js` is the only place that touches persistence; keep data shape backward-compatible
 - Design consistency matters — `DESIGN.md` is the source of truth before touching any UI
 - Guest mode must stay fully functional (ephemeral, no cloud writes)
-- AI agents follow `.agents/skills/impeccable/` rules for UX quality
+- AI agents follow `.claude/skills/impeccable/` rules for UX quality
 
 ---
 

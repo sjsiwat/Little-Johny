@@ -57,6 +57,25 @@ const Auth = (() => {
       _lineInfo = null;
     },
 
+    /* ── Email + password auth ──────────────────────────────────────────────── */
+
+    // Throws on failure. Returns the Supabase auth data on success.
+    async signInWithPassword(email, password) {
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      _user = data.user;
+      return data;
+    },
+
+    // Throws on failure. `data.session` is null when the project requires
+    // email confirmation — the caller should tell the user to check their inbox.
+    async signUp(email, password) {
+      const { data, error } = await db.auth.signUp({ email, password });
+      if (error) throw error;
+      _user = data.session ? data.user : null;
+      return data;
+    },
+
     onChange(callback) {
       db.auth.onAuthStateChange((event, session) => {
         _user = session?.user ?? null;

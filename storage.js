@@ -8,6 +8,11 @@
 
 const Storage = (() => {
   const LOCAL_KEY = 'johny-os-lite-state';
+  // Set the moment a real sign-in succeeds, cleared on sign-out. Lets init
+  // decide — synchronously, before the async Supabase session check resolves
+  // — whether LOCAL_KEY is trustworthy cached account data or just needs to
+  // be ignored in favor of fresh demo content.
+  const AUTH_HINT_KEY = 'johny-os-auth-hint';
   let _syncTimer = null;
   let _syncChangeListener = null;
 
@@ -161,6 +166,21 @@ const Storage = (() => {
     loadLocal(defaultState) {
       const saved = localLoad();
       return saved ? { ...defaultState, ...saved } : defaultState;
+    },
+
+    hasAuthHint() {
+      return localStorage.getItem(AUTH_HINT_KEY) === '1';
+    },
+
+    setAuthHint(on) {
+      if (on) localStorage.setItem(AUTH_HINT_KEY, '1');
+      else localStorage.removeItem(AUTH_HINT_KEY);
+    },
+
+    // Wipe the cached account snapshot — used on sign-out so the next
+    // not-logged-in view can never inherit a previous account's data.
+    clearLocal() {
+      localStorage.removeItem(LOCAL_KEY);
     },
 
     save(state) {

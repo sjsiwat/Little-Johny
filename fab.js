@@ -1,30 +1,59 @@
-const fabMain = document.getElementById('fabMain');
+/* ============================================================
+   FAB MENU — quick-action popover
+   ------------------------------------------------------------
+   Toggled by clicking the Johny mascot (see mascot.js). This
+   module only handles the OPEN/CLOSE state + outside-click and
+   Escape dismissal. Selecting an item is delegated to app.js
+   (data-view-jump / data-open-task-modal listeners).
+   ============================================================ */
 const fabMenu = document.getElementById('fabMenu');
 
-if (fabMain && fabMenu) {
-  function closeFab() {
-    fabMenu.hidden = true;
-    fabMain.setAttribute('aria-expanded', 'false');
-    fabMain.classList.remove('open');
+function fabAnchor() {
+  return document.querySelector('.johny-buddy-body');
+}
+
+function closeFab() {
+  if (!fabMenu) return;
+  fabMenu.hidden = true;
+  const a = fabAnchor();
+  if (a) {
+    a.setAttribute('aria-expanded', 'false');
+    a.classList.remove('is-fab-open');
   }
-  fabMain.addEventListener('click', function (e) {
-    e.stopPropagation();
-    if (!fabMenu.hidden) {
-      closeFab();
-    } else {
-      fabMenu.hidden = false;
-      fabMain.setAttribute('aria-expanded', 'true');
-      fabMain.classList.add('open');
-    }
-  });
-  document.addEventListener('click', function (e) {
-    if (!fabMenu.hidden && !fabMenu.contains(e.target)) closeFab();
-  });
-  fabMenu.addEventListener('click', function (e) {
-    const item = e.target.closest('.fab-item[data-view-jump]');
-    if (item) setTimeout(closeFab, 120);
-  });
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeFab();
+}
+
+function openFab() {
+  if (!fabMenu) return;
+  fabMenu.hidden = false;
+  const a = fabAnchor();
+  if (a) {
+    a.setAttribute('aria-expanded', 'true');
+    a.classList.add('is-fab-open');
+  }
+}
+
+// Toggle from anywhere (mascot.js dispatches this)
+window.addEventListener('johny:fab-toggle', () => {
+  if (!fabMenu) return;
+  if (fabMenu.hidden) openFab(); else closeFab();
+});
+
+// Selecting an item auto-closes after the delegated handler fires
+if (fabMenu) {
+  fabMenu.addEventListener('click', (e) => {
+    if (e.target.closest('.fab-item')) setTimeout(closeFab, 120);
   });
 }
+
+// Outside click closes — but ignore clicks on the mascot itself,
+// so its own click handler decides open vs close.
+document.addEventListener('click', (e) => {
+  if (!fabMenu || fabMenu.hidden) return;
+  if (fabMenu.contains(e.target)) return;
+  if (e.target.closest('.johny-buddy')) return;
+  closeFab();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeFab();
+});
