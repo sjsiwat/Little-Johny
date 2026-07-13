@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { navLinks, signupAppUrl } from "@/lib/content";
+import { appUrl, navLinks, signupAppUrl } from "@/lib/content";
 
 export function Nav() {
   const [open, setOpen] = useState(false);
@@ -11,7 +11,7 @@ export function Nav() {
     <header className="sticky top-0 z-50 border-b border-hairline bg-paper/95 backdrop-blur-sm">
       <div className="mx-auto flex max-w-edit items-center justify-between px-6 py-5 md:px-10">
         <a
-          href="#top"
+          href="/"
           className="font-grotesk text-lg font-semibold tracking-tight text-ink"
         >
           Johny Memo
@@ -25,16 +25,22 @@ export function Nav() {
 
         <div className="hidden items-center gap-3 md:flex">
           <a
+            href={appUrl}
+            className="inline-flex items-center px-5 py-2 text-sm font-medium text-ink transition-colors duration-200 hover:text-accent"
+          >
+            Log in
+          </a>
+          <a
             href={signupAppUrl}
             className="inline-flex items-center px-5 py-2 text-sm font-medium text-ink transition-colors duration-200 hover:text-accent"
           >
             Sign Up
           </a>
           <a
-            href="/about"
+            href="/about#index"
             className="inline-flex items-center border border-ink px-5 py-2 text-sm font-medium text-ink transition-colors duration-200 hover:bg-ink hover:text-paper"
           >
-            About Me
+            See what it does
           </a>
         </div>
 
@@ -69,18 +75,25 @@ export function Nav() {
             </a>
           ))}
           <a
-            href={signupAppUrl}
+            href={appUrl}
             onClick={() => setOpen(false)}
             className="mt-4 inline-flex items-center justify-center px-5 py-3 text-sm font-medium text-ink"
+          >
+            Log in
+          </a>
+          <a
+            href={signupAppUrl}
+            onClick={() => setOpen(false)}
+            className="inline-flex items-center justify-center px-5 py-3 text-sm font-medium text-ink"
           >
             Sign Up
           </a>
           <a
-            href="/about"
+            href="/about#index"
             onClick={() => setOpen(false)}
             className="mb-4 inline-flex items-center justify-center border border-ink px-5 py-3 text-sm font-medium text-ink"
           >
-            About Me
+            See what it does
           </a>
         </nav>
       </div>

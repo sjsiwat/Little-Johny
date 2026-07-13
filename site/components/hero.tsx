@@ -80,12 +80,6 @@ export function Hero() {
             >
               See what it does
             </a>
-            <a
-              href="/about"
-              className="inline-flex items-center text-sm font-medium text-ink underline decoration-hairline underline-offset-4 transition-colors hover:decoration-accent"
-            >
-              About Me
-            </a>
           </motion.div>
         </div>
 
