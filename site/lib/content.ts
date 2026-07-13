@@ -1,9 +1,9 @@
-// TODO: confirm this is the real subdomain before deploying — placeholder per
-// the Approach-A split (root = this landing page, app. = the existing dashboard).
-export const appUrl = "https://app.johny.siwat.me";
+// Dashboard lives on the same domain at /dashboard (not a separate app.
+// subdomain — root = this landing page, /dashboard = the app).
+export const appUrl = "/dashboard";
 
 // Opens the Dashboard app directly on its Sign Up form (see auth-gate in the app).
-export const signupAppUrl = `${appUrl}/?auth=signup`;
+export const signupAppUrl = `${appUrl}?auth=signup`;
 
 export type NavLink = {
   label: string;

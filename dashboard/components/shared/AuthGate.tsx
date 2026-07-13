@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { ArrowLeft } from "lucide-react";
 import type { AuthBootstrap } from "@/lib/useAuthBootstrap";
 
 interface AuthGateProps {
@@ -44,7 +45,16 @@ export function AuthGate({ auth }: AuthGateProps) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-paper px-6 py-12 dark:bg-dark-bg">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-paper px-6 py-12 dark:bg-dark-bg">
+      <div className="mb-4 w-full max-w-sm">
+        <a
+          href="/"
+          className="inline-flex items-center gap-1.5 text-xs text-ink-muted underline decoration-hairline underline-offset-4 hover:text-ink hover:decoration-accent"
+        >
+          <ArrowLeft size={12} aria-hidden />
+          กลับหน้าแรก
+        </a>
+      </div>
       <div className="w-full max-w-sm border border-ink px-6 py-8 dark:border-white/20">
         <Image src="/johny-cat.svg" alt="" width={64} height={64} aria-hidden className="mx-auto opacity-90" />
         <h1 className="mt-4 text-center font-grotesk text-2xl font-semibold tracking-tight text-ink dark:text-white/90">
