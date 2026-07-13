@@ -1,3 +1,8 @@
 .DS_Store
 .claude/
 .wrangler/
+
+# Kept local-only — never tracked/pushed (purged from git history on 2026-07-13)
+DESIGN.md
+PRODUCT.md
+supabase_migration_*.sql
