@@ -56,3 +56,69 @@ dialog::backdrop {
 html[data-theme="dark"] dialog::backdrop {
   background: rgba(0, 0, 0, 0.6);
 }
+
+.doc-editor-content .ProseMirror {
+  min-height: 1000px;
+  padding: 4rem;
+  outline: none;
+  line-height: 1.7;
+}
+
+.doc-editor-content .ProseMirror p {
+  margin: 0 0 0.75em;
+}
+
+.doc-editor-content .ProseMirror h1,
+.doc-editor-content .ProseMirror h2,
+.doc-editor-content .ProseMirror h3 {
+  margin: 1em 0 0.5em;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.doc-editor-content .ProseMirror h1 {
+  font-size: 1.8em;
+}
+
+.doc-editor-content .ProseMirror h2 {
+  font-size: 1.4em;
+}
+
+.doc-editor-content .ProseMirror h3 {
+  font-size: 1.15em;
+}
+
+.doc-editor-content .ProseMirror ul,
+.doc-editor-content .ProseMirror ol {
+  margin: 0 0 0.75em;
+  padding-left: 1.5em;
+}
+
+.doc-editor-content .ProseMirror blockquote {
+  margin: 0 0 0.75em;
+  padding-left: 1em;
+  border-left: 3px solid #dedace;
+  color: #6b6459;
+}
+
+.doc-editor-content .ProseMirror img {
+  max-width: 100%;
+  height: auto;
+}
+
+.doc-editor-content .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: #726b5c;
+  pointer-events: none;
+}
+
+html[data-theme="dark"] .doc-editor-content .ProseMirror blockquote {
+  border-left-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+html[data-theme="dark"] .doc-editor-content .ProseMirror p.is-editor-empty:first-child::before {
+  color: rgba(255, 255, 255, 0.4);
+}

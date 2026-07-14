@@ -336,9 +336,15 @@ export function DocEditor({ noteId, onClose }: DocEditorProps) {
         </ToolbarButton>
       </div>
 
-      <div className="flex-1 overflow-y-auto bg-paper-dim px-4 py-8 dark:bg-dark-bg">
-        <div className="mx-auto min-h-[1000px] max-w-[794px] border border-hairline bg-paper p-16 shadow-none dark:border-white/10 dark:bg-dark-surface">
-          <EditorContent editor={editor} className="doc-editor-content prose max-w-none focus:outline-none" />
+      <div
+        className="flex-1 overflow-y-auto bg-paper-dim px-4 py-8 dark:bg-dark-bg"
+        onClick={() => editor.chain().focus().run()}
+      >
+        <div
+          className="mx-auto max-w-[794px] border border-hairline bg-paper shadow-none dark:border-white/10 dark:bg-dark-surface"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <EditorContent editor={editor} className="doc-editor-content" />
         </div>
       </div>
     </div>
