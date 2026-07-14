@@ -46,7 +46,7 @@ export function TodayCommandCenter() {
   const dateText = now
     ? new Intl.DateTimeFormat("th-TH", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(now)
     : "";
-  const timeText = now ? new Intl.DateTimeFormat("th-TH", { hour: "2-digit", minute: "2-digit" }).format(now) : "";
+  const timeText = now ? new Intl.DateTimeFormat("th-TH", { hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(now) : "";
 
   return (
     <div className="border border-hairline bg-paper p-5 dark:border-white/10 dark:bg-dark-surface">
