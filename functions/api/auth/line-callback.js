@@ -119,7 +119,7 @@ export async function onRequestGet({ request, env }) {
       body: JSON.stringify({
         type: 'magiclink',
         email: userData.email,
-        options: { redirect_to: origin },
+        options: { redirect_to: `${origin}/dashboard` },
       }),
     });
     const linkData = await linkRes.json();
@@ -133,5 +133,5 @@ export async function onRequestGet({ request, env }) {
 }
 
 function redirect(origin, query) {
-  return Response.redirect(`${origin}/?${query}`, 302);
+  return Response.redirect(`${origin}/dashboard?${query}`, 302);
 }

@@ -36,12 +36,6 @@ export function Nav() {
           >
             Sign Up
           </a>
-          <a
-            href="/about#index"
-            className="inline-flex items-center border border-ink px-5 py-2 text-sm font-medium text-ink transition-colors duration-200 hover:bg-ink hover:text-paper"
-          >
-            See what it does
-          </a>
         </div>
 
         <button
@@ -84,16 +78,9 @@ export function Nav() {
           <a
             href={signupAppUrl}
             onClick={() => setOpen(false)}
-            className="inline-flex items-center justify-center px-5 py-3 text-sm font-medium text-ink"
+            className="mb-4 inline-flex items-center justify-center px-5 py-3 text-sm font-medium text-ink"
           >
             Sign Up
-          </a>
-          <a
-            href="/about#index"
-            onClick={() => setOpen(false)}
-            className="mb-4 inline-flex items-center justify-center border border-ink px-5 py-3 text-sm font-medium text-ink"
-          >
-            See what it does
           </a>
         </nav>
       </div>

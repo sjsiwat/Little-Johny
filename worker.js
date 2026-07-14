@@ -135,7 +135,7 @@ async function handleLineCallback(request, env) {
       body: JSON.stringify({
         type: 'magiclink',
         email: userEmail,
-        options: { redirect_to: origin },
+        options: { redirect_to: `${origin}/dashboard` },
       }),
     });
     const linkData = await linkRes.json();
@@ -149,5 +149,5 @@ async function handleLineCallback(request, env) {
 }
 
 function redirect(origin, query) {
-  return Response.redirect(`${origin}/?${query}`, 302);
+  return Response.redirect(`${origin}/dashboard?${query}`, 302);
 }
