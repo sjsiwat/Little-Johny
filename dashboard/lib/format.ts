@@ -41,9 +41,15 @@ export function relativeTime(ts: number | null | undefined): string {
   return new Intl.DateTimeFormat("th-TH", { day: "numeric", month: "short" }).format(new Date(ts));
 }
 
+const NOTE_HTML_RE = /<[a-z!/][\s\S]*>/i;
+
+export function isRichNote(body: string | null | undefined): boolean {
+  return !!body && NOTE_HTML_RE.test(body);
+}
+
 export function notePlainText(body: string | null | undefined): string {
   if (!body) return "";
-  if (!/<[a-z!/][\s\S]*>/i.test(body)) return body.replace(/\s+/g, " ").trim();
+  if (!NOTE_HTML_RE.test(body)) return body.replace(/\s+/g, " ").trim();
   if (typeof document === "undefined") return body.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
   const tmp = document.createElement("div");
   tmp.innerHTML = body;
