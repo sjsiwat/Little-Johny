@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TextStyle from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
@@ -54,6 +54,34 @@ const DOC_HL_SWATCHES = [
 interface DocEditorProps {
   noteId: string;
   onClose: () => void;
+}
+
+function insertImageFile(
+  editor: Editor,
+  file: File,
+  insertCountRef: React.MutableRefObject<number>,
+  dirtyRef: React.MutableRefObject<boolean>
+) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    const src = reader.result as string;
+    const img = new window.Image();
+    img.onload = () => {
+      const maxWidth = 320;
+      const ratio = img.naturalWidth > 0 ? img.naturalHeight / img.naturalWidth : 0.75;
+      const width = Math.min(maxWidth, img.naturalWidth || maxWidth);
+      const height = Math.max(40, Math.round(width * ratio));
+      const offset = (insertCountRef.current++ % 6) * 28;
+      editor
+        .chain()
+        .focus()
+        .setResizableImage({ src, x: 64 + offset, y: 64 + offset, width, height })
+        .run();
+      dirtyRef.current = true;
+    };
+    img.src = src;
+  };
+  reader.readAsDataURL(file);
 }
 
 function ToolbarButton({
@@ -113,6 +141,19 @@ export function DocEditor({ noteId, onClose }: DocEditorProps) {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
       saveTimerRef.current = setTimeout(saveNow, 1200);
     },
+    editorProps: {
+      handlePaste(_view, event) {
+        if (!editor) return false;
+        const files = Array.from(event.clipboardData?.items || [])
+          .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
+          .map((item) => item.getAsFile())
+          .filter((file): file is File => !!file);
+        if (files.length === 0) return false;
+        event.preventDefault();
+        files.forEach((file) => insertImageFile(editor, file, insertCountRef, dirtyRef));
+        return true;
+      },
+    },
   });
 
   const saveNow = useCallback(() => {
@@ -148,26 +189,7 @@ export function DocEditor({ noteId, onClose }: DocEditorProps) {
   function insertImage(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !editor) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const src = reader.result as string;
-      const img = new window.Image();
-      img.onload = () => {
-        const maxWidth = 320;
-        const ratio = img.naturalWidth > 0 ? img.naturalHeight / img.naturalWidth : 0.75;
-        const width = Math.min(maxWidth, img.naturalWidth || maxWidth);
-        const height = Math.max(40, Math.round(width * ratio));
-        const offset = (insertCountRef.current++ % 6) * 28;
-        editor
-          .chain()
-          .focus()
-          .setResizableImage({ src, x: 64 + offset, y: 64 + offset, width, height })
-          .run();
-        dirtyRef.current = true;
-      };
-      img.src = src;
-    };
-    reader.readAsDataURL(file);
+    insertImageFile(editor, file, insertCountRef, dirtyRef);
     e.target.value = "";
   }
 
