@@ -8,9 +8,9 @@ import Color from "@tiptap/extension-color";
 import FontFamily from "@tiptap/extension-font-family";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
-import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import Highlight from "@tiptap/extension-highlight";
+import { ResizableImage } from "@/lib/tiptapResizableImage";
 import {
   Bold,
   Italic,
@@ -91,6 +91,7 @@ export function DocEditor({ noteId, onClose }: DocEditorProps) {
   const [showHlSwatches, setShowHlSwatches] = useState(false);
   const dirtyRef = useRef(false);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const insertCountRef = useRef(0);
 
   const editor = useEditor({
     extensions: [
@@ -102,7 +103,7 @@ export function DocEditor({ noteId, onClose }: DocEditorProps) {
       Underline,
       Highlight.configure({ multicolor: true }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
-      Image,
+      ResizableImage,
       Placeholder.configure({ placeholder: "เริ่มพิมพ์เอกสารของคุณ…" }),
     ],
     content: note?.body || "",
@@ -149,8 +150,22 @@ export function DocEditor({ noteId, onClose }: DocEditorProps) {
     if (!file || !editor) return;
     const reader = new FileReader();
     reader.onload = () => {
-      editor.chain().focus().setImage({ src: reader.result as string }).run();
-      dirtyRef.current = true;
+      const src = reader.result as string;
+      const img = new window.Image();
+      img.onload = () => {
+        const maxWidth = 320;
+        const ratio = img.naturalWidth > 0 ? img.naturalHeight / img.naturalWidth : 0.75;
+        const width = Math.min(maxWidth, img.naturalWidth || maxWidth);
+        const height = Math.max(40, Math.round(width * ratio));
+        const offset = (insertCountRef.current++ % 6) * 28;
+        editor
+          .chain()
+          .focus()
+          .setResizableImage({ src, x: 64 + offset, y: 64 + offset, width, height })
+          .run();
+        dirtyRef.current = true;
+      };
+      img.src = src;
     };
     reader.readAsDataURL(file);
     e.target.value = "";

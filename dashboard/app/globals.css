@@ -58,6 +58,7 @@ html[data-theme="dark"] dialog::backdrop {
 }
 
 .doc-editor-content .ProseMirror {
+  position: relative;
   min-height: 1000px;
   padding: 4rem;
   outline: none;
