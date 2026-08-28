@@ -6,6 +6,9 @@ compatibility_date = "2024-01-01"
 [assets]
 directory = "../web_dist"
 binding = "ASSETS"
+# Single-page app: deep links like /tasks must fall through to index.html so
+# React Router can handle them.
+not_found_handling = "single-page-application"
 
 [vars]
 LINE_CHANNEL_ID = "2010502491"

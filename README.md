@@ -2,7 +2,7 @@
 
 > A personal digital workspace — tasks, notes, expenses, calendar, and daily review in one place, with a LINE secretary in your pocket.
 
-**Live:** [johny.siwat.me](https://johny.siwat.me) &nbsp;|&nbsp; **Stack:** Vanilla JS · Supabase · LINE Login · Cloudflare Workers
+**Live:** [johny.siwat.me](https://johny.siwat.me) &nbsp;|&nbsp; **Stack:** React · Vite · Tailwind · Supabase · LINE Login · Cloudflare Workers
 
 ---
 
@@ -28,7 +28,7 @@ Little Johny started as a local-only productivity PWA and has grown into a **LIN
 | **Johny Buddy** 🐱 | Animated mascot companion — waves hello, celebrates finished tasks, thinks while syncing, sleeps late at night |
 | **Cloud Sync** | Supabase-backed, offline-first with sync status indicator, safe deletes, empty-state wipe protection |
 | **PWA** | Installable, offline cache via service worker, custom icons + manifest |
-| **UI** | Warm paper workspace, no dark shell, one accent blue (see `DESIGN.md`) · FAB quick actions · Fully responsive |
+| **UI** | Warm paper workspace, no dark shell, one accent blue (see `docs/DESIGN.md`) · FAB quick actions · Fully responsive |
 
 ---
 
@@ -38,14 +38,14 @@ Little Johny started as a local-only productivity PWA and has grown into a **LIN
                     ┌─────────────────────────────┐
                     │   johny.siwat.me            │
                     │   Cloudflare Worker         │
-                    │   (worker.js + static assets)│
+                    │  (server/worker.js + assets)│
                     └──────┬──────────────┬───────┘
                            │              │
               /api/auth/line-callback   everything else
                            │              │
-                     LINE Login      index.html + app.js
-                     OAuth 2.1       auth.js / storage.js
-                           │         fab.js / mascot.js
+                     LINE Login      React SPA (web_dist/)
+                     OAuth 2.1       landing + workspace
+                           │         routes in one bundle
                            ▼              │
                     ┌─────────────┐       │ anon key + RLS
                     │  Supabase   │◄──────┘
@@ -68,7 +68,7 @@ Little Johny started as a local-only productivity PWA and has grown into a **LIN
 4. Worker generates a Supabase magic link → browser lands back signed in
 ```
 
-### Storage layer (`storage.js`)
+### Storage layer (`src/lib/storage.js`)
 
 - **Guest:** ephemeral — nothing persisted
 - **Logged in:** every save writes LocalStorage immediately, then syncs to Supabase after a 1.5s debounce
@@ -91,28 +91,36 @@ All tables protected by RLS (web) and filtered by `user_id` (bot, service role).
 
 ## Project Structure
 
+One app, one `package.json`, one build. The landing page and the workspace are
+routes in the same React Router tree.
+
 ```
 little-johny/
-├── index.html               # Single-page app shell (all views)
-├── app.js                   # App logic: views, tasks, notes, expenses, calendar, review
-├── auth.js                  # Supabase auth wrapper + LINE Login OAuth
-├── storage.js               # Unified storage adapter (LocalStorage ↔ Supabase)
-├── fab.js                   # Floating action button menu
-├── mascot.js                # Johny Buddy — animated desk companion
-├── mascot/                  # Mascot pose frames (idle, wave, happy, typing, thinking, sleeping)
-├── styles.css               # Full design system implementation
-├── sw.js                    # Service worker (offline cache)
-├── manifest.webmanifest     # PWA manifest ("Johny Memo")
-├── worker.js                # Cloudflare Worker entry: LINE callback + static assets
-├── wrangler.toml            # Worker config (name: johnyos)
-├── functions/               # Cloudflare Pages Functions (LINE callback, legacy)
-├── supabase_migration_*.sql # DB migrations (line_users, plans, task progress)
-├── _headers                 # Security headers
-│
-├── PRODUCT.md               # Vision, features, roadmap
-├── DESIGN.md                # Design system — source of truth for all UI
-│
-└── .claude/skills/impeccable/  # AI dev rules (UX review, frontend quality)
+├── index.html               # Vite entry — fonts, PWA meta, #root
+├── src/
+│   ├── main.jsx             # React root + service worker registration
+│   ├── App.jsx              # Routes; the app half is lazy-loaded
+│   ├── routes/
+│   │   ├── landing/         # /  /about  /signup   + LandingLayout
+│   │   ├── app/             # /dashboard /tasks /notes /expenses /calendar /review
+│   │   │                    #   + AppLayout (auth gate, sidebar, topbar)
+│   │   └── NotFound.jsx
+│   ├── components/
+│   │   ├── landing/         # hero, nav, capabilities, process, footer, …
+│   │   ├── shared/          # Sidebar, Topbar, Modal, Toast, Fab, Mascot, AuthGate
+│   │   └── tasks|notes|expenses|calendar|dashboard|review/
+│   ├── lib/                 # store (zustand), storage, auth, actions, format, …
+│   └── styles/globals.css   # Tailwind layers + editor and theme styles
+├── public/                  # icons, mascot frames, manifest, sw.js
+├── server/
+│   ├── worker.js            # Cloudflare Worker: LINE callback + static assets
+│   ├── wrangler.toml        # Worker config (name: johnyos)
+│   ├── headers              # Security headers → copied to web_dist/_headers
+│   └── .env.example         # Worker secrets + optional client build vars
+├── supabase/migrations/     # 001_v2 … 004_task_progress
+├── scripts/deploy.sh        # build → headers → wrangler deploy
+├── docs/                    # DESIGN.md, PRODUCT.md (local-only), mascot.md
+└── web_dist/                # Build output — gitignored, rebuilt every deploy
 ```
 
 ---
@@ -122,25 +130,30 @@ little-johny/
 ```bash
 git clone <repository-url>
 cd little-johny
-
-# Static-only (no LINE login):
-python3 -m http.server 8080     # → http://localhost:8080
-
-# Full stack incl. LINE callback:
-wrangler dev                    # runs worker.js + assets
+npm install
+npm run dev                     # → http://localhost:3000
 ```
 
-No build step. No dependencies. Environment variables for the Worker are documented in `.env.example` (LINE channel secret, Supabase service role key — set as Wrangler secrets; public vars live in `wrangler.toml`).
+`src/lib/supabaseClient.js` falls back to the public Supabase URL and anon key,
+so login works without any local env file. To point the build at a different
+project, put `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` /
+`VITE_LINE_CHANNEL_ID` in a root `.env.local` — see `server/.env.example`.
+
+The Worker's own secrets (`LINE_CHANNEL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`)
+are set with `npx wrangler secret put <NAME> -c server/wrangler.toml`.
 
 ---
 
 ## Deployment
 
-```
-Local → Git commit → GitHub → Cloudflare Worker (wrangler) → johny.siwat.me
+```bash
+./scripts/deploy.sh
 ```
 
-The Worker (`johnyos`) serves the static app and handles `/api/auth/line-callback`.
+Builds into `web_dist/`, copies the security headers in, and runs
+`wrangler deploy`. The Worker (`johnyos`) serves the static bundle and handles
+`/api/auth/line-callback`; unknown paths fall through to `index.html` so React
+Router can route them.
 
 ---
 
@@ -212,8 +225,8 @@ LINE Messaging API → Cloudflare Worker (Hono) → Supabase REST API
 ## Development Notes
 
 - Understand existing code before editing — avoid unnecessary rewrites
-- `storage.js` is the only place that touches persistence; keep data shape backward-compatible
-- Design consistency matters — `DESIGN.md` is the source of truth before touching any UI
+- `src/lib/storage.js` is the only place that touches persistence; keep data shape backward-compatible
+- Design consistency matters — `docs/DESIGN.md` is the source of truth before touching any UI
 - Guest mode must stay fully functional (ephemeral, no cloud writes)
 - AI agents follow `.claude/skills/impeccable/` rules for UX quality
 
