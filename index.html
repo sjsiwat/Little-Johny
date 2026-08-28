@@ -17,20 +17,14 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Johny" />
 
-    <!-- Latin + the italic serif accents come from Google; Thai is self-hosted
-         (see the @font-face in src/styles/globals.css). The CSS variable names
-         are unchanged, so every font-grotesk/serif/thai class still resolves. -->
+    <!-- Mitr covers Latin and Thai in one family, so there is no separate Thai
+         face to host or metric-match. Mitr has no italic, so Newsreader still
+         supplies the italic accents. Weights are limited to the four the UI
+         actually uses (400/500/600/700). -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      rel="preload"
-      as="font"
-      type="font/woff2"
-      href="/fonts/royal-institute-of-siam-new.woff2"
-      crossorigin
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&display=swap"
       rel="stylesheet"
     />
   </head>

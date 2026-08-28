@@ -24,9 +24,9 @@ export default {
         "dark-surface-soft": "#292929",
       },
       fontFamily: {
-        grotesk: ["var(--font-grotesk)", "var(--font-thai)", "Helvetica", "Arial", "sans-serif"],
+        // Mitr carries both scripts, so there is no separate Thai entry.
+        grotesk: ["var(--font-grotesk)", "Helvetica", "Arial", "sans-serif"],
         serif: ["var(--font-serif)", "Georgia", "serif"],
-        thai: ["var(--font-thai)", "sans-serif"],
       },
       maxWidth: {
         edit: "1400px",
