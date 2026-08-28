@@ -53,20 +53,20 @@ export const EXPENSE_CATEGORIES = [
   "อื่นๆ",
 ] ;
 
-export const EXPENSE_BAR_COLORS = {
-  อาหาร: token("data-3"),
-  เครื่องดื่ม: token("data-2"),
-  เดินทาง: token("data-6"),
-  น้ำมัน: token("data-3"),
-  ค่าไฟ: token("data-5"),
-  ค่าน้ำ: token("data-2"),
-  อินเทอร์เน็ต: token("data-6"),
-  สุขภาพ: token("data-4"),
-  ช้อปปิ้ง: token("data-5"),
-  การศึกษา: token("data-4"),
-  ลงทุน: token("data-1"),
-  อื่นๆ: token("text-muted"),
-};
+// Expense bars are a single hue — the brand purple — with intensity carrying
+// the magnitude, so the panel reads as one family instead of a categorical
+// rainbow.
+//
+// The alpha is normalised across the bars actually on screen rather than taken
+// straight from total/max. Real category totals cluster (370 / 232 / 205 maps
+// to alpha 1.00 / 0.80 / 0.75, which the eye cannot separate); stretching the
+// visible range over the full ramp keeps the steps legible while still ordering
+// strictly by bar length.
+export function expenseBarColor(total, max, min) {
+  const span = max - min;
+  const t = span > 0 ? (total - min) / span : 1;
+  return `rgb(var(--c-accent) / ${(0.45 + 0.55 * t).toFixed(2)})`;
+}
 
 export const EXPENSE_ICONS = {
   อาหาร: "🍜",

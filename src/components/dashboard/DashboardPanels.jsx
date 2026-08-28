@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { FileText } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { PRIORITY_COLORS, PRIORITY_RANK, EXPENSE_BAR_COLORS } from "@/lib/constants";
+import { PRIORITY_COLORS, PRIORITY_RANK, expenseBarColor } from "@/lib/constants";
 import { formatDate, formatMoney, getMonthKey, getTodayKey, relativeTime, parseTags } from "@/lib/format";
 import { isTaskDone } from "@/lib/actions";
 
@@ -81,6 +81,7 @@ export function ExpenseBarsPanel() {
   expenses.forEach((e) => totals.set(e.category, (totals.get(e.category) ?? 0) + Number(e.amount)));
   const top = [...totals.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
   const max = top.length ? top[0][1] : 0;
+  const min = top.length ? top[top.length - 1][1] : 0;
 
   return (
     <div className="border border-hairline bg-paper p-5">
@@ -94,16 +95,19 @@ export function ExpenseBarsPanel() {
           />
         ) : (
           top.map(([category, total]) => {
-            const color = EXPENSE_BAR_COLORS[category] || "rgb(var(--c-text-muted))";
-            const width = max ? Math.round((total / max) * 100) : 0;
+            const ratio = max ? total / max : 0;
+            const width = Math.round(ratio * 100);
             return (
               <div key={category}>
                 <div className="flex items-center justify-between text-xs text-ink-muted">
                   <span>{category}</span>
                   <strong className="text-ink">{formatMoney(total)}</strong>
                 </div>
-                <div className="mt-1 h-1.5 w-full bg-paper-dim">
-                  <div className="h-full" style={{ width: `${width}%`, background: color }} />
+                <div className="mt-1.5 h-2 w-full rounded-[4px] bg-paper-dim">
+                  <div
+                    className="h-full rounded-[4px]"
+                    style={{ width: `${width}%`, background: expenseBarColor(total, max, min) }}
+                  />
                 </div>
               </div>
             );

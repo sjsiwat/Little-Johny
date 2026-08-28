@@ -4,7 +4,7 @@ import { useStore } from "@/lib/store";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { deleteExpense } from "@/lib/actions";
 import { useToastStore } from "@/lib/toastStore";
-import { EXPENSE_BAR_COLORS, EXPENSE_CATEGORIES, EXPENSE_ICONS } from "@/lib/constants";
+import { EXPENSE_CATEGORIES, EXPENSE_ICONS } from "@/lib/constants";
 import { formatDate, formatMoney, getMonthKey, getTodayKey } from "@/lib/format";
 
 function ExpenseEditForm({ expense, onDone }) {
@@ -50,11 +50,10 @@ function ExpenseRow({ expense }) {
   if (editing) return <ExpenseEditForm expense={expense} onDone={() => setEditing(false)} />;
 
   const icon = EXPENSE_ICONS[expense.category] || "📦";
-  const color = EXPENSE_BAR_COLORS[expense.category] || "rgb(var(--c-text-muted))";
 
   return (
     <div className="flex items-center gap-3 border-t border-hairline py-2 first:border-t-0">
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center text-base" style={{ background: `${color}20` }}>
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center text-base" style={{ background: "rgb(var(--c-accent) / 0.10)" }}>
         {icon}
       </span>
       <span className="min-w-0 flex-1 truncate text-sm text-ink">{expense.title}</span>
