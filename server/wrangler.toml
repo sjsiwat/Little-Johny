@@ -2,6 +2,19 @@ name = "johnyos"
 main = "worker.js"
 compatibility_date = "2024-01-01"
 
+# Both default to false once any config is applied via wrangler, which silently
+# turns off the *.workers.dev URL and the version Preview URLs. Declared so a
+# `wrangler triggers deploy` cannot disable them again.
+workers_dev = true
+preview_urls = true
+
+# The production hostname. It was attached in the Cloudflare dashboard only, so
+# nothing in the repo recorded it — declared here it survives a worker rebuild.
+# Custom domain (not a route): the pattern is the bare hostname, no path.
+[[routes]]
+pattern = "johny.siwat.me"
+custom_domain = true
+
 # Paths are relative to this file (server/), hence the ../ on the asset dir.
 [assets]
 directory = "../web_dist"
