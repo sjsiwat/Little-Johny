@@ -8,14 +8,11 @@ import {
   ambientReevaluate,
 } from "@/lib/mascotStore";
 
-const POSE_SRC = {
-  idle: "/mascot/idle.png",
-  wave: "/mascot/wave.png",
-  happy: "/mascot/happy.png",
-  typing: "/mascot/typing.png",
-  thinking: "/mascot/thinking.png",
-  sleeping: "/mascot/sleeping.png",
-};
+// One animated loop (224px master, 12fps, seamless) plus a still first frame.
+// The still stands in whenever motion is unwanted — reduced-motion users, and
+// the sleeping state, where a moving cat would contradict the "z".
+const ANIMATED = "/mascot/johny.webp";
+const STILL = "/mascot/johny.png";
 
 // Lives inline in the Dashboard greeting row — only ever rendered on the
 // Dashboard page. Purely decorative: it reacts to time of day, typing and
@@ -27,6 +24,7 @@ export function Mascot() {
   const syncStatus = useStore((s) => s.syncStatus);
   const reducedMotion =
     typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const asleep = pose === "sleeping";
 
   useEffect(() => {
     greetOnce();
@@ -60,8 +58,14 @@ export function Mascot() {
         aria-hidden
         className={`relative h-14 w-14 ${reducedMotion ? "" : "transition-transform duration-300"}`}
       >
-        <img src={POSE_SRC[pose] || POSE_SRC.idle} alt="" width={56} height={56} className="pointer-events-none" />
-        {pose === "sleeping" && (
+        <img
+          src={reducedMotion || asleep ? STILL : ANIMATED}
+          alt=""
+          width={56}
+          height={56}
+          className="pointer-events-none h-14 w-14 object-contain"
+        />
+        {asleep && (
           <span className="absolute -right-1 -top-1 font-serif text-sm italic text-ink-faint" aria-hidden>
             z
           </span>
