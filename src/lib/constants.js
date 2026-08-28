@@ -13,12 +13,24 @@ export const PRIORITY_RANK = {
 // else draws from the neutral categorical set.
 const token = (name) => `rgb(var(--c-${name}))`;
 
-export const PRIORITY_COLORS = {
-  Critical: token("danger"),
-  High: token("warning"),
-  Medium: token("text-secondary"),
-  Low: token("text-muted"),
+// Both maps derive from one token per priority, so the solid colour and its
+// tint can never disagree. Building a tint by appending hex alpha to the
+// colour string was the old approach and it silently produced invalid CSS
+// once these became rgb(var(--…)).
+const PRIORITY_TOKENS = {
+  Critical: "danger",
+  High: "warning",
+  Medium: "text-secondary",
+  Low: "text-muted",
 };
+
+export const PRIORITY_COLORS = Object.fromEntries(
+  Object.entries(PRIORITY_TOKENS).map(([k, t]) => [k, `rgb(var(--c-${t}))`])
+);
+
+export const PRIORITY_TINTS = Object.fromEntries(
+  Object.entries(PRIORITY_TOKENS).map(([k, t]) => [k, `rgb(var(--c-${t}) / 0.14)`])
+);
 
 // Labels carry the token name rather than a finished colour so a badge can
 // build both the solid and the tinted form from it. Composing a soft variant

@@ -21,7 +21,7 @@ export function NoteComposerForm({ onNewDoc }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2 border border-hairline bg-paper p-4">
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -43,7 +43,7 @@ export function NoteComposerForm({ onNewDoc }) {
         rows={2}
         className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-hairline"
       />
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <input
           value={tags}
           onChange={(e) => setTags(e.target.value)}

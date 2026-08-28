@@ -33,14 +33,14 @@ export function ExpenseStats({ period, onChange }) {
           </div>
         </div>
       )}
-      <div className="flex border border-hairline">
+      <div className="flex max-w-full shrink-0 overflow-x-auto border border-hairline">
         {PERIODS.map((p) => (
           <button
             key={p.key}
             type="button"
             onClick={() => onChange(p.key)}
             className={`px-3 py-1.5 text-xs font-medium ${
- period === p.key ? "bg-accent text-paper" : "text-ink-muted"
+ period === p.key ? "bg-accent text-accent-fg" : "text-ink-muted"
  }`}
           >
             {p.label}

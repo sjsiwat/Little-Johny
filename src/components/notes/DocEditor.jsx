@@ -94,7 +94,7 @@ function ToolbarButton({
       aria-label={label}
       title={label}
       className={`flex h-8 w-8 items-center justify-center border ${
- active ? "border-accent bg-accent text-paper" : "border-transparent text-ink-muted hover:border-hairline"
+ active ? "border-accent bg-accent text-accent-fg" : "border-transparent text-ink-muted hover:border-hairline"
  }`}
     >
       {children}

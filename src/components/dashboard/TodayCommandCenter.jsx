@@ -23,6 +23,7 @@ export function TodayCommandCenter() {
   const [secValue, setSecValue] = useState("");
   const [secOutput, setSecOutput] = useState(null);
   const inputRef = useRef(null);
+  const [pendingCaret, setPendingCaret] = useState(null);
 
   useEffect(() => {
     setNow(new Date());
@@ -31,21 +32,26 @@ export function TodayCommandCenter() {
   }, []);
 
   useEffect(() => {
+    if (pendingCaret == null) return;
+    const el = inputRef.current;
+    el?.focus();
+    el?.setSelectionRange(pendingCaret, pendingCaret);
+    setPendingCaret(null);
+  }, [pendingCaret]);
+
+  useEffect(() => {
     if (!secOutput) return;
     const t = setTimeout(() => setSecOutput(null), 4000);
     return () => clearTimeout(t);
   }, [secOutput]);
 
-  // Chip -> prefilled command. Caret goes after the prefix so typing continues
-  // straight into the content.
+  // Chip -> prefilled command. The caret has to move after React has written
+  // the new value, so it runs in an effect rather than a requestAnimationFrame
+  // callback — rAF is throttled to nothing in a background tab, which would
+  // leave the box filled but unfocused.
   function applyPrefix(prefix) {
     setSecValue(prefix);
-    requestAnimationFrame(() => {
-      const el = inputRef.current;
-      if (!el) return;
-      el.focus();
-      el.setSelectionRange(prefix.length, prefix.length);
-    });
+    setPendingCaret(prefix.length);
   }
 
   function runCmd() {

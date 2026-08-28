@@ -89,7 +89,7 @@ export function AuthGate({ auth }) {
             role="tab"
             aria-selected={tab === "login"}
             onClick={() => setTab("login")}
-            className={`flex-1 py-2 text-sm font-medium ${tab === "login" ? "bg-accent text-paper" : "text-ink-muted"}`}
+            className={`flex-1 py-2 text-sm font-medium ${tab === "login" ? "bg-accent text-accent-fg" : "text-ink-muted"}`}
           >
             เข้าสู่ระบบ
           </button>
@@ -98,7 +98,7 @@ export function AuthGate({ auth }) {
             role="tab"
             aria-selected={tab === "signup"}
             onClick={() => setTab("signup")}
-            className={`flex-1 border-l border-accent py-2 text-sm font-medium ${tab === "signup" ? "bg-accent text-paper" : "text-ink-muted"}`}
+            className={`flex-1 border-l border-accent py-2 text-sm font-medium ${tab === "signup" ? "bg-accent text-accent-fg" : "text-ink-muted"}`}
           >
             สมัครสมาชิก
           </button>

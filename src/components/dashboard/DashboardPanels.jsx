@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { FileText } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { PRIORITY_COLORS, PRIORITY_RANK, expenseBarColor } from "@/lib/constants";
+import { PRIORITY_COLORS, PRIORITY_RANK, PRIORITY_TINTS, expenseBarColor } from "@/lib/constants";
 import { formatDate, formatMoney, getMonthKey, getTodayKey, relativeTime, parseTags } from "@/lib/format";
 import { isTaskDone } from "@/lib/actions";
 
@@ -27,8 +27,8 @@ export function FocusList() {
                 <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: color }} aria-hidden />
                 <span className="min-w-0 flex-1 truncate text-sm text-ink">{task.title}</span>
                 <span
-                  className="shrink-0 px-1.5 py-0.5 text-[11px] font-medium"
-                  style={{ background: `${color}18`, color }}
+                  className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium"
+                  style={{ background: PRIORITY_TINTS[task.priority], color }}
                 >
                   {task.priority}
                 </span>

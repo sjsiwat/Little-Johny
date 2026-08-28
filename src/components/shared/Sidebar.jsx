@@ -44,23 +44,25 @@ export function Sidebar() {
     });
   }
 
+  // Icon-only below lg regardless of the saved preference: at 375px a 208px
+  // rail leaves the content too narrow and every page overflows sideways.
   return (
     <aside
       aria-label="Main navigation"
       className={`sticky top-0 flex h-screen shrink-0 flex-col border-r border-hairline bg-paper p-4 transition-[width] duration-200 ${
- collapsed ? "w-16" : "w-52"
- }`}
+        collapsed ? "w-16" : "w-16 lg:w-52"
+      }`}
     >
       <div className="flex items-center justify-between gap-2">
         {!collapsed && (
-          <span className="font-grotesk text-sm font-semibold text-ink">Johny Memo</span>
+          <span className="hidden font-grotesk text-sm font-semibold text-ink lg:inline">Johny Memo</span>
         )}
         <button
           type="button"
           onClick={toggle}
           aria-label="Toggle sidebar"
           title="Toggle sidebar"
-          className="text-ink-faint hover:text-ink"
+          className="hidden text-ink-faint hover:text-ink lg:block"
         >
           {collapsed ? <PanelLeft size={16} aria-hidden /> : <PanelLeftClose size={16} aria-hidden />}
         </button>
@@ -73,22 +75,22 @@ export function Sidebar() {
             <Link
               key={href}
               to={href}
-              className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors max-lg:justify-center ${
  active
- ? "bg-accent text-paper"
+ ? "bg-accent text-accent-fg"
  : "text-ink-muted hover:text-ink"
  }`}
               title={label}
             >
               <Icon size={16} aria-hidden className="shrink-0" />
-              {!collapsed && <span>{label}</span>}
+              {!collapsed && <span className="hidden lg:inline">{label}</span>}
             </Link>
           );
         })}
       </nav>
 
       {!collapsed && (
-        <p className="mt-auto text-xs italic leading-relaxed text-ink-faint font-serif">&ldquo;{quote}&rdquo;</p>
+        <p className="mt-auto hidden text-xs italic leading-relaxed text-ink-faint font-serif lg:block">&ldquo;{quote}&rdquo;</p>
       )}
     </aside>
   );

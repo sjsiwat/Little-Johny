@@ -48,7 +48,7 @@ export function ReviewView() {
             aria-selected={tab === t.key}
             onClick={() => setTab(t.key)}
             className={`flex-1 py-2 text-sm font-medium ${
- tab === t.key ? "bg-accent text-paper" : "text-ink-muted"
+ tab === t.key ? "bg-accent text-accent-fg" : "text-ink-muted"
  }`}
           >
             {t.label}

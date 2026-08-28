@@ -144,7 +144,7 @@ function CalendarPreview() {
           key={i}
           className={`flex items-center justify-center text-[9px] ${
  cell === todayCell
- ? "bg-accent font-semibold text-paper"
+ ? "bg-accent font-semibold text-accent-fg"
  : cell
  ? "text-ink-muted"
  : ""
