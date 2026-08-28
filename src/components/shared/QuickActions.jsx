@@ -1,37 +1,28 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Wallet, FileText, ListChecks } from "lucide-react";
-import { TaskModal } from "@/components/tasks/TaskModal";
 
-// Sits under the quick-capture input so the three things you can capture are
-// one click away without typing a command. This used to be a popup menu hung
-// off the mascot; the mascot is display-only now.
-export function QuickActions() {
-  const navigate = useNavigate();
-  const [taskModalOpen, setTaskModalOpen] = useState(false);
+// The prefixes parseCommand() recognises. Picking a chip drops the command
+// into the capture box and puts the caret after it, so the only thing left to
+// do is type the actual content — no modal, no page change.
+const ACTIONS = [
+  { label: "งานใหม่", Icon: ListChecks, prefix: "เพิ่มงาน " },
+  { label: "โน้ตใหม่", Icon: FileText, prefix: "โน้ต: " },
+  { label: "รายจ่ายใหม่", Icon: Wallet, prefix: "จ่าย " },
+];
 
-  const actions = [
-    { label: "งานใหม่", Icon: ListChecks, run: () => setTaskModalOpen(true) },
-    { label: "โน้ตใหม่", Icon: FileText, run: () => navigate("/notes") },
-    { label: "รายจ่ายใหม่", Icon: Wallet, run: () => navigate("/expenses") },
-  ];
-
+export function QuickActions({ onPick }) {
   return (
-    <>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {actions.map(({ label, Icon, run }) => (
-          <button
-            key={label}
-            type="button"
-            onClick={run}
-            className="inline-flex items-center gap-1.5 border border-hairline px-3 py-1.5 text-xs text-ink-muted transition-colors hover:border-accent hover:text-accent"
-          >
-            <Icon size={13} aria-hidden />
-            {label}
-          </button>
-        ))}
-      </div>
-      {taskModalOpen && <TaskModal taskId={null} defaultStatus="todo" onClose={() => setTaskModalOpen(false)} />}
-    </>
+    <div className="mt-2 flex flex-wrap gap-2">
+      {ACTIONS.map(({ label, Icon, prefix }) => (
+        <button
+          key={label}
+          type="button"
+          onClick={() => onPick(prefix)}
+          className="inline-flex items-center gap-1.5 border border-hairline px-3 py-1.5 text-xs text-ink-muted transition-colors hover:border-accent hover:text-accent"
+        >
+          <Icon size={13} aria-hidden />
+          {label}
+        </button>
+      ))}
+    </div>
   );
 }

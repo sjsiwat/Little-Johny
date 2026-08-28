@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { parseCommand } from "@/lib/commandParser";
 import { notifyTyping } from "@/lib/mascotStore";
 import { Mascot } from "@/components/shared/Mascot";
@@ -20,6 +20,7 @@ export function TodayCommandCenter() {
   const [now, setNow] = useState(null);
   const [secValue, setSecValue] = useState("");
   const [secOutput, setSecOutput] = useState(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     setNow(new Date());
@@ -32,6 +33,18 @@ export function TodayCommandCenter() {
     const t = setTimeout(() => setSecOutput(null), 4000);
     return () => clearTimeout(t);
   }, [secOutput]);
+
+  // Chip -> prefilled command. Caret goes after the prefix so typing continues
+  // straight into the content.
+  function applyPrefix(prefix) {
+    setSecValue(prefix);
+    requestAnimationFrame(() => {
+      const el = inputRef.current;
+      if (!el) return;
+      el.focus();
+      el.setSelectionRange(prefix.length, prefix.length);
+    });
+  }
 
   function runCmd() {
     const raw = secValue.trim();
@@ -61,6 +74,7 @@ export function TodayCommandCenter() {
 
       <div className="mt-5 flex flex-col gap-2 sm:flex-row">
         <input
+          ref={inputRef}
           value={secValue}
           onChange={(e) => {
             setSecValue(e.target.value);
@@ -80,7 +94,7 @@ export function TodayCommandCenter() {
           ADD
         </button>
       </div>
-      <QuickActions />
+      <QuickActions onPick={applyPrefix} />
       {secOutput && <p className="mt-2 text-xs leading-relaxed text-ink-muted">{secOutput}</p>}
     </div>
   );
