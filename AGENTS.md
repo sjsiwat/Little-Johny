@@ -2,7 +2,7 @@
 
 Always reference:
 
-DESIGN.md
+docs/DESIGN.md
 
 It is the source of truth for the visual design system.
 
