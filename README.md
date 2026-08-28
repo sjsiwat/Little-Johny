@@ -228,7 +228,7 @@ LINE Messaging API → Cloudflare Worker (Hono) → Supabase REST API
 - `src/lib/storage.js` is the only place that touches persistence; keep data shape backward-compatible
 - Design consistency matters — `docs/DESIGN.md` is the source of truth before touching any UI
 - Guest mode must stay fully functional (ephemeral, no cloud writes)
-- AI agents follow `.claude/skills/impeccable/` rules for UX quality
+- AI agents read `AGENTS.md` (design rules) before touching UI
 
 ---
 
