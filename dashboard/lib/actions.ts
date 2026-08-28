@@ -88,14 +88,6 @@ export function deleteExpense(id: string) {
   Storage.deleteRow("expenses", id, currentUid());
 }
 
-export function toggleTaskDone(id: string) {
-  const task = useStore.getState().tasks.find((t) => t.id === id);
-  if (!task) return;
-  const nowDone = task.status !== "done";
-  useStore.getState().updateTask(id, { status: nowDone ? "done" : "todo" });
-  return nowDone;
-}
-
 export function isTaskDone(t: Task): boolean {
   return t.status === "done";
 }

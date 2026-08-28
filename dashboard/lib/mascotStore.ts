@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type MascotPose = "idle" | "wave" | "happy" | "typing" | "thinking" | "sleeping";
+type MascotPose = "idle" | "wave" | "happy" | "typing" | "thinking" | "sleeping";
 
 interface MascotState {
   pose: MascotPose;
@@ -92,11 +92,6 @@ export function notifySyncStatus(status: string) {
   } else if (status === "synced" && useMascotStore.getState().pose === "thinking") {
     setPose("happy", { hold: 1200 });
   }
-}
-
-export function celebrate(message?: string) {
-  resetIdle();
-  setPose("happy", { message: message || "เยี่ยมไปเลย! เสร็จอีกงานแล้ว 🎉", hold: 2800 });
 }
 
 export function mascotClicked(onToggleFab: () => void) {

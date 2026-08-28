@@ -13,7 +13,6 @@ export interface Task {
   target_unit: string;
   progress_value: number;
   createdAt: number;
-  _isDemo?: boolean;
 }
 
 export interface Note {
@@ -22,8 +21,6 @@ export interface Note {
   body: string; // HTML string (TipTap output) or plain text
   tags: string; // comma-separated, matches legacy storage shape (Supabase `notes.tags` column)
   createdAt: number;
-  _isDemo?: boolean;
-  _isKVLine?: boolean; // display-only legacy LINE-bot note, never persisted
 }
 
 export interface Expense {
@@ -33,7 +30,6 @@ export interface Expense {
   category: string;
   date: string; // YYYY-MM-DD
   createdAt: number;
-  _isDemo?: boolean;
 }
 
 export type Theme = "light" | "dark";

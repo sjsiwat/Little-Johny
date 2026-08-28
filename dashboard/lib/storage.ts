@@ -172,14 +172,11 @@ async function syncTable<T extends { id: string }>(
 
 async function pushToCloud(state: AppState, uid: string) {
   syncChangeListener?.("syncing");
-  const tasks = state.tasks.filter((t) => !t._isDemo);
-  const notes = state.notes.filter((n) => !n._isDemo && !n._isKVLine);
-  const expenses = state.expenses.filter((e) => !e._isDemo);
   try {
     const results = await Promise.allSettled([
-      syncTable("tasks", tasks, taskToRow, uid),
-      syncTable("notes", notes, noteToRow, uid),
-      syncTable("expenses", expenses, expenseToRow, uid),
+      syncTable("tasks", state.tasks, taskToRow, uid),
+      syncTable("notes", state.notes, noteToRow, uid),
+      syncTable("expenses", state.expenses, expenseToRow, uid),
     ]);
     const failed = results.filter((r): r is PromiseRejectedResult => r.status === "rejected");
     if (failed.length > 0) {
@@ -219,11 +216,7 @@ export const Storage = {
   // Guest/signed-out is ephemeral — no persistence anywhere, no cloud sync.
   save(state: AppState, isLoggedIn: boolean, uid: string | null) {
     if (!isLoggedIn || !uid) return;
-    const persistState: AppState = {
-      ...state,
-      notes: state.notes.filter((n) => !n._isKVLine),
-    };
-    localSave(persistState);
+    localSave(state);
     if (syncTimer) clearTimeout(syncTimer);
     syncChangeListener?.("pending");
     syncTimer = setTimeout(() => pushToCloud(state, uid), 1500);

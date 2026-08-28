@@ -20,14 +20,6 @@ export function NoteCardGrid({ onOpen }: { onOpen: (id: string) => void }) {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {sorted.map((note) => {
-        if (note._isKVLine) {
-          return (
-            <article key={note.id} className="border border-hairline bg-paper-dim p-4 dark:border-white/10 dark:bg-dark-surface-soft">
-              <p className="font-grotesk text-sm font-semibold text-ink dark:text-white/90">{note.title}</p>
-              <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-ink-muted">{notePlainText(note.body)}</p>
-            </article>
-          );
-        }
         const tags = parseTags(note.tags);
         const preview = notePlainText(note.body);
         return (

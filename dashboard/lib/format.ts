@@ -61,7 +61,7 @@ export function parseTags(tags: string | null | undefined): string[] {
   return tags ? tags.split(",").map((t) => t.trim()).filter(Boolean) : [];
 }
 
-export type DeadlineInfo =
+type DeadlineInfo =
   | { type: "overdue"; days: number }
   | { type: "today" }
   | { type: "soon"; days: number }

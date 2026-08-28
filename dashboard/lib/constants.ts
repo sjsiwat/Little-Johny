@@ -14,7 +14,7 @@ export const PRIORITY_COLORS: Record<TaskPriority, string> = {
   Low: "#8E8E93",
 };
 
-export interface TaskLabel {
+interface TaskLabel {
   id: string;
   name: string;
   color: string;
@@ -86,11 +86,6 @@ export const EXPENSE_ICONS: Record<string, string> = {
 export const THAI_MONTHS = [
   "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
   "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม",
-];
-
-export const THAI_MONTHS_SHORT = [
-  "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
-  "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.",
 ];
 
 export const THAI_DOW = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
