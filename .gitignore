@@ -12,3 +12,6 @@ node_modules/
 # Kept local-only — never tracked/pushed (purged from git history on 2026-07-13)
 docs/DESIGN.md
 docs/PRODUCT.md
+
+# Vite dev cache
+.vite/
