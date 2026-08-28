@@ -17,12 +17,20 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Johny" />
 
-    <!-- Replaces next/font/google. The CSS variable names match what the old
-         layouts exposed, so every font-grotesk/serif/thai class still resolves. -->
+    <!-- Latin + the italic serif accents come from Google; Thai is self-hosted
+         (see the @font-face in src/styles/globals.css). The CSS variable names
+         are unchanged, so every font-grotesk/serif/thai class still resolves. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/royal-institute-of-siam-new.woff2"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&display=swap"
       rel="stylesheet"
     />
   </head>

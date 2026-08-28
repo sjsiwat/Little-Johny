@@ -6,8 +6,32 @@
    files were near-identical; only the grid-line helpers below were unique
    to the landing page. */
 
+/* Thai — self-hosted, SIL OFL 1.1. Thai-only (no Latin or digit glyphs), so
+   the unicode-range keeps the browser from ever reaching for it otherwise.
+   One weight only: bold Thai is synthesised by the browser.
+
+   size-adjust is not optional here: the face has unitsPerEm 2100 with base
+   consonants only 810 units tall (0.386em), so at 16px Thai rendered about
+   half the height of the Latin beside it. 148% restores the consonant height
+   Noto Sans Thai used to give, which is what the type scale was tuned against. */
+@font-face {
+  font-family: "Royal Institute of Siam New";
+  src: url("/fonts/royal-institute-of-siam-new.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  size-adjust: 148%;
+  unicode-range: U+0E00-0E7F, U+200B-200D, U+25CC;
+}
+
 :root {
   --grid-line: rgba(21, 19, 15, 0.08);
+
+  /* next/font used to inject these; with plain <link> tags we define them
+     ourselves. Tailwind's font-* utilities read them via var(). */
+  --font-grotesk: "Bricolage Grotesque";
+  --font-serif: "Newsreader";
+  --font-thai: "Royal Institute of Siam New";
 }
 
 * {
