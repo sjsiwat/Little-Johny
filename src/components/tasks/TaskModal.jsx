@@ -4,7 +4,7 @@ import { Modal, } from "@/components/shared/Modal";
 import { useStore } from "@/lib/store";
 import { useToastStore } from "@/lib/toastStore";
 import { addTask, deleteTask } from "@/lib/actions";
-import { TASK_LABELS } from "@/lib/constants";
+import { TASK_LABELS, labelColor, labelTint } from "@/lib/constants";
 
 export function TaskModal({ taskId, defaultStatus, onClose }) {
   const modalRef = useRef(null);
@@ -142,11 +142,11 @@ export function TaskModal({ taskId, defaultStatus, onClose }) {
                 type="button"
                 key={l.id}
                 onClick={() => toggleLabel(l.id)}
-                className="px-2 py-1 text-xs"
+                className="rounded-full px-2.5 py-1 text-xs"
                 style={
                   labels.includes(l.id)
-                    ? { background: l.color, color: "#fff" }
-                    : { background: `${l.color}18`, color: l.color }
+                    ? { background: labelColor(l), color: "rgb(var(--c-accent-fg))" }
+                    : { background: labelTint(l), color: labelColor(l) }
                 }
               >
                 {l.name}

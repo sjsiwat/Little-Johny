@@ -20,14 +20,21 @@ export const PRIORITY_COLORS = {
   Low: token("text-muted"),
 };
 
+// Labels carry the token name rather than a finished colour so a badge can
+// build both the solid and the tinted form from it. Composing a soft variant
+// by appending hex alpha ("#RRGGBB18") stopped working when the palette moved
+// to rgb(var(--…)) — labelTint replaces that.
 export const TASK_LABELS = [
-  { id: "urgent", name: "ด่วน", color: token("warning") },
-  { id: "work", name: "งาน", color: token("data-6") },
-  { id: "personal", name: "ส่วนตัว", color: token("data-1") },
-  { id: "followup", name: "ติดตาม", color: token("data-3") },
-  { id: "idea", name: "ไอเดีย", color: token("data-4") },
-  { id: "meeting", name: "ประชุม", color: token("data-2") },
+  { id: "urgent", name: "ด่วน", token: "warning" },
+  { id: "work", name: "งาน", token: "data-6" },
+  { id: "personal", name: "ส่วนตัว", token: "data-1" },
+  { id: "followup", name: "ติดตาม", token: "data-3" },
+  { id: "idea", name: "ไอเดีย", token: "data-4" },
+  { id: "meeting", name: "ประชุม", token: "data-2" },
 ];
+
+export const labelColor = (label) => `rgb(var(--c-${label.token}))`;
+export const labelTint = (label) => `rgb(var(--c-${label.token}) / 0.14)`;
 
 export const STATUS_META = {
   todo: { label: "สิ่งที่ต้องทำ", color: token("text-muted") },
