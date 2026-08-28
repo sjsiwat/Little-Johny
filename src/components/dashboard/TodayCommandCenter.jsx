@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { parseCommand } from "@/lib/commandParser";
 import { notifyTyping } from "@/lib/mascotStore";
 import { Mascot } from "@/components/shared/Mascot";
-import { Fab } from "@/components/shared/Fab";
+import { QuickActions } from "@/components/shared/QuickActions";
 
 const GREETING_MAP = [
   [5, 11, "สวัสดีตอนเช้า"],
@@ -55,10 +55,7 @@ export function TodayCommandCenter() {
         </div>
         <div className="flex items-center gap-3">
           <span className="font-serif text-3xl italic text-ink-faint tabular-nums">{timeText}</span>
-          <div className="relative">
-            <Mascot />
-            <Fab />
-          </div>
+          <Mascot />
         </div>
       </div>
 
@@ -80,9 +77,10 @@ export function TodayCommandCenter() {
           onClick={runCmd}
           className="shrink-0 border border-accent px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-accent hover:text-accent-fg"
         >
-          Secretary
+          ADD
         </button>
       </div>
+      <QuickActions />
       {secOutput && <p className="mt-2 text-xs leading-relaxed text-ink-muted">{secOutput}</p>}
     </div>
   );

@@ -87,12 +87,6 @@ export function notifySyncStatus(status) {
   }
 }
 
-export function mascotClicked(onToggleFab) {
-  resetIdle();
-  setPose("wave", { hold: 900 });
-  onToggleFab();
-}
-
 export function ambientReevaluate() {
   if (!holdTimer && useMascotStore.getState().pose !== "sleeping") settle();
 }

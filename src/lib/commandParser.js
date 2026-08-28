@@ -2,7 +2,7 @@ import { useStore } from "@/lib/store";
 import { addTask, addNote, addExpense, isTaskDone } from "@/lib/actions";
 import { formatMoney, getTodayKey } from "@/lib/format";
 
-// Ported verbatim from app.js's parseCommand() — the Secretary command bar's
+// Ported verbatim from app.js's parseCommand() — the quick-capture bar's
 // tiny natural-language-ish parser.
 export function parseCommand(rawText) {
   const text = rawText.trim();
@@ -10,7 +10,7 @@ export function parseCommand(rawText) {
   const state = useStore.getState();
 
   if (text.startsWith("เพิ่มงาน")) {
-    const title = text.replace("เพิ่มงาน", "").trim() || "งานใหม่จาก Secretary";
+    const title = text.replace("เพิ่มงาน", "").trim() || "งานใหม่";
     addTask(title, "Medium", "", "todo", "", []);
     return `เพิ่มงานแล้ว: ${title}`;
   }

@@ -1,12 +1,10 @@
 import { useEffect } from "react";
 import { useStore } from "@/lib/store";
-import { useFabStore } from "@/lib/fabStore";
 import {
   useMascotStore,
   resetIdle,
   greetOnce,
   notifySyncStatus,
-  mascotClicked,
   ambientReevaluate,
 } from "@/lib/mascotStore";
 
@@ -20,13 +18,13 @@ const POSE_SRC = {
 };
 
 // Lives inline in the Dashboard greeting row — only ever rendered on the
-// Dashboard page (mirrors the legacy mascot's Dashboard-only visibility,
-// now handled naturally by real routing instead of a MutationObserver).
+// Dashboard page. Purely decorative: it reacts to time of day, typing and
+// sync status, but is not interactive. The quick actions it used to open now
+// sit under the capture input as QuickActions.
 export function Mascot() {
   const pose = useMascotStore((s) => s.pose);
   const bubble = useMascotStore((s) => s.bubble);
   const syncStatus = useStore((s) => s.syncStatus);
-  const toggleFab = useFabStore((s) => s.toggle);
   const reducedMotion =
     typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
@@ -58,14 +56,8 @@ export function Mascot() {
           {bubble}
         </div>
       )}
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          mascotClicked(toggleFab);
-        }}
-        aria-label="Quick actions — เปิดเมนูเพิ่มงาน/โน้ต/รายจ่าย"
-        aria-haspopup="menu"
+      <div
+        aria-hidden
         className={`relative h-14 w-14 ${reducedMotion ? "" : "transition-transform duration-300"}`}
       >
         <img src={POSE_SRC[pose] || POSE_SRC.idle} alt="" width={56} height={56} className="pointer-events-none" />
@@ -74,7 +66,7 @@ export function Mascot() {
             z
           </span>
         )}
-      </button>
+      </div>
     </div>
   );
 }
