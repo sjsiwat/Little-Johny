@@ -16,14 +16,14 @@ function KanbanColumn({ status, onEdit }) {
 
   return (
     <div className="flex min-w-0 flex-col">
-      <div className="flex items-center gap-2 border-b border-ink pb-2 dark:border-white/30">
+      <div className="flex items-center gap-2 border-b border-hairline pb-2">
         <span className="h-2 w-2 rounded-full" style={{ background: meta.color }} aria-hidden />
-        <span className="text-sm font-semibold text-ink dark:text-white/90">{meta.label}</span>
+        <span className="text-sm font-semibold text-ink">{meta.label}</span>
         <span className="ml-auto text-xs text-ink-faint">{columnTasks.length}</span>
       </div>
       <div
         ref={setNodeRef}
-        className={`mt-3 flex min-h-[120px] flex-col gap-2 ${isOver ? "bg-paper-dim dark:bg-dark-surface-soft" : ""}`}
+        className={`mt-3 flex min-h-[120px] flex-col gap-2 ${isOver ? "bg-paper-dim" : ""}`}
       >
         {columnTasks.length === 0 ? (
           <p className="py-6 text-center text-xs text-ink-faint">ไม่มีงาน</p>
@@ -33,7 +33,7 @@ function KanbanColumn({ status, onEdit }) {
         <button
           type="button"
           onClick={() => onEdit("__new__:" + status)}
-          className="mt-1 border border-dashed border-hairline py-2 text-xs text-ink-faint hover:border-ink hover:text-ink dark:border-white/15"
+          className="mt-1 border border-dashed border-hairline py-2 text-xs text-ink-faint hover:border-hairline hover:text-ink"
         >
           + เพิ่มงาน
         </button>

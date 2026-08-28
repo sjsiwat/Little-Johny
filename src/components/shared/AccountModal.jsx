@@ -10,7 +10,7 @@ export const AccountModal = forwardRef(function AccountModal({ auth }, ref) {
     <Modal ref={ref} labelledBy="account-modal-title">
       <div className="p-6">
         <div className="flex items-start justify-between">
-          <p id="account-modal-title" className="font-grotesk text-lg font-semibold text-ink dark:text-white/90">
+          <p id="account-modal-title" className="font-grotesk text-lg font-semibold text-ink">
             เชื่อมต่อแล้ว
           </p>
           <button
@@ -22,7 +22,7 @@ export const AccountModal = forwardRef(function AccountModal({ auth }, ref) {
             <X size={16} aria-hidden />
           </button>
         </div>
-        <p className="mt-4 text-sm text-ink dark:text-white/90">{displayName}</p>
+        <p className="mt-4 text-sm text-ink">{displayName}</p>
         <span className="mt-2 inline-block border border-hairline px-2 py-0.5 text-xs uppercase tracking-[0.1em] text-ink-muted">
           {plan === "pro" ? "Pro" : "Free"}
         </span>
@@ -32,7 +32,7 @@ export const AccountModal = forwardRef(function AccountModal({ auth }, ref) {
             (ref ).current?.close();
             auth.signOut();
           }}
-          className="mt-6 w-full border border-ink px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-ink hover:text-paper dark:border-white/30 dark:text-white/90"
+          className="mt-6 w-full border border-accent px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-accent hover:text-accent-fg"
         >
           ออกจากระบบ
         </button>

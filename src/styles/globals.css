@@ -6,14 +6,91 @@
    files were near-identical; only the grid-line helpers below were unique
    to the landing page. */
 
-:root {
-  --grid-line: rgba(21, 19, 15, 0.08);
+/* ── Design tokens ─────────────────────────────────────────────────────────
+   Swiss Minimal x Warm Luxury x Personal OS.
 
-  /* next/font used to inject these; with plain <link> tags we define them
-     ourselves. Tailwind's font-* utilities read them via var(). */
+   One system, two value sets. Every colour below is stored as space-separated
+   RGB channels so Tailwind can apply the /opacity modifier (rgb(var(--x) / a)).
+   Components never name a theme: they use the semantic utility, and these
+   variables swap underneath. That is why there are no dark: colour classes
+   anywhere in src/.
+
+   Budget: neutrals ~90%, purple accent ~8%, status colours ~2%.
+   ------------------------------------------------------------------------ */
+:root {
+  /* Surfaces — background and card sit one small step apart, never far */
+  --c-canvas: 247 246 242;         /* #F7F6F2 page */
+  --c-surface: 252 251 248;        /* #FCFBF8 card, sidebar, topbar */
+  --c-surface-hover: 239 238 233;  /* #EFEEE9 hover, recessed panels */
+  --c-border: 221 218 210;         /* #DDDAD2 */
+  --c-border-strong: 201 197 187;
+
+  /* Text */
+  --c-text: 28 28 28;              /* #1C1C1C — never pure black surfaces */
+  --c-text-secondary: 111 107 99;  /* #6F6B63 */
+  --c-text-muted: 154 150 141;     /* #9A968D */
+
+  /* Brand — branding, active nav, primary buttons, links, focus */
+  --c-accent: 117 101 128;         /* #756580 */
+  --c-accent-hover: 98 83 109;     /* #62536D */
+  --c-accent-fg: 255 255 255;      /* text on top of accent */
+
+  /* Status — sparingly, never decoratively */
+  --c-success: 113 128 108;        /* #71806C */
+  --c-warning: 178 138 74;         /* #B28A4A — priority and warning only */
+  --c-danger: 167 101 101;         /* #A76565 */
+
+
+  /* Categorical data hues — labels, categories, chart bars. Deliberately kept
+     apart from the status colours so green/amber/red keep meaning something.
+     All are desaturated and warm-leaning so a full chart still reads calm. */
+  --c-data-1: 122 107 133;         /* plum, closest to brand */
+  --c-data-2: 110 127 132;         /* teal slate */
+  --c-data-3: 138 122 99;          /* taupe */
+  --c-data-4: 124 132 112;         /* moss */
+  --c-data-5: 150 112 124;         /* mauve rose */
+  --c-data-6: 107 117 144;         /* indigo slate */
+
+  --grid-line: rgb(var(--c-text) / 0.07);
+}
+
+html[data-theme="dark"] {
+  --c-canvas: 17 17 17;            /* #111111 — not pure black */
+  --c-surface: 24 24 24;           /* #181818 */
+  --c-surface-hover: 32 32 32;     /* #202020 */
+  --c-border: 45 45 45;            /* #2D2D2D */
+  --c-border-strong: 58 58 58;
+
+  --c-text: 242 240 234;           /* #F2F0EA — warm off-white, not #FFF */
+  --c-text-secondary: 166 161 152; /* #A6A198 */
+  --c-text-muted: 119 115 107;     /* #77736B */
+
+  --c-accent: 138 120 153;         /* #8A7899 */
+  --c-accent-hover: 155 137 170;   /* #9B89AA */
+  --c-accent-fg: 17 17 17;
+
+  --c-success: 132 146 125;        /* #84927D */
+  --c-warning: 192 154 90;         /* #C09A5A */
+  --c-danger: 184 121 121;         /* #B87979 */
+
+
+  --c-data-1: 158 141 170;
+  --c-data-2: 141 162 168;
+  --c-data-3: 173 155 127;
+  --c-data-4: 157 167 143;
+  --c-data-5: 186 143 157;
+  --c-data-6: 139 150 182;
+
+  --grid-line: rgb(var(--c-text) / 0.08);
+}
+
+/* Typography — next/font used to inject these; with plain <link> tags we
+   define them ourselves. Tailwind's font-* utilities read them via var(). */
+:root {
   --font-grotesk: "Mitr";
   --font-serif: "Newsreader";
 }
+
 
 * {
   box-sizing: border-box;
@@ -43,22 +120,17 @@ html[data-theme="dark"] {
 }
 
 body {
-  background-color: #f4f1ea;
-  color: #15130f;
-}
-
-html[data-theme="dark"] body {
-  background-color: #141414;
-  color: rgba(255, 255, 255, 0.92);
+  background-color: rgb(var(--c-canvas));
+  color: rgb(var(--c-text));
 }
 
 ::selection {
-  background: #c23b22;
-  color: #f4f1ea;
+  background: rgb(var(--c-accent));
+  color: rgb(var(--c-accent-fg));
 }
 
 :focus-visible {
-  outline: 2px solid #c23b22;
+  outline: 2px solid rgb(var(--c-accent));
   outline-offset: 3px;
 }
 
@@ -69,15 +141,11 @@ html[data-theme="dark"] body {
 }
 
 .rule {
-  border-color: #dedace;
+  border-color: rgb(var(--c-border));
 }
 
 dialog::backdrop {
-  background: rgba(21, 19, 15, 0.4);
-}
-
-html[data-theme="dark"] dialog::backdrop {
-  background: rgba(0, 0, 0, 0.6);
+  background: rgb(var(--c-text) / 0.35);
 }
 
 .doc-editor-content .ProseMirror {
@@ -121,8 +189,8 @@ html[data-theme="dark"] dialog::backdrop {
 .doc-editor-content .ProseMirror blockquote {
   margin: 0 0 0.75em;
   padding-left: 1em;
-  border-left: 3px solid #dedace;
-  color: #6b6459;
+  border-left: 3px solid rgb(var(--c-border));
+  color: rgb(var(--c-text-secondary));
 }
 
 .doc-editor-content .ProseMirror img {
@@ -134,15 +202,7 @@ html[data-theme="dark"] dialog::backdrop {
   content: attr(data-placeholder);
   float: left;
   height: 0;
-  color: #726b5c;
+  color: rgb(var(--c-text-muted));
   pointer-events: none;
 }
 
-html[data-theme="dark"] .doc-editor-content .ProseMirror blockquote {
-  border-left-color: rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.6);
-}
-
-html[data-theme="dark"] .doc-editor-content .ProseMirror p.is-editor-empty:first-child::before {
-  color: rgba(255, 255, 255, 0.4);
-}

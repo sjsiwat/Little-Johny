@@ -29,10 +29,10 @@ export function NoteCardGrid({ onOpen }) {
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") onOpen(note.id);
             }}
-            className="cursor-pointer border border-hairline bg-paper p-4 transition-colors hover:bg-paper-dim dark:border-white/10 dark:bg-dark-surface dark:hover:bg-dark-surface-soft"
+            className="cursor-pointer border border-hairline bg-paper p-4 transition-colors hover:bg-paper-dim"
           >
             <div className="flex items-start justify-between gap-2">
-              <span className="min-w-0 flex-1 truncate font-grotesk text-sm font-semibold text-ink dark:text-white/90">
+              <span className="min-w-0 flex-1 truncate font-grotesk text-sm font-semibold text-ink">
                 {note.title}
               </span>
               <button

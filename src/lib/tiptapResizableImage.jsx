@@ -108,7 +108,7 @@ function ResizableImageView({ node, updateAttributes, selected, editor, deleteNo
             title="ลบรูปภาพ"
             onPointerDown={(e) => e.stopPropagation()}
             onClick={() => deleteNode()}
-            className="absolute -right-3 -top-3 flex h-6 w-6 items-center justify-center border border-ink bg-paper text-xs text-ink hover:bg-ink hover:text-paper"
+            className="absolute -right-3 -top-3 flex h-6 w-6 items-center justify-center border border-accent bg-paper text-xs text-ink hover:bg-accent hover:text-accent-fg"
           >
             ×
           </button>

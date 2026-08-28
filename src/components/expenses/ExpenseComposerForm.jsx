@@ -22,24 +22,24 @@ export function ExpenseComposerForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-2 border border-hairline bg-paper p-4 sm:grid-cols-5 dark:border-white/10 dark:bg-dark-surface">
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-2 border border-hairline bg-paper p-4 sm:grid-cols-5">
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="รายการ"
-        className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-ink sm:col-span-2 dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+        className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-hairline sm:col-span-2"
       />
       <input
         type="number"
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
         placeholder="จำนวนเงิน"
-        className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+        className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-hairline"
       />
       <select
         value={category}
         onChange={(e) => setCategory(e.target.value)}
-        className="border border-hairline bg-paper px-2 py-2 text-sm text-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+        className="border border-hairline bg-paper px-2 py-2 text-sm text-ink"
       >
         {EXPENSE_CATEGORIES.map((c) => (
           <option key={c} value={c}>
@@ -51,9 +51,9 @@ export function ExpenseComposerForm() {
         type="date"
         value={date}
         onChange={(e) => setDate(e.target.value)}
-        className="border border-hairline bg-paper px-2 py-2 text-sm text-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+        className="border border-hairline bg-paper px-2 py-2 text-sm text-ink"
       />
-      <button type="submit" className="col-span-full bg-ink px-4 py-2 text-sm font-medium text-paper hover:bg-accent sm:col-span-1">
+      <button type="submit" className="col-span-full bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:bg-accent-dim sm:col-span-1">
         บันทึก
       </button>
     </form>

@@ -20,7 +20,7 @@ const ReviewPage = lazy(() => import("@/routes/app/ReviewPage.jsx"));
 const NotFound = lazy(() => import("@/routes/NotFound.jsx"));
 
 // Matches AppLayout's own pre-auth placeholder, so a chunk fetch does not flash.
-const Blank = <div className="min-h-screen bg-paper dark:bg-dark-bg" />;
+const Blank = <div className="min-h-screen bg-paper" />;
 
 export default function App() {
   return (

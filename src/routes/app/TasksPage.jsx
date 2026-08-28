@@ -13,7 +13,7 @@ export default function TasksPage() {
         <button
           type="button"
           onClick={() => setAddOpen(true)}
-          className="border border-ink bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-accent hover:border-accent"
+          className="border border-accent bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition-colors hover:bg-accent-dim hover:border-accent-dim"
         >
           + เพิ่มงาน
         </button>

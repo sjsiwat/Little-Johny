@@ -48,7 +48,7 @@ export function NoteModal({ noteId, onClose, onExpand }) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="ชื่อโน้ต"
-            className="min-w-0 flex-1 bg-transparent font-grotesk text-lg font-semibold text-ink outline-none dark:text-white/90"
+            className="min-w-0 flex-1 bg-transparent font-grotesk text-lg font-semibold text-ink outline-none"
           />
           <button type="button" onClick={() => modalRef.current?.close()} aria-label="ปิด" className="text-ink-faint hover:text-ink">
             <X size={16} aria-hidden />
@@ -62,13 +62,13 @@ export function NoteModal({ noteId, onClose, onExpand }) {
           value={body}
           onChange={(e) => setBody(e.target.value)}
           rows={8}
-          className="mt-4 w-full border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+          className="mt-4 w-full border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-hairline"
         />
         <input
           value={tags}
           onChange={(e) => setTags(e.target.value)}
           placeholder="แท็ก (คั่นด้วยจุลภาค)"
-          className="mt-2 w-full border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+          className="mt-2 w-full border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-hairline"
         />
 
         <div className="mt-6 flex items-center justify-between">
@@ -79,18 +79,18 @@ export function NoteModal({ noteId, onClose, onExpand }) {
             <button
               type="button"
               onClick={onExpand}
-              className="border border-hairline px-4 py-2 text-sm text-ink dark:border-white/15 dark:text-white/90"
+              className="border border-hairline px-4 py-2 text-sm text-ink"
             >
               แก้ไขเต็มหน้า
             </button>
             <button
               type="button"
               onClick={() => modalRef.current?.close()}
-              className="border border-hairline px-4 py-2 text-sm text-ink-muted dark:border-white/15"
+              className="border border-hairline px-4 py-2 text-sm text-ink-muted"
             >
               ยกเลิก
             </button>
-            <button type="button" onClick={handleSave} className="bg-ink px-4 py-2 text-sm font-medium text-paper hover:bg-accent">
+            <button type="button" onClick={handleSave} className="bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:bg-accent-dim">
               บันทึก
             </button>
           </div>

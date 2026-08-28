@@ -17,7 +17,7 @@ export function FinalCta() {
 
         <Link
           to={appUrl}
-          className="group inline-flex shrink-0 items-center gap-3 border border-ink bg-ink px-7 py-4 text-sm font-medium text-paper transition-colors duration-200 hover:bg-accent hover:border-accent"
+          className="group inline-flex shrink-0 items-center gap-3 border border-accent bg-accent px-7 py-4 text-sm font-medium text-accent-fg transition-colors duration-200 hover:bg-accent-dim hover:border-accent-dim"
         >
           {finalCta.action}
           <ArrowUpRight

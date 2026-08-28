@@ -7,7 +7,7 @@ import { isTaskDone } from "@/lib/actions";
 
 export function TaskCard({ task, onEdit }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: task.id });
-  const color = PRIORITY_COLORS[task.priority] || "#8E8E93";
+  const color = PRIORITY_COLORS[task.priority] || "rgb(var(--c-text-muted))";
   const done = isTaskDone(task);
   const info = getDeadlineInfo(task.due, done);
 
@@ -21,13 +21,13 @@ export function TaskCard({ task, onEdit }) {
       style={style}
       {...listeners}
       {...attributes}
-      className={`cursor-grab border border-hairline bg-paper p-3 active:cursor-grabbing dark:border-white/10 dark:bg-dark-surface ${
-        isDragging ? "opacity-40" : ""
-      }`}
+      className={`cursor-grab border border-hairline bg-paper p-3 active:cursor-grabbing ${
+ isDragging ? "opacity-40" : ""
+ }`}
     >
       <div className="flex items-start gap-2">
         <span className="mt-1 h-2 w-2 shrink-0 rounded-full" style={{ background: color }} aria-hidden />
-        <span className="min-w-0 flex-1 text-sm font-medium text-ink dark:text-white/90">{task.title}</span>
+        <span className="min-w-0 flex-1 text-sm font-medium text-ink">{task.title}</span>
         <button
           type="button"
           onPointerDown={(e) => e.stopPropagation()}

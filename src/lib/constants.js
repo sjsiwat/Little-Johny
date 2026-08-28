@@ -7,27 +7,33 @@ export const PRIORITY_RANK = {
   Low: 3,
 };
 
+// Colours below resolve to the theme tokens in src/styles/globals.css, so they
+// follow light/dark like everything else. Status hues stay reserved: amber only
+// signals priority or warning, green only success, red only danger. Everything
+// else draws from the neutral categorical set.
+const token = (name) => `rgb(var(--c-${name}))`;
+
 export const PRIORITY_COLORS = {
-  Critical: "#FF453A",
-  High: "#FF9F0A",
-  Medium: "#0A84FF",
-  Low: "#8E8E93",
+  Critical: token("danger"),
+  High: token("warning"),
+  Medium: token("text-secondary"),
+  Low: token("text-muted"),
 };
 
 export const TASK_LABELS = [
-  { id: "urgent", name: "ด่วน", color: "#FF453A" },
-  { id: "work", name: "งาน", color: "#0A84FF" },
-  { id: "personal", name: "ส่วนตัว", color: "#BF5AF2" },
-  { id: "followup", name: "ติดตาม", color: "#FF9F0A" },
-  { id: "idea", name: "ไอเดีย", color: "#30D158" },
-  { id: "meeting", name: "ประชุม", color: "#64D2FF" },
+  { id: "urgent", name: "ด่วน", color: token("warning") },
+  { id: "work", name: "งาน", color: token("data-6") },
+  { id: "personal", name: "ส่วนตัว", color: token("data-1") },
+  { id: "followup", name: "ติดตาม", color: token("data-3") },
+  { id: "idea", name: "ไอเดีย", color: token("data-4") },
+  { id: "meeting", name: "ประชุม", color: token("data-2") },
 ];
 
 export const STATUS_META = {
-  todo: { label: "สิ่งที่ต้องทำ", color: "#6F7480" },
-  in_progress: { label: "กำลังทำ", color: "#0A84FF" },
-  review: { label: "รอตรวจ", color: "#FF9F0A" },
-  done: { label: "เสร็จแล้ว", color: "#30D158" },
+  todo: { label: "สิ่งที่ต้องทำ", color: token("text-muted") },
+  in_progress: { label: "กำลังทำ", color: token("accent") },
+  review: { label: "รอตรวจ", color: token("warning") },
+  done: { label: "เสร็จแล้ว", color: token("success") },
 };
 
 export const KANBAN_COLUMNS = ["todo", "in_progress", "review", "done"];
@@ -48,18 +54,18 @@ export const EXPENSE_CATEGORIES = [
 ] ;
 
 export const EXPENSE_BAR_COLORS = {
-  อาหาร: "#FF9F0A",
-  เครื่องดื่ม: "#64D2FF",
-  เดินทาง: "#BF5AF2",
-  น้ำมัน: "#FF9F0A",
-  ค่าไฟ: "#FF6B6B",
-  ค่าน้ำ: "#64D2FF",
-  อินเทอร์เน็ต: "#0A84FF",
-  สุขภาพ: "#30D158",
-  ช้อปปิ้ง: "#FF6B6B",
-  การศึกษา: "#30D158",
-  ลงทุน: "#BF5AF2",
-  อื่นๆ: "#8E8E93",
+  อาหาร: token("data-3"),
+  เครื่องดื่ม: token("data-2"),
+  เดินทาง: token("data-6"),
+  น้ำมัน: token("data-3"),
+  ค่าไฟ: token("data-5"),
+  ค่าน้ำ: token("data-2"),
+  อินเทอร์เน็ต: token("data-6"),
+  สุขภาพ: token("data-4"),
+  ช้อปปิ้ง: token("data-5"),
+  การศึกษา: token("data-4"),
+  ลงทุน: token("data-1"),
+  อื่นๆ: token("text-muted"),
 };
 
 export const EXPENSE_ICONS = {

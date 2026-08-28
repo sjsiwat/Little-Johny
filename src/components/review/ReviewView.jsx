@@ -11,14 +11,14 @@ const TABS = [
 
 function StatCard({ value, label, tone }) {
   const toneClass = {
-    green: "text-[#30D158]",
+    green: "text-success",
     red: "text-danger",
     amber: "text-amber",
-    blue: "text-[#0A84FF]",
+    blue: "text-ink-secondary",
     primary: "text-accent",
   }[tone];
   return (
-    <div className="border border-hairline bg-paper p-4 dark:border-white/10 dark:bg-dark-surface">
+    <div className="border border-hairline bg-paper p-4">
       <strong className={`block font-grotesk text-2xl font-semibold ${toneClass}`}>{value}</strong>
       <span className="mt-1 block text-xs text-ink-muted">{label}</span>
     </div>
@@ -40,7 +40,7 @@ export function ReviewView() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex border border-ink dark:border-white/30" role="tablist">
+      <div className="flex border border-hairline" role="tablist">
         {TABS.map((t) => (
           <button
             key={t.key}
@@ -48,8 +48,8 @@ export function ReviewView() {
             aria-selected={tab === t.key}
             onClick={() => setTab(t.key)}
             className={`flex-1 py-2 text-sm font-medium ${
-              tab === t.key ? "bg-ink text-paper dark:bg-white dark:text-dark-bg" : "text-ink-muted"
-            }`}
+ tab === t.key ? "bg-accent text-paper" : "text-ink-muted"
+ }`}
           >
             {t.label}
           </button>
@@ -71,7 +71,7 @@ export function ReviewView() {
             </div>
             {todayDone.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold text-ink dark:text-white/90">งานที่เสร็จวันนี้</h3>
+                <h3 className="text-sm font-semibold text-ink">งานที่เสร็จวันนี้</h3>
                 <div className="mt-2 flex flex-col gap-1">
                   {todayDone.map((t) => (
                     <p key={t.id} className="text-sm text-ink-muted">
@@ -83,7 +83,7 @@ export function ReviewView() {
             )}
             {todayOverdue.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold text-ink dark:text-white/90">งานที่เกินกำหนด</h3>
+                <h3 className="text-sm font-semibold text-ink">งานที่เกินกำหนด</h3>
                 <div className="mt-2 flex flex-col gap-1">
                   {todayOverdue.map((t) => (
                     <p key={t.id} className="text-sm text-danger">
@@ -119,7 +119,7 @@ export function ReviewView() {
             </div>
             {topCat && (
               <div>
-                <h3 className="text-sm font-semibold text-ink dark:text-white/90">หมวดที่ใช้มากสุดสัปดาห์นี้</h3>
+                <h3 className="text-sm font-semibold text-ink">หมวดที่ใช้มากสุดสัปดาห์นี้</h3>
                 <p className="mt-2 text-sm text-ink-muted">
                   {topCat[0]} · {formatMoney(topCat[1])}
                 </p>

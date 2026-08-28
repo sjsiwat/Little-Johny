@@ -14,7 +14,7 @@ export function FocusList() {
     .slice(0, 5);
 
   return (
-    <div className="border border-hairline bg-paper p-5 dark:border-white/10 dark:bg-dark-surface">
+    <div className="border border-hairline bg-paper p-5">
       <h3 className="font-grotesk text-sm font-semibold uppercase tracking-[0.08em] text-ink-faint">Focus</h3>
       <div className="mt-3 flex flex-col gap-2">
         {focus.length === 0 ? (
@@ -23,9 +23,9 @@ export function FocusList() {
           focus.map((task) => {
             const color = PRIORITY_COLORS[task.priority];
             return (
-              <div key={task.id} className="flex items-center gap-3 border-t border-hairline pt-2 first:border-t-0 first:pt-0 dark:border-white/10">
+              <div key={task.id} className="flex items-center gap-3 border-t border-hairline pt-2 first:border-t-0 first:pt-0">
                 <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: color }} aria-hidden />
-                <span className="min-w-0 flex-1 truncate text-sm text-ink dark:text-white/90">{task.title}</span>
+                <span className="min-w-0 flex-1 truncate text-sm text-ink">{task.title}</span>
                 <span
                   className="shrink-0 px-1.5 py-0.5 text-[11px] font-medium"
                   style={{ background: `${color}18`, color }}
@@ -51,7 +51,7 @@ export function TodayCalendarPanel() {
   );
 
   return (
-    <div className="border border-hairline bg-paper p-5 dark:border-white/10 dark:bg-dark-surface">
+    <div className="border border-hairline bg-paper p-5">
       <div className="flex items-baseline justify-between">
         <h3 className="font-grotesk text-sm font-semibold uppercase tracking-[0.08em] text-ink-faint">วันนี้</h3>
         <span className="text-xs text-ink-faint">{headingText}</span>
@@ -61,9 +61,9 @@ export function TodayCalendarPanel() {
           <p className="py-6 text-center text-sm text-ink-faint">ไม่มีกำหนดการวันนี้</p>
         ) : (
           todayTasks.map((t) => (
-            <div key={t.id} className="flex items-center gap-2 border-t border-hairline pt-2 first:border-t-0 first:pt-0 dark:border-white/10">
+            <div key={t.id} className="flex items-center gap-2 border-t border-hairline pt-2 first:border-t-0 first:pt-0">
               <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: PRIORITY_COLORS[t.priority] }} aria-hidden />
-              <span className={`min-w-0 flex-1 truncate text-sm text-ink dark:text-white/90 ${isTaskDone(t) ? "line-through opacity-50" : ""}`}>
+              <span className={`min-w-0 flex-1 truncate text-sm text-ink ${isTaskDone(t) ? "line-through opacity-50" : ""}`}>
                 {t.title}
               </span>
               <span className="shrink-0 text-[11px] text-ink-faint">{t.priority}</span>
@@ -83,7 +83,7 @@ export function ExpenseBarsPanel() {
   const max = top.length ? top[0][1] : 0;
 
   return (
-    <div className="border border-hairline bg-paper p-5 dark:border-white/10 dark:bg-dark-surface">
+    <div className="border border-hairline bg-paper p-5">
       <h3 className="font-grotesk text-sm font-semibold uppercase tracking-[0.08em] text-ink-faint">รายจ่ายตามหมวด</h3>
       <div className="mt-3 flex flex-col gap-3">
         {top.length === 0 ? (
@@ -94,15 +94,15 @@ export function ExpenseBarsPanel() {
           />
         ) : (
           top.map(([category, total]) => {
-            const color = EXPENSE_BAR_COLORS[category] || "#0A84FF";
+            const color = EXPENSE_BAR_COLORS[category] || "rgb(var(--c-text-muted))";
             const width = max ? Math.round((total / max) * 100) : 0;
             return (
               <div key={category}>
                 <div className="flex items-center justify-between text-xs text-ink-muted">
                   <span>{category}</span>
-                  <strong className="text-ink dark:text-white/90">{formatMoney(total)}</strong>
+                  <strong className="text-ink">{formatMoney(total)}</strong>
                 </div>
-                <div className="mt-1 h-1.5 w-full bg-paper-dim dark:bg-dark-surface-soft">
+                <div className="mt-1 h-1.5 w-full bg-paper-dim">
                   <div className="h-full" style={{ width: `${width}%`, background: color }} />
                 </div>
               </div>
@@ -119,7 +119,7 @@ export function RecentNotesPanel() {
   const recent = [...notes].sort((a, b) => b.createdAt - a.createdAt).slice(0, 5);
 
   return (
-    <div className="border border-hairline bg-paper p-5 md:col-span-2 dark:border-white/10 dark:bg-dark-surface">
+    <div className="border border-hairline bg-paper p-5 md:col-span-2">
       <h3 className="font-grotesk text-sm font-semibold uppercase tracking-[0.08em] text-ink-faint">โน้ตล่าสุด</h3>
       <div className="mt-3 flex flex-col gap-2">
         {recent.length === 0 ? (
@@ -131,10 +131,10 @@ export function RecentNotesPanel() {
               <Link
                 key={note.id}
                 to="/notes"
-                className="flex items-center gap-3 border-t border-hairline py-2 first:border-t-0 dark:border-white/10"
+                className="flex items-center gap-3 border-t border-hairline py-2 first:border-t-0"
               >
                 <FileText size={14} className="shrink-0 text-ink-faint" aria-hidden />
-                <span className="min-w-0 flex-1 truncate text-sm text-ink dark:text-white/90">{note.title}</span>
+                <span className="min-w-0 flex-1 truncate text-sm text-ink">{note.title}</span>
                 {tags.slice(0, 2).map((t) => (
                   <span key={t} className="shrink-0 border border-hairline px-1.5 py-0.5 text-[11px] text-ink-muted">
                     {t}
@@ -168,19 +168,19 @@ export function MonthlyReviewWidget() {
   ).length;
 
   return (
-    <div className="border border-hairline bg-paper p-5 dark:border-white/10 dark:bg-dark-surface">
+    <div className="border border-hairline bg-paper p-5">
       <h3 className="font-grotesk text-sm font-semibold uppercase tracking-[0.08em] text-ink-faint">สรุปช่วงนี้</h3>
       <div className="mt-3 grid grid-cols-3 gap-2 text-center">
         <div>
-          <p className="font-grotesk text-lg font-semibold text-ink dark:text-white/90">{weekDone}</p>
+          <p className="font-grotesk text-lg font-semibold text-ink">{weekDone}</p>
           <p className="mt-1 text-[11px] text-ink-faint">งานเสร็จสัปดาห์นี้</p>
         </div>
         <div>
-          <p className="font-grotesk text-lg font-semibold text-ink dark:text-white/90">{formatMoney(monthExpense)}</p>
+          <p className="font-grotesk text-lg font-semibold text-ink">{formatMoney(monthExpense)}</p>
           <p className="mt-1 text-[11px] text-ink-faint">รายจ่ายเดือนนี้</p>
         </div>
         <div>
-          <p className="font-grotesk text-lg font-semibold text-ink dark:text-white/90">{monthNotes}</p>
+          <p className="font-grotesk text-lg font-semibold text-ink">{monthNotes}</p>
           <p className="mt-1 text-[11px] text-ink-faint">โน้ตเดือนนี้</p>
         </div>
       </div>

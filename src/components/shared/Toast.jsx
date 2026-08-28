@@ -25,13 +25,13 @@ export function Toast() {
   return (
     <div
       role="status"
-      className="fixed bottom-6 right-6 z-[1000] w-80 border border-ink bg-paper p-4 dark:border-white/20 dark:bg-dark-surface"
+      className="fixed bottom-6 right-6 z-[1000] w-80 border border-hairline bg-paper p-4"
     >
       <div className="flex items-start gap-3">
         <Icon size={16} className={`mt-0.5 shrink-0 ${color}`} aria-hidden />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-ink-faint">{label}</p>
-          <p className="mt-1 text-sm text-ink dark:text-white/90">{toast.title}</p>
+          <p className="mt-1 text-sm text-ink">{toast.title}</p>
           {toast.description && (
             <p className="mt-1 text-xs leading-relaxed text-ink-muted">{toast.description}</p>
           )}

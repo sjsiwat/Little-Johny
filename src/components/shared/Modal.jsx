@@ -26,7 +26,7 @@ export const Modal = forwardRef(function Modal(
     <dialog
       ref={dialogRef}
       aria-labelledby={labelledBy}
-      className={`w-full max-w-lg border border-ink bg-paper p-0 text-ink dark:border-white/20 dark:bg-dark-surface dark:text-white/90 ${className ?? ""}`}
+      className={`w-full max-w-lg border border-hairline bg-paper p-0 text-ink ${className ?? ""}`}
       onClick={(e) => {
         if (e.target === dialogRef.current) dialogRef.current?.close();
       }}

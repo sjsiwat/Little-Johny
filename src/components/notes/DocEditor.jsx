@@ -40,8 +40,10 @@ const DOC_FONTS = [
   ["Angsana", "'Angsana New', 'AngsanaUPC', serif"],
 ];
 const DOC_SIZES = [10, 11, 12, 13, 14, 16, 18, 20, 24, 28, 32, 36, 48, 60, 72];
+// Document content colours, not UI chrome: these are written into the saved
+// note HTML, so they stay literal. Only the brand swatch was retuned.
 const DOC_TEXT_SWATCHES = [
-  "#1a1a1a", "#c23b22", "#fb2c36", "#edb200", "#00c758", "#3080ff",
+  "#1a1a1a", "#756580", "#a76565", "#b28a4a", "#71806c", "#3080ff",
   "#8e44ad", "#5a8fa8", "#795548", "#607d8b", "#e91e63", "#ffffff",
 ];
 const DOC_HL_SWATCHES = [
@@ -92,8 +94,8 @@ function ToolbarButton({
       aria-label={label}
       title={label}
       className={`flex h-8 w-8 items-center justify-center border ${
-        active ? "border-ink bg-ink text-paper" : "border-transparent text-ink-muted hover:border-hairline"
-      }`}
+ active ? "border-accent bg-accent text-paper" : "border-transparent text-ink-muted hover:border-hairline"
+ }`}
     >
       {children}
     </button>
@@ -186,8 +188,8 @@ export function DocEditor({ noteId, onClose }) {
   if (!note || !editor) return null;
 
   return (
-    <div className="fixed inset-0 z-[1000] flex flex-col bg-paper dark:bg-dark-bg" role="dialog" aria-modal="true">
-      <header className="flex items-center justify-between border-b border-hairline px-4 py-3 dark:border-white/10">
+    <div className="fixed inset-0 z-[1000] flex flex-col bg-paper" role="dialog" aria-modal="true">
+      <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
         <input
           value={title}
           onChange={(e) => {
@@ -195,22 +197,22 @@ export function DocEditor({ noteId, onClose }) {
             dirtyRef.current = true;
           }}
           placeholder="ชื่อเอกสาร"
-          className="min-w-0 flex-1 bg-transparent font-grotesk text-lg font-semibold text-ink outline-none dark:text-white/90"
+          className="min-w-0 flex-1 bg-transparent font-grotesk text-lg font-semibold text-ink outline-none"
         />
         <button
           type="button"
           onClick={handleClose}
           aria-label="ปิด"
-          className="ml-4 shrink-0 border border-ink px-3 py-1.5 text-sm text-ink hover:bg-ink hover:text-paper dark:border-white/30 dark:text-white/90"
+          className="ml-4 shrink-0 border border-accent px-3 py-1.5 text-sm text-ink hover:bg-accent hover:text-accent-fg"
         >
           <X size={14} aria-hidden className="inline" /> ปิด
         </button>
       </header>
 
-      <div className="flex flex-wrap items-center gap-1 border-b border-hairline px-4 py-2 dark:border-white/10">
+      <div className="flex flex-wrap items-center gap-1 border-b border-hairline px-4 py-2">
         <select
           onChange={(e) => editor.chain().focus().setFontFamily(e.target.value).run()}
-          className="border border-hairline bg-paper px-2 py-1 text-xs dark:border-white/15 dark:bg-dark-surface-soft"
+          className="border border-hairline bg-paper px-2 py-1 text-xs"
           defaultValue=""
         >
           <option value="" disabled>
@@ -224,7 +226,7 @@ export function DocEditor({ noteId, onClose }) {
         </select>
         <select
           onChange={(e) => editor.chain().focus().setFontSize(`${e.target.value}px`).run()}
-          className="border border-hairline bg-paper px-2 py-1 text-xs dark:border-white/15 dark:bg-dark-surface-soft"
+          className="border border-hairline bg-paper px-2 py-1 text-xs"
           defaultValue=""
         >
           <option value="" disabled>
@@ -244,7 +246,7 @@ export function DocEditor({ noteId, onClose }) {
             else if (v === "blockquote") chain.toggleBlockquote().run();
             else chain.toggleHeading({ level: Number(v)  }).run();
           }}
-          className="border border-hairline bg-paper px-2 py-1 text-xs dark:border-white/15 dark:bg-dark-surface-soft"
+          className="border border-hairline bg-paper px-2 py-1 text-xs"
           defaultValue="p"
         >
           <option value="p">Paragraph</option>
@@ -254,7 +256,7 @@ export function DocEditor({ noteId, onClose }) {
           <option value="blockquote">Blockquote</option>
         </select>
 
-        <div className="mx-1 h-5 w-px bg-hairline dark:bg-white/15" />
+        <div className="mx-1 h-5 w-px bg-hairline" />
 
         <ToolbarButton label="Bold" active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
           <Bold size={14} aria-hidden />
@@ -269,7 +271,7 @@ export function DocEditor({ noteId, onClose }) {
           <Strikethrough size={14} aria-hidden />
         </ToolbarButton>
 
-        <div className="mx-1 h-5 w-px bg-hairline dark:bg-white/15" />
+        <div className="mx-1 h-5 w-px bg-hairline" />
 
         <div className="relative">
           <button
@@ -282,7 +284,7 @@ export function DocEditor({ noteId, onClose }) {
             A
           </button>
           {showTextSwatches && (
-            <div className="absolute left-0 top-9 z-10 grid grid-cols-6 gap-1 border border-ink bg-paper p-2 dark:border-white/20 dark:bg-dark-surface">
+            <div className="absolute left-0 top-9 z-10 grid grid-cols-6 gap-1 border border-hairline bg-paper p-2">
               {DOC_TEXT_SWATCHES.map((c) => (
                 <button
                   key={c}
@@ -310,7 +312,7 @@ export function DocEditor({ noteId, onClose }) {
             <span className="bg-amber/40 px-0.5">H</span>
           </button>
           {showHlSwatches && (
-            <div className="absolute left-0 top-9 z-10 grid grid-cols-6 gap-1 border border-ink bg-paper p-2 dark:border-white/20 dark:bg-dark-surface">
+            <div className="absolute left-0 top-9 z-10 grid grid-cols-6 gap-1 border border-hairline bg-paper p-2">
               {DOC_HL_SWATCHES.map((c) => (
                 <button
                   key={c}
@@ -328,7 +330,7 @@ export function DocEditor({ noteId, onClose }) {
           )}
         </div>
 
-        <div className="mx-1 h-5 w-px bg-hairline dark:bg-white/15" />
+        <div className="mx-1 h-5 w-px bg-hairline" />
 
         <ToolbarButton label="ชิดซ้าย" active={editor.isActive({ textAlign: "left" })} onClick={() => editor.chain().focus().setTextAlign("left").run()}>
           <AlignLeft size={14} aria-hidden />
@@ -340,7 +342,7 @@ export function DocEditor({ noteId, onClose }) {
           <AlignRight size={14} aria-hidden />
         </ToolbarButton>
 
-        <div className="mx-1 h-5 w-px bg-hairline dark:bg-white/15" />
+        <div className="mx-1 h-5 w-px bg-hairline" />
 
         <ToolbarButton label="Bullet list" active={editor.isActive("bulletList")} onClick={() => editor.chain().focus().toggleBulletList().run()}>
           <List size={14} aria-hidden />
@@ -352,7 +354,7 @@ export function DocEditor({ noteId, onClose }) {
           <Quote size={14} aria-hidden />
         </ToolbarButton>
 
-        <div className="mx-1 h-5 w-px bg-hairline dark:bg-white/15" />
+        <div className="mx-1 h-5 w-px bg-hairline" />
 
         <label className="flex h-8 w-8 cursor-pointer items-center justify-center border border-transparent text-ink-muted hover:border-hairline" title="แทรกรูปภาพ">
           <ImagePlus size={14} aria-hidden />
@@ -364,11 +366,11 @@ export function DocEditor({ noteId, onClose }) {
       </div>
 
       <div
-        className="flex-1 overflow-y-auto bg-paper-dim px-4 py-8 dark:bg-dark-bg"
+        className="flex-1 overflow-y-auto bg-paper-dim px-4 py-8"
         onClick={() => editor.chain().focus().run()}
       >
         <div
-          className="mx-auto max-w-[794px] border border-hairline bg-paper shadow-none dark:border-white/10 dark:bg-dark-surface"
+          className="mx-auto max-w-[794px] border border-hairline bg-paper shadow-none"
           onClick={(e) => e.stopPropagation()}
         >
           <EditorContent editor={editor} className="doc-editor-content" />

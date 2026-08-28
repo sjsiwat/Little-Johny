@@ -20,10 +20,10 @@ function Tile({ index, label, value, trend }) {
       animate="show"
       custom={index}
       variants={reveal}
-      className="border border-hairline bg-paper p-4 dark:border-white/10 dark:bg-dark-surface"
+      className="border border-hairline bg-paper p-4"
     >
       <p className="text-xs font-semibold uppercase tracking-[0.1em] text-ink-faint">{label}</p>
-      <p className="mt-2 font-grotesk text-2xl font-semibold text-ink dark:text-white/90">{value}</p>
+      <p className="mt-2 font-grotesk text-2xl font-semibold text-ink">{value}</p>
       <p className="mt-1 h-4 text-xs text-ink-muted">{trend}</p>
     </motion.div>
   );

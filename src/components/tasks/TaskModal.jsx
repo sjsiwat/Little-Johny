@@ -77,7 +77,7 @@ export function TaskModal({ taskId, defaultStatus, onClose }) {
     <Modal ref={modalRef} onClose={onClose} labelledBy="task-modal-title" className="max-w-xl">
       <form onSubmit={handleSubmit} className="p-6">
         <div className="flex items-start justify-between">
-          <p id="task-modal-title" className="font-grotesk text-lg font-semibold text-ink dark:text-white/90">
+          <p id="task-modal-title" className="font-grotesk text-lg font-semibold text-ink">
             {taskId ? "แก้ไขงาน" : "เพิ่มงาน"}
           </p>
           <button
@@ -97,21 +97,21 @@ export function TaskModal({ taskId, defaultStatus, onClose }) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="ชื่องาน"
-            className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+            className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-hairline"
           />
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="รายละเอียด (ไม่บังคับ)"
             rows={3}
-            className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+            className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-hairline"
           />
 
           <div className="grid grid-cols-3 gap-2">
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value )}
-              className="border border-hairline bg-paper px-2 py-2 text-sm text-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+              className="border border-hairline bg-paper px-2 py-2 text-sm text-ink"
             >
               <option value="todo">สิ่งที่ต้องทำ</option>
               <option value="in_progress">กำลังทำ</option>
@@ -121,7 +121,7 @@ export function TaskModal({ taskId, defaultStatus, onClose }) {
             <select
               value={priority}
               onChange={(e) => setPriority(e.target.value )}
-              className="border border-hairline bg-paper px-2 py-2 text-sm text-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+              className="border border-hairline bg-paper px-2 py-2 text-sm text-ink"
             >
               <option value="Low">Low</option>
               <option value="Medium">Medium</option>
@@ -132,7 +132,7 @@ export function TaskModal({ taskId, defaultStatus, onClose }) {
               type="date"
               value={due}
               onChange={(e) => setDue(e.target.value)}
-              className="border border-hairline bg-paper px-2 py-2 text-sm text-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+              className="border border-hairline bg-paper px-2 py-2 text-sm text-ink"
             />
           </div>
 
@@ -165,20 +165,20 @@ export function TaskModal({ taskId, defaultStatus, onClose }) {
                 placeholder="เป้าหมาย"
                 value={targetValue}
                 onChange={(e) => setTargetValue(e.target.value)}
-                className="border border-hairline bg-paper px-2 py-2 text-sm text-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+                className="border border-hairline bg-paper px-2 py-2 text-sm text-ink"
               />
               <input
                 placeholder="หน่วย"
                 value={targetUnit}
                 onChange={(e) => setTargetUnit(e.target.value)}
-                className="border border-hairline bg-paper px-2 py-2 text-sm text-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+                className="border border-hairline bg-paper px-2 py-2 text-sm text-ink"
               />
               <input
                 type="number"
                 placeholder="ความคืบหน้าปัจจุบัน"
                 value={progressValue}
                 onChange={(e) => setProgressValue(e.target.value)}
-                className="border border-hairline bg-paper px-2 py-2 text-sm text-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+                className="border border-hairline bg-paper px-2 py-2 text-sm text-ink"
               />
             </div>
           )}
@@ -196,11 +196,11 @@ export function TaskModal({ taskId, defaultStatus, onClose }) {
             <button
               type="button"
               onClick={() => modalRef.current?.close()}
-              className="border border-hairline px-4 py-2 text-sm text-ink-muted dark:border-white/15"
+              className="border border-hairline px-4 py-2 text-sm text-ink-muted"
             >
               ยกเลิก
             </button>
-            <button type="submit" className="bg-ink px-4 py-2 text-sm font-medium text-paper hover:bg-accent">
+            <button type="submit" className="bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:bg-accent-dim">
               บันทึก
             </button>
           </div>

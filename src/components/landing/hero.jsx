@@ -74,7 +74,7 @@ export function Hero() {
           >
             <Link
               to="/about#index"
-              className="inline-flex items-center border border-ink px-6 py-3 text-sm font-medium text-ink transition-colors duration-200 hover:bg-ink hover:text-paper"
+              className="inline-flex items-center border border-hairline px-6 py-3 text-sm font-medium text-ink transition-colors duration-200 hover:bg-accent hover:text-accent-fg"
             >
               See what it does
             </Link>
@@ -97,7 +97,7 @@ export function Hero() {
             className="opacity-95"
           />
 
-          <div className="w-full max-w-[220px] border border-ink/80 bg-paper p-4 text-left">
+          <div className="w-full max-w-[220px] border border-hairline/80 bg-paper p-4 text-left">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-ink">
               Add on LINE
             </p>

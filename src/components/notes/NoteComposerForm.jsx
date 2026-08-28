@@ -20,18 +20,18 @@ export function NoteComposerForm({ onNewDoc }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-2 border border-hairline bg-paper p-4 dark:border-white/10 dark:bg-dark-surface">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-2 border border-hairline bg-paper p-4">
       <div className="flex gap-2">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="ชื่อโน้ต"
-          className="flex-1 border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+          className="flex-1 border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-hairline"
         />
         <button
           type="button"
           onClick={onNewDoc}
-          className="shrink-0 border border-ink px-3 py-2 text-sm text-ink hover:bg-ink hover:text-paper dark:border-white/30 dark:text-white/90"
+          className="shrink-0 border border-accent px-3 py-2 text-sm text-ink hover:bg-accent hover:text-accent-fg"
         >
           เอกสาร A4
         </button>
@@ -41,16 +41,16 @@ export function NoteComposerForm({ onNewDoc }) {
         onChange={(e) => setBody(e.target.value)}
         placeholder="เขียนอะไรก็ได้ที่คิดออก…"
         rows={2}
-        className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+        className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-hairline"
       />
       <div className="flex gap-2">
         <input
           value={tags}
           onChange={(e) => setTags(e.target.value)}
           placeholder="แท็ก (คั่นด้วยจุลภาค)"
-          className="flex-1 border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+          className="flex-1 border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent"
         />
-        <button type="submit" className="shrink-0 bg-ink px-4 py-2 text-sm font-medium text-paper hover:bg-accent">
+        <button type="submit" className="shrink-0 bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:bg-accent-dim">
           บันทึกโน้ต
         </button>
       </div>

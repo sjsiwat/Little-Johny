@@ -53,7 +53,7 @@ export function Mascot() {
         <div
           role="status"
           aria-live="polite"
-          className="absolute bottom-full mb-2 max-w-[200px] border border-ink bg-paper px-3 py-2 text-xs text-ink shadow-none dark:border-white/30 dark:bg-dark-surface dark:text-white/90"
+          className="absolute bottom-full mb-2 max-w-[200px] border border-hairline bg-paper px-3 py-2 text-xs text-ink shadow-none"
         >
           {bubble}
         </div>

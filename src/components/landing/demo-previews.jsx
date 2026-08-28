@@ -20,8 +20,8 @@ function DashboardPreview() {
         >
           <span
             className={`font-grotesk text-base font-semibold leading-none ${
-              stat.accent ? "text-accent" : "text-ink"
-            }`}
+ stat.accent ? "text-accent" : "text-ink"
+ }`}
           >
             {stat.value}
           </span>
@@ -37,16 +37,16 @@ function DashboardPreview() {
 const kanbanColumns = [
   {
     label: "To do",
-    cards: [{ title: "Send monthly report", dot: "bg-[#FF453A]" }],
+    cards: [{ title: "Send monthly report", dot: "bg-danger" }],
   },
   {
     label: "Doing",
     cards: [
-      { title: "Product review 2pm", dot: "bg-[#FF9F0A]" },
-      { title: "LINE bot integration", dot: "bg-[#0A84FF]" },
+      { title: "Product review 2pm", dot: "bg-warning" },
+      { title: "LINE bot integration", dot: "bg-data-6" },
     ],
   },
-  { label: "Done", cards: [{ title: "Login system", dot: "bg-[#30D158]" }] },
+  { label: "Done", cards: [{ title: "Login system", dot: "bg-success" }] },
 ];
 
 function TasksPreview() {
@@ -143,12 +143,12 @@ function CalendarPreview() {
         <span
           key={i}
           className={`flex items-center justify-center text-[9px] ${
-            cell === todayCell
-              ? "bg-accent font-semibold text-paper"
-              : cell
-                ? "text-ink-muted"
-                : ""
-          }`}
+ cell === todayCell
+ ? "bg-accent font-semibold text-paper"
+ : cell
+ ? "text-ink-muted"
+ : ""
+ }`}
         >
           {cell ?? ""}
         </span>

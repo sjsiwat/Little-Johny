@@ -36,14 +36,14 @@ export function Topbar({ auth }) {
 
   return (
     <>
-      <header className="flex items-center justify-between border-b border-hairline bg-paper px-6 py-4 dark:border-white/10 dark:bg-dark-bg">
-        <h1 className="font-grotesk text-xl font-semibold tracking-tight text-ink dark:text-white/90">{title}</h1>
+      <header className="flex items-center justify-between border-b border-hairline bg-paper px-6 py-4">
+        <h1 className="font-grotesk text-xl font-semibold tracking-tight text-ink">{title}</h1>
         <div className="flex items-center gap-4">
           <button
             type="button"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             aria-label="Toggle theme"
-            className="text-ink-muted hover:text-ink dark:hover:text-white/90"
+            className="text-ink-muted hover:text-ink"
           >
             {theme === "dark" ? "☀" : "◐"}
           </button>
@@ -51,9 +51,9 @@ export function Topbar({ auth }) {
             type="button"
             onClick={() => modalRef.current?.showModal()}
             aria-label="บัญชีผู้ใช้"
-            className="flex items-center gap-2 border border-hairline px-3 py-1.5 text-xs dark:border-white/15"
+            className="flex items-center gap-2 border border-hairline px-3 py-1.5 text-xs"
           >
-            <span className="text-ink dark:text-white/90">{displayLabel}</span>
+            <span className="text-ink">{displayLabel}</span>
             <span className="flex items-center gap-1.5 text-ink-faint">
               <span className={`h-1.5 w-1.5 rounded-full ${sync.dot}`} aria-hidden />
               {sync.text}

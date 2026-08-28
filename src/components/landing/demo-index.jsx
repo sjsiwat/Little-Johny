@@ -16,7 +16,7 @@ export function DemoIndex() {
           </p>
         </div>
 
-        <div role="list" className="border-t border-ink">
+        <div role="list" className="border-t border-hairline">
           {indexEntries.map((entry, i) => {
             const Preview = DEMO_PREVIEWS[entry.name];
             return (

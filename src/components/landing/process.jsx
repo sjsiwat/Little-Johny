@@ -13,7 +13,7 @@ export function Process() {
           Four rules the product answers to before any screen gets drawn.
         </p>
 
-        <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-14 border-t border-ink pt-10 md:grid-cols-2">
+        <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-14 border-t border-hairline pt-10 md:grid-cols-2">
           {processSteps.map((step) => (
             <div key={step.number}>
               <span className="font-serif text-3xl italic text-ink-faint">

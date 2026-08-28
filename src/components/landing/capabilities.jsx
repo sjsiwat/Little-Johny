@@ -21,7 +21,7 @@ export function Capabilities() {
           {capabilities.map((cap) => (
             <div
               key={cap.number}
-              className="grid grid-cols-[2.5rem_1fr] gap-x-4 gap-y-2 border-t border-ink/70 py-7 first:border-t-2"
+              className="grid grid-cols-[2.5rem_1fr] gap-x-4 gap-y-2 border-t border-hairline/70 py-7 first:border-t-2"
             >
               <span className="font-grotesk text-sm font-semibold text-accent">
                 {cap.number}

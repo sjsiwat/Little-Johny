@@ -21,22 +21,22 @@ function ExpenseEditForm({ expense, onDone }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-2 border border-hairline bg-paper-dim p-3 sm:grid-cols-5 dark:border-white/10 dark:bg-dark-surface-soft">
-      <input value={title} onChange={(e) => setTitle(e.target.value)} className="border border-hairline bg-paper px-2 py-1.5 text-sm sm:col-span-2 dark:border-white/15 dark:bg-dark-surface" />
-      <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="border border-hairline bg-paper px-2 py-1.5 text-sm dark:border-white/15 dark:bg-dark-surface" />
-      <select value={category} onChange={(e) => setCategory(e.target.value)} className="border border-hairline bg-paper px-2 py-1.5 text-sm dark:border-white/15 dark:bg-dark-surface">
+    <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-2 border border-hairline bg-paper-dim p-3 sm:grid-cols-5">
+      <input value={title} onChange={(e) => setTitle(e.target.value)} className="border border-hairline bg-paper px-2 py-1.5 text-sm sm:col-span-2" />
+      <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="border border-hairline bg-paper px-2 py-1.5 text-sm" />
+      <select value={category} onChange={(e) => setCategory(e.target.value)} className="border border-hairline bg-paper px-2 py-1.5 text-sm">
         {EXPENSE_CATEGORIES.map((c) => (
           <option key={c} value={c}>
             {c}
           </option>
         ))}
       </select>
-      <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="border border-hairline bg-paper px-2 py-1.5 text-sm dark:border-white/15 dark:bg-dark-surface" />
+      <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="border border-hairline bg-paper px-2 py-1.5 text-sm" />
       <div className="col-span-2 flex gap-2 sm:col-span-5">
-        <button type="submit" className="bg-ink px-3 py-1.5 text-xs font-medium text-paper hover:bg-accent">
+        <button type="submit" className="bg-accent px-3 py-1.5 text-xs font-medium text-accent-fg hover:bg-accent-dim">
           บันทึก
         </button>
-        <button type="button" onClick={onDone} className="border border-hairline px-3 py-1.5 text-xs text-ink-muted dark:border-white/15">
+        <button type="button" onClick={onDone} className="border border-hairline px-3 py-1.5 text-xs text-ink-muted">
           ยกเลิก
         </button>
       </div>
@@ -50,16 +50,16 @@ function ExpenseRow({ expense }) {
   if (editing) return <ExpenseEditForm expense={expense} onDone={() => setEditing(false)} />;
 
   const icon = EXPENSE_ICONS[expense.category] || "📦";
-  const color = EXPENSE_BAR_COLORS[expense.category] || "#8E8E93";
+  const color = EXPENSE_BAR_COLORS[expense.category] || "rgb(var(--c-text-muted))";
 
   return (
-    <div className="flex items-center gap-3 border-t border-hairline py-2 first:border-t-0 dark:border-white/10">
+    <div className="flex items-center gap-3 border-t border-hairline py-2 first:border-t-0">
       <span className="flex h-8 w-8 shrink-0 items-center justify-center text-base" style={{ background: `${color}20` }}>
         {icon}
       </span>
-      <span className="min-w-0 flex-1 truncate text-sm text-ink dark:text-white/90">{expense.title}</span>
+      <span className="min-w-0 flex-1 truncate text-sm text-ink">{expense.title}</span>
       <span className="hidden shrink-0 text-xs text-ink-faint sm:block">{expense.category}</span>
-      <span className="shrink-0 text-sm font-medium text-ink dark:text-white/90">−{formatMoney(expense.amount)}</span>
+      <span className="shrink-0 text-sm font-medium text-ink">−{formatMoney(expense.amount)}</span>
       <button type="button" onClick={() => setEditing(true)} aria-label="แก้ไขรายจ่าย" className="shrink-0 text-ink-faint hover:text-ink">
         <Pencil size={12} aria-hidden />
       </button>
@@ -97,7 +97,7 @@ export function ExpenseList({ period }) {
 
   if (period === "today") {
     return (
-      <div className="border border-hairline bg-paper px-3 dark:border-white/10 dark:bg-dark-surface">
+      <div className="border border-hairline bg-paper px-3">
         {filtered.map((e) => (
           <ExpenseRow key={e.id} expense={e} />
         ))}
@@ -122,7 +122,7 @@ export function ExpenseList({ period }) {
               <span>{formatDate(date)}</span>
               <span className="font-medium text-ink-muted">{formatMoney(dayTotal)}</span>
             </div>
-            <div className="mt-1 border border-hairline bg-paper px-3 dark:border-white/10 dark:bg-dark-surface">
+            <div className="mt-1 border border-hairline bg-paper px-3">
               {exps.map((e) => (
                 <ExpenseRow key={e.id} expense={e} />
               ))}

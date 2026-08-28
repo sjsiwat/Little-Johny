@@ -20,28 +20,28 @@ export function ExpenseStats({ period, onChange }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-4">
       {expenses.length > 0 && (
-        <div className="flex divide-x divide-hairline border border-hairline bg-paper dark:divide-white/10 dark:border-white/10 dark:bg-dark-surface">
+        <div className="flex divide-x divide-hairline border border-hairline bg-paper">
           <div className="px-4 py-2">
             <p className="text-xs text-ink-faint">วันนี้</p>
-            <p className="font-grotesk text-lg font-semibold text-ink dark:text-white/90">{formatMoney(todayTotal)}</p>
+            <p className="font-grotesk text-lg font-semibold text-ink">{formatMoney(todayTotal)}</p>
             <p className="text-[11px] text-ink-faint">{todayExps.length} รายการ</p>
           </div>
           <div className="px-4 py-2">
             <p className="text-xs text-ink-faint">เดือนนี้</p>
-            <p className="font-grotesk text-lg font-semibold text-ink dark:text-white/90">{formatMoney(monthTotal)}</p>
+            <p className="font-grotesk text-lg font-semibold text-ink">{formatMoney(monthTotal)}</p>
             <p className="text-[11px] text-ink-faint">{monthExps.length} รายการ</p>
           </div>
         </div>
       )}
-      <div className="flex border border-ink dark:border-white/30">
+      <div className="flex border border-hairline">
         {PERIODS.map((p) => (
           <button
             key={p.key}
             type="button"
             onClick={() => onChange(p.key)}
             className={`px-3 py-1.5 text-xs font-medium ${
-              period === p.key ? "bg-ink text-paper dark:bg-white dark:text-dark-bg" : "text-ink-muted"
-            }`}
+ period === p.key ? "bg-accent text-paper" : "text-ink-muted"
+ }`}
           >
             {p.label}
           </button>

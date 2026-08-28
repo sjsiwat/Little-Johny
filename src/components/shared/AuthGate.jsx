@@ -38,7 +38,7 @@ export function AuthGate({ auth }) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-paper px-6 py-12 dark:bg-dark-bg">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-canvas px-6 py-12">
       <div className="mb-4 w-full max-w-sm">
         <Link
           to="/"
@@ -48,9 +48,9 @@ export function AuthGate({ auth }) {
           กลับหน้าแรก
         </Link>
       </div>
-      <div className="w-full max-w-sm border border-ink px-6 py-8 dark:border-white/20">
+      <div className="w-full max-w-sm border border-hairline px-6 py-8">
         <img src="/johny-cat.svg" alt="" width={64} height={64} aria-hidden className="mx-auto opacity-90" />
-        <h1 className="mt-4 text-center font-grotesk text-2xl font-semibold tracking-tight text-ink dark:text-white/90">
+        <h1 className="mt-4 text-center font-grotesk text-2xl font-semibold tracking-tight text-ink">
           Johny Memo
         </h1>
         <p className="mt-2 text-center text-sm leading-relaxed text-ink-muted">
@@ -83,13 +83,13 @@ export function AuthGate({ auth }) {
           <span className="h-px flex-1 bg-hairline" />
         </div>
 
-        <div role="tablist" className="flex border border-ink">
+        <div role="tablist" className="flex border border-hairline">
           <button
             type="button"
             role="tab"
             aria-selected={tab === "login"}
             onClick={() => setTab("login")}
-            className={`flex-1 py-2 text-sm font-medium ${tab === "login" ? "bg-ink text-paper" : "text-ink-muted"}`}
+            className={`flex-1 py-2 text-sm font-medium ${tab === "login" ? "bg-accent text-paper" : "text-ink-muted"}`}
           >
             เข้าสู่ระบบ
           </button>
@@ -98,7 +98,7 @@ export function AuthGate({ auth }) {
             role="tab"
             aria-selected={tab === "signup"}
             onClick={() => setTab("signup")}
-            className={`flex-1 border-l border-ink py-2 text-sm font-medium ${tab === "signup" ? "bg-ink text-paper" : "text-ink-muted"}`}
+            className={`flex-1 border-l border-accent py-2 text-sm font-medium ${tab === "signup" ? "bg-accent text-paper" : "text-ink-muted"}`}
           >
             สมัครสมาชิก
           </button>
@@ -113,7 +113,7 @@ export function AuthGate({ auth }) {
               placeholder="อีเมล"
               value={loginEmail}
               onChange={(e) => setLoginEmail(e.target.value)}
-              className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-ink"
+              className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-hairline"
             />
             <input
               type="password"
@@ -122,9 +122,9 @@ export function AuthGate({ auth }) {
               placeholder="รหัสผ่าน"
               value={loginPassword}
               onChange={(e) => setLoginPassword(e.target.value)}
-              className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-ink"
+              className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent"
             />
-            <button type="submit" className="bg-ink px-4 py-2 text-sm font-medium text-paper hover:bg-accent">
+            <button type="submit" className="bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:bg-accent-dim">
               เข้าสู่ระบบ
             </button>
           </form>
@@ -137,7 +137,7 @@ export function AuthGate({ auth }) {
               placeholder="อีเมล"
               value={signupEmail}
               onChange={(e) => setSignupEmail(e.target.value)}
-              className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-ink"
+              className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-hairline"
             />
             <input
               type="password"
@@ -147,7 +147,7 @@ export function AuthGate({ auth }) {
               placeholder="รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)"
               value={signupPassword}
               onChange={(e) => setSignupPassword(e.target.value)}
-              className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-ink"
+              className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-hairline"
             />
             <input
               type="password"
@@ -157,9 +157,9 @@ export function AuthGate({ auth }) {
               placeholder="ยืนยันรหัสผ่าน"
               value={signupConfirm}
               onChange={(e) => setSignupConfirm(e.target.value)}
-              className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-ink"
+              className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent"
             />
-            <button type="submit" className="bg-ink px-4 py-2 text-sm font-medium text-paper hover:bg-accent">
+            <button type="submit" className="bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:bg-accent-dim">
               สมัครสมาชิก
             </button>
           </form>

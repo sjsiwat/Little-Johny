@@ -20,7 +20,7 @@ export function AppLayout() {
   }, [theme]);
 
   if (!auth.authReady) {
-    return <div className="min-h-screen bg-paper dark:bg-dark-bg" />;
+    return <div className="min-h-screen bg-canvas" />;
   }
 
   if (!auth.authed) {
@@ -33,7 +33,7 @@ export function AppLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-paper dark:bg-dark-bg">
+    <div className="flex min-h-screen bg-canvas">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar auth={auth} />

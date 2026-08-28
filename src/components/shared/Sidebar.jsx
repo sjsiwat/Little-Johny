@@ -47,13 +47,13 @@ export function Sidebar() {
   return (
     <aside
       aria-label="Main navigation"
-      className={`sticky top-0 flex h-screen shrink-0 flex-col border-r border-hairline bg-paper p-4 transition-[width] duration-200 dark:border-white/10 dark:bg-dark-surface ${
-        collapsed ? "w-16" : "w-52"
-      }`}
+      className={`sticky top-0 flex h-screen shrink-0 flex-col border-r border-hairline bg-paper p-4 transition-[width] duration-200 ${
+ collapsed ? "w-16" : "w-52"
+ }`}
     >
       <div className="flex items-center justify-between gap-2">
         {!collapsed && (
-          <span className="font-grotesk text-sm font-semibold text-ink dark:text-white/90">Johny Memo</span>
+          <span className="font-grotesk text-sm font-semibold text-ink">Johny Memo</span>
         )}
         <button
           type="button"
@@ -74,10 +74,10 @@ export function Sidebar() {
               key={href}
               to={href}
               className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${
-                active
-                  ? "bg-ink text-paper dark:bg-white dark:text-dark-bg"
-                  : "text-ink-muted hover:text-ink dark:hover:text-white/90"
-              }`}
+ active
+ ? "bg-accent text-paper"
+ : "text-ink-muted hover:text-ink"
+ }`}
               title={label}
             >
               <Icon size={16} aria-hidden className="shrink-0" />

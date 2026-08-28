@@ -30,8 +30,8 @@ function CalendarDayPanel({ dateKey, tasks }) {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-hairline pb-2 dark:border-white/10">
-        <span className="text-sm font-medium text-ink dark:text-white/90">{dateLabel}</span>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-hairline pb-2">
+        <span className="text-sm font-medium text-ink">{dateLabel}</span>
         {holiday && <span className="text-xs text-accent">{holiday.name}</span>}
       </div>
       <div className="mt-3 flex flex-col gap-2">
@@ -41,32 +41,32 @@ function CalendarDayPanel({ dateKey, tasks }) {
           [...openTasks, ...doneTasks].map((t) => (
             <div key={t.id} className={`flex items-center gap-2 ${isTaskDone(t) ? "opacity-50 line-through" : ""}`}>
               <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: PRIORITY_COLORS[t.priority] }} aria-hidden />
-              <span className="min-w-0 flex-1 truncate text-sm text-ink dark:text-white/90">{t.title}</span>
+              <span className="min-w-0 flex-1 truncate text-sm text-ink">{t.title}</span>
               <span className="shrink-0 text-[11px] text-ink-faint">{t.priority}</span>
             </div>
           ))
         )}
       </div>
-      <form onSubmit={handleAdd} className="mt-4 flex flex-col gap-2 border-t border-hairline pt-3 dark:border-white/10">
+      <form onSubmit={handleAdd} className="mt-4 flex flex-col gap-2 border-t border-hairline pt-3">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="เพิ่มงานสำหรับวันนี้…"
           autoComplete="off"
-          className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+          className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-hairline"
         />
         <div className="flex gap-2">
           <select
             value={priority}
             onChange={(e) => setPriority(e.target.value )}
-            className="flex-1 border border-hairline bg-paper px-2 py-2 text-sm text-ink dark:border-white/15 dark:bg-dark-surface-soft dark:text-white/90"
+            className="flex-1 border border-hairline bg-paper px-2 py-2 text-sm text-ink"
           >
             <option value="Medium">Medium</option>
             <option value="High">High</option>
             <option value="Critical">Critical</option>
             <option value="Low">Low</option>
           </select>
-          <button type="submit" className="shrink-0 bg-ink px-4 py-2 text-sm font-medium text-paper hover:bg-accent">
+          <button type="submit" className="shrink-0 bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:bg-accent-dim">
             + เพิ่ม
           </button>
         </div>
@@ -122,14 +122,14 @@ export function CalendarView() {
         onClick={() => setSelectedDate(dateKey)}
         aria-label={`${dateKey}${holiday ? " " + holiday.name : ""}`}
         className={`flex aspect-square flex-col items-center justify-start gap-0.5 border border-transparent p-1 text-xs ${
-          isSelected
-            ? "border-ink bg-ink text-paper dark:border-white dark:bg-white dark:text-dark-bg"
-            : isToday
-              ? "border-accent text-ink dark:text-white/90"
-              : isWeekend
-                ? "text-ink-faint"
-                : "text-ink dark:text-white/90"
-        }`}
+ isSelected
+ ? "border-accent bg-accent text-paper"
+ : isToday
+ ? "border-accent text-ink"
+ : isWeekend
+ ? "text-ink-faint"
+ : "text-ink"
+ }`}
       >
         <span>{d}</span>
         {holiday && <span className="h-1 w-1 rounded-full bg-accent" title={holiday.name} />}
@@ -169,12 +169,12 @@ export function CalendarView() {
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
       <div>
-        <div className="flex items-center justify-between border-b border-hairline pb-3 dark:border-white/10">
+        <div className="flex items-center justify-between border-b border-hairline pb-3">
           <button type="button" onClick={goPrev} aria-label="เดือนก่อน" className="text-ink-muted hover:text-ink">
             <ChevronLeft size={18} aria-hidden />
           </button>
           <div className="text-center">
-            <span className="font-grotesk text-lg font-semibold text-ink dark:text-white/90">{THAI_MONTHS[calMonth]}</span>{" "}
+            <span className="font-grotesk text-lg font-semibold text-ink">{THAI_MONTHS[calMonth]}</span>{" "}
             <span className="text-ink-muted">{thaiYear}</span>
           </div>
           <button type="button" onClick={goNext} aria-label="เดือนถัดไป" className="text-ink-muted hover:text-ink">
@@ -195,7 +195,7 @@ export function CalendarView() {
           </span>
         </div>
       </div>
-      <aside className="border border-hairline bg-paper p-4 dark:border-white/10 dark:bg-dark-surface">
+      <aside className="border border-hairline bg-paper p-4">
         {selectedDate ? (
           <CalendarDayPanel dateKey={selectedDate} tasks={tasksByDate.get(selectedDate) || []} />
         ) : (

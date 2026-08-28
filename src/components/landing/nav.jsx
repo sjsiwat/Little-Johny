@@ -53,8 +53,8 @@ export function Nav() {
         id="mobile-menu"
         inert={!open}
         className={`grid overflow-hidden border-hairline bg-paper transition-[grid-template-rows,opacity] duration-300 ease-swiss md:hidden ${
-          open ? "grid-rows-[1fr] border-t opacity-100" : "grid-rows-[0fr] border-t-0 opacity-0"
-        }`}
+ open ? "grid-rows-[1fr] border-t opacity-100" : "grid-rows-[0fr] border-t-0 opacity-0"
+ }`}
       >
         <nav className="flex min-h-0 flex-col px-6" aria-label="Mobile">
           {navLinks.map((link) => (

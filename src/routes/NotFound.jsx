@@ -5,7 +5,7 @@ export default function NotFound() {
   useDocumentTitle("Johny Memo — ไม่พบหน้านี้");
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-5 bg-paper px-6 text-center">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-5 bg-canvas px-6 text-center">
       <p className="font-grotesk text-xs font-semibold uppercase tracking-[0.18em] text-accent">404</p>
       <h1 className="font-grotesk text-3xl font-semibold tracking-tight text-ink">ไม่พบหน้าที่คุณต้องการ</h1>
       <p className="max-w-sm text-sm leading-relaxed text-ink-muted">
@@ -13,7 +13,7 @@ export default function NotFound() {
       </p>
       <Link
         to="/"
-        className="mt-2 inline-flex items-center border border-ink bg-ink px-5 py-3 text-sm font-medium text-paper transition-colors hover:border-accent hover:bg-accent"
+        className="mt-2 inline-flex items-center border border-accent bg-accent px-5 py-3 text-sm font-medium text-accent-fg transition-colors hover:border-accent-dim hover:bg-accent-dim"
       >
         กลับหน้าแรก
       </Link>

@@ -38,7 +38,7 @@ export function Fab() {
         <div
           ref={menuRef}
           role="menu"
-          className="absolute bottom-full left-1/2 mb-2 flex w-40 -translate-x-1/2 flex-col border border-ink bg-paper dark:border-white/30 dark:bg-dark-surface"
+          className="absolute bottom-full left-1/2 mb-2 flex w-40 -translate-x-1/2 flex-col border border-hairline bg-paper"
         >
           <button
             type="button"
@@ -47,7 +47,7 @@ export function Fab() {
               close();
               navigate("/expenses");
             }}
-            className="flex items-center gap-2 border-b border-hairline px-3 py-2 text-left text-sm text-ink hover:bg-paper-dim dark:border-white/10 dark:text-white/90 dark:hover:bg-dark-surface-soft"
+            className="flex items-center gap-2 border-b border-hairline px-3 py-2 text-left text-sm text-ink hover:bg-paper-dim"
           >
             <Wallet size={14} aria-hidden /> รายจ่ายใหม่
           </button>
@@ -58,7 +58,7 @@ export function Fab() {
               close();
               navigate("/notes");
             }}
-            className="flex items-center gap-2 border-b border-hairline px-3 py-2 text-left text-sm text-ink hover:bg-paper-dim dark:border-white/10 dark:text-white/90 dark:hover:bg-dark-surface-soft"
+            className="flex items-center gap-2 border-b border-hairline px-3 py-2 text-left text-sm text-ink hover:bg-paper-dim"
           >
             <FileText size={14} aria-hidden /> โน้ตใหม่
           </button>
@@ -69,7 +69,7 @@ export function Fab() {
               close();
               setTaskModalOpen(true);
             }}
-            className="flex items-center gap-2 px-3 py-2 text-left text-sm text-ink hover:bg-paper-dim dark:text-white/90 dark:hover:bg-dark-surface-soft"
+            className="flex items-center gap-2 px-3 py-2 text-left text-sm text-ink hover:bg-paper-dim"
           >
             <ListChecks size={14} aria-hidden /> งานใหม่
           </button>
