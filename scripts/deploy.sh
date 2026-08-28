@@ -1,32 +1,35 @@
 #!/usr/bin/env bash
-# Builds dashboard/, merges the export into web_dist/ (never touching the
-# site/ landing page's index.html), commits+pushes, then deploys via wrangler.
+# Builds both Next.js apps into a clean web_dist/, then deploys the Worker.
+#
+# web_dist/ is a build artifact and is NOT tracked in git — it is rebuilt from
+# scratch every run, so no orphaned chunks can accumulate.
+#
+#   site/       → /            /about  /signup
+#   dashboard/  → /dashboard   /tasks  /notes  /expenses  /calendar  /review
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
+OUT=web_dist
 
-echo "==> Building dashboard/ ..."
-cd dashboard
-rm -rf out
-npm run build
-cd ..
+echo "==> Cleaning $OUT ..."
+rm -rf "$OUT" site/out dashboard/out
+mkdir -p "$OUT"
 
-echo "==> Syncing build output into web_dist/ (keeping index.html/index.txt untouched) ..."
-rsync -a --exclude 'index.html' --exclude 'index.txt' dashboard/out/ web_dist/
-rm -rf dashboard/out
+echo "==> Building site/ (landing) ..."
+npm --prefix site run build
+cp -R site/out/. "$OUT"/
 
-git add web_dist
+echo "==> Building dashboard/ (app) ..."
+npm --prefix dashboard run build
+# The landing page owns / — keep its index.html and skip the dashboard's.
+rsync -a --exclude 'index.html' --exclude 'index.txt' dashboard/out/ "$OUT"/
 
-if git diff --cached --quiet; then
-  echo "==> No changes to deploy."
-else
-  read -r -p "Commit message [Deploy: dashboard update]: " msg
-  msg=${msg:-"Deploy: dashboard update"}
-  git commit -m "$msg"
-  git push origin main
-fi
+echo "==> Adding security headers ..."
+cp server/headers "$OUT"/_headers
+
+rm -rf site/out dashboard/out
 
 echo "==> Deploying to Cloudflare Workers ..."
-npx wrangler deploy
+npx wrangler deploy -c server/wrangler.toml
 
 echo "✅ Done: https://johnyos.sj-siwat.workers.dev"
