@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { parseCommand } from "@/lib/commandParser";
+import { COMMANDS, parseCommand } from "@/lib/commandParser";
 import { notifyTyping } from "@/lib/mascotStore";
 import { Mascot } from "@/components/shared/Mascot";
 import { QuickActions } from "@/components/shared/QuickActions";
@@ -10,6 +10,8 @@ const GREETING_MAP = [
   [18, 23, "สวัสดีตอนเย็น"],
   [0, 4, "ดึกแล้วนะ"],
 ];
+
+const DEFAULT_PLACEHOLDER = 'ลองพิมพ์ "เพิ่มงาน ส่งรายงาน" หรือ "จ่าย กาแฟ 60"';
 
 function getGreeting(hour) {
   const found = GREETING_MAP.find(([s, e]) => hour >= s && hour <= e);
@@ -53,6 +55,11 @@ export function TodayCommandCenter() {
     setSecValue("");
   }
 
+  // Derived from the input rather than from the last chip clicked, so it also
+  // reacts to a prefix typed by hand and resets when the box is cleared.
+  const placeholder =
+    COMMANDS.find((c) => c.test(secValue.trimStart()))?.hint ?? DEFAULT_PLACEHOLDER;
+
   const greeting = now ? getGreeting(now.getHours()) : "";
   const dateText = now
     ? new Intl.DateTimeFormat("th-TH", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(now)
@@ -83,7 +90,7 @@ export function TodayCommandCenter() {
           onKeyDown={(e) => {
             if (e.key === "Enter") runCmd();
           }}
-          placeholder='ลองพิมพ์ "เพิ่มงาน ส่งรายงาน" หรือ "จ่าย กาแฟ 60"'
+          placeholder={placeholder}
           className="flex-1 border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-hairline"
         />
         <button

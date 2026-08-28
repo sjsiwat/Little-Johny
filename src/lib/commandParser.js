@@ -2,6 +2,33 @@ import { useStore } from "@/lib/store";
 import { addTask, addNote, addExpense, isTaskDone } from "@/lib/actions";
 import { formatMoney, getTodayKey } from "@/lib/format";
 
+// The commands the capture bar understands, declared next to the parser that
+// matches them. `prefix` is what a quick-action chip drops into the input;
+// `test` is how we recognise it afterwards to show the right placeholder hint.
+export const COMMANDS = [
+  {
+    id: "task",
+    label: "งานใหม่",
+    prefix: "เพิ่มงาน ",
+    test: (t) => t.startsWith("เพิ่มงาน"),
+    hint: "ส่งรายงานประจำเดือน",
+  },
+  {
+    id: "note",
+    label: "โน้ตใหม่",
+    prefix: "โน้ต: ",
+    test: (t) => t.startsWith("โน้ต:") || t.toLowerCase().startsWith("note:"),
+    hint: "ไอเดียที่เพิ่งคิดออก",
+  },
+  {
+    id: "expense",
+    label: "รายจ่ายใหม่",
+    prefix: "จ่าย ",
+    test: (t) => t.startsWith("จ่าย"),
+    hint: "กาแฟ 60 เครื่องดื่ม  (ชื่อ จำนวน หมวด)",
+  },
+];
+
 // Ported verbatim from app.js's parseCommand() — the quick-capture bar's
 // tiny natural-language-ish parser.
 export function parseCommand(rawText) {
