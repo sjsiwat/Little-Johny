@@ -1,22 +1,32 @@
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays, Plus } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { addTask, isTaskDone } from "@/lib/actions";
 import { useToastStore } from "@/lib/toastStore";
 import { PRIORITY_COLORS, PRIORITY_RANK, THAI_DOW, THAI_HOLIDAYS, THAI_MONTHS } from "@/lib/constants";
 import { getTodayKey } from "@/lib/format";
 
-function CalendarDayPanel({ dateKey, tasks }) {
+function thaiDate(dateKey) {
+  const [y, m, d] = dateKey.split("-");
+  return `${Number(d)} ${THAI_MONTHS[Number(m) - 1]} ${Number(y) + 543}`;
+}
+
+/* ── Right column: the selected day in full ─────────────────────────────── */
+function AgendaPanel({ dateKey, tasks }) {
   const showToast = useToastStore((s) => s.showToast);
+  const updateTask = useStore((s) => s.updateTask);
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("Medium");
+  const [focused, setFocused] = useState(false);
 
   const holiday = THAI_HOLIDAYS[dateKey];
-  const [y, m, d] = dateKey.split("-");
-  const thaiYear = Number(y) + 543;
-  const dateLabel = `${Number(d)} ${THAI_MONTHS[Number(m) - 1]} ${thaiYear}`;
-  const openTasks = tasks.filter((t) => !isTaskDone(t));
-  const doneTasks = tasks.filter((t) => isTaskDone(t));
+  const open = tasks.filter((t) => !isTaskDone(t));
+  const done = tasks.filter(isTaskDone);
+  const expanded = focused || title.trim().length > 0;
+
+  function toggle(task) {
+    updateTask(task.id, { status: isTaskDone(task) ? "todo" : "done" });
+  }
 
   function handleAdd(e) {
     e.preventDefault();
@@ -29,49 +39,134 @@ function CalendarDayPanel({ dateKey, tasks }) {
   }
 
   return (
-    <div>
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-hairline pb-2">
-        <span className="text-sm font-medium text-ink">{dateLabel}</span>
-        {holiday && <span className="text-xs text-accent">{holiday.name}</span>}
+    <div className="flex h-full flex-col">
+      <div>
+        <h3 className="font-grotesk text-lg font-semibold text-ink">{thaiDate(dateKey)}</h3>
+        <p className="mt-0.5 text-xs text-ink-faint">
+          {holiday ? holiday.name : tasks.length ? `${open.length} งานค้าง` : "ไม่มีงาน"}
+        </p>
       </div>
-      <div className="mt-3 flex flex-col gap-2">
-        {openTasks.length === 0 && doneTasks.length === 0 ? (
-          <p className="py-4 text-center text-xs text-ink-faint">ไม่มีงานในวันนี้</p>
+
+      <div className="mt-4 flex flex-1 flex-col gap-2">
+        {tasks.length === 0 ? (
+          <p className="py-8 text-center text-xs text-ink-faint">ยังไม่มีงานในวันนี้</p>
         ) : (
-          [...openTasks, ...doneTasks].map((t) => (
-            <div key={t.id} className={`flex items-center gap-2 ${isTaskDone(t) ? "opacity-50 line-through" : ""}`}>
-              <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: PRIORITY_COLORS[t.priority] }} aria-hidden />
-              <span className="min-w-0 flex-1 truncate text-sm text-ink">{t.title}</span>
-              <span className="shrink-0 text-[11px] text-ink-faint">{t.priority}</span>
-            </div>
-          ))
+          [...open, ...done].map((t) => {
+            const isDone = isTaskDone(t);
+            return (
+              <label
+                key={t.id}
+                className="flex cursor-pointer items-center gap-3 border border-hairline px-3 py-2.5 transition-colors hover:border-hairline-strong"
+              >
+                <input
+                  type="checkbox"
+                  checked={isDone}
+                  onChange={() => toggle(t)}
+                  className="h-4 w-4 shrink-0 accent-accent"
+                />
+                <span className="min-w-0 flex-1">
+                  <span className={`block truncate text-sm ${isDone ? "text-ink-faint line-through" : "text-ink"}`}>
+                    {t.title}
+                  </span>
+                  <span className="mt-0.5 block text-[11px] text-ink-faint">{t.priority}</span>
+                </span>
+                <span
+                  className="h-1.5 w-1.5 shrink-0 rounded-full"
+                  style={{ background: PRIORITY_COLORS[t.priority] }}
+                  aria-hidden
+                />
+              </label>
+            );
+          })
         )}
       </div>
-      <form onSubmit={handleAdd} className="mt-4 flex flex-col gap-2 border-t border-hairline pt-3">
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="เพิ่มงานสำหรับวันนี้…"
-          autoComplete="off"
-          className="border border-hairline bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-hairline"
-        />
-        <div className="flex gap-2">
-          <select
-            value={priority}
-            onChange={(e) => setPriority(e.target.value )}
-            className="flex-1 border border-hairline bg-paper px-2 py-2 text-sm text-ink"
-          >
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-            <option value="Critical">Critical</option>
-            <option value="Low">Low</option>
-          </select>
-          <button type="submit" className="shrink-0 bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:bg-accent-dim">
-            + เพิ่ม
-          </button>
+
+      {/* Quiet by default, like a "+ add" link; the priority control only
+          appears once you are actually adding something. */}
+      <form onSubmit={handleAdd} className="mt-4 border-t border-hairline pt-3">
+        <div className="flex items-center gap-1.5 text-ink-faint focus-within:text-accent">
+          <Plus size={14} aria-hidden className="shrink-0" />
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            placeholder="เพิ่มงานใหม่…"
+            autoComplete="off"
+            aria-label="เพิ่มงานในวันที่เลือก"
+            className="w-full bg-transparent py-1 text-sm text-ink outline-none placeholder:text-ink-faint"
+          />
         </div>
+        {expanded && (
+          <div className="mt-2 flex gap-2">
+            <select
+              value={priority}
+              onChange={(e) => setPriority(e.target.value)}
+              aria-label="ความสำคัญ"
+              className="flex-1 border border-hairline bg-paper px-2 py-1.5 text-xs text-ink"
+            >
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Critical">Critical</option>
+              <option value="Low">Low</option>
+            </select>
+            <button
+              type="submit"
+              className="shrink-0 bg-accent px-4 py-1.5 text-xs font-medium text-accent-fg hover:bg-accent-dim"
+            >
+              เพิ่ม
+            </button>
+          </div>
+        )}
       </form>
     </div>
+  );
+}
+
+/* ── One cell. The highlight is a 36px disc around the number, never the
+      whole cell, so the grid keeps its own background and stays quiet. ──── */
+function DayCell({ dateKey, day, isToday, isSelected, isWeekend, holiday, dayTasks, onSelect }) {
+  const dots = [...dayTasks]
+    .sort((a, b) => (PRIORITY_RANK[a.priority] ?? 9) - (PRIORITY_RANK[b.priority] ?? 9))
+    .slice(0, 3);
+
+  const disc = isSelected
+    ? "bg-accent text-accent-fg"
+    : isToday
+      ? "border border-accent text-ink"
+      : holiday
+        ? "text-accent"
+        : isWeekend
+          ? "text-ink-faint"
+          : "text-ink";
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(dateKey)}
+      title={holiday?.name}
+      aria-label={`${thaiDate(dateKey)}${holiday ? ` — ${holiday.name}` : ""}`}
+      aria-pressed={isSelected}
+      className="flex h-12 flex-col items-center justify-center gap-1"
+    >
+      <span
+        className={`flex h-9 w-9 items-center justify-center rounded-full text-xs transition-colors ${disc} ${
+          isSelected || isToday ? "" : "hover:bg-paper-dim"
+        }`}
+      >
+        {day}
+      </span>
+      <span className="flex h-1 items-center gap-0.5">
+        {dots.map((t, i) => (
+          <span
+            key={i}
+            className="h-1 w-1 rounded-full"
+            style={{ background: PRIORITY_COLORS[t.priority] }}
+            aria-hidden
+          />
+        ))}
+      </span>
+    </button>
   );
 }
 
@@ -80,124 +175,95 @@ export function CalendarView() {
   const now = new Date();
   const [calYear, setCalYear] = useState(now.getFullYear());
   const [calMonth, setCalMonth] = useState(now.getMonth());
-  const [selectedDate, setSelectedDate] = useState(null);
-
   const todayKey = getTodayKey();
-  const thaiYear = calYear + 543;
+  const [selectedDate, setSelectedDate] = useState(todayKey);
 
   const tasksByDate = new Map();
   tasks.forEach((t) => {
-    if (t.due) {
-      if (!tasksByDate.has(t.due)) tasksByDate.set(t.due, []);
-      tasksByDate.get(t.due).push(t);
-    }
+    if (!t.due) return;
+    if (!tasksByDate.has(t.due)) tasksByDate.set(t.due, []);
+    tasksByDate.get(t.due).push(t);
   });
 
-  const firstDay = new Date(calYear, calMonth, 1);
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-  const startDow = firstDay.getDay();
+  const startDow = new Date(calYear, calMonth, 1).getDay();
 
   const cells = [];
-  for (let i = 0; i < startDow; i++) {
-    cells.push(<div key={`empty-${i}`} />);
-  }
+  for (let i = 0; i < startDow; i++) cells.push(<div key={`empty-${i}`} className="h-12" />);
   for (let d = 1; d <= daysInMonth; d++) {
-    const mm = String(calMonth + 1).padStart(2, "0");
-    const dd = String(d).padStart(2, "0");
-    const dateKey = `${calYear}-${mm}-${dd}`;
-    const isToday = dateKey === todayKey;
-    const isSelected = dateKey === selectedDate;
-    const holiday = THAI_HOLIDAYS[dateKey];
-    const dayTasks = tasksByDate.get(dateKey) || [];
+    const dateKey = `${calYear}-${String(calMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
     const dow = new Date(calYear, calMonth, d).getDay();
-    const isWeekend = dow === 0 || dow === 6;
-    const dots = [...dayTasks]
-      .sort((a, b) => (PRIORITY_RANK[a.priority] ?? 9) - (PRIORITY_RANK[b.priority] ?? 9))
-      .slice(0, 3);
-
     cells.push(
-      <button
+      <DayCell
         key={dateKey}
-        type="button"
-        onClick={() => setSelectedDate(dateKey)}
-        aria-label={`${dateKey}${holiday ? " " + holiday.name : ""}`}
-        className={`flex aspect-square flex-col items-center justify-start gap-0.5 border border-transparent p-1 text-xs ${
- isSelected
- ? "border-accent bg-accent text-paper"
- : isToday
- ? "border-accent text-ink"
- : isWeekend
- ? "text-ink-faint"
- : "text-ink"
- }`}
-      >
-        <span>{d}</span>
-        {holiday && <span className="h-1 w-1 rounded-full bg-accent" title={holiday.name} />}
-        {dots.length > 0 && (
-          <span className="flex gap-0.5">
-            {dots.map((t, i) => (
-              <span
-                key={i}
-                className="h-1 w-1 rounded-full"
-                style={{ background: isSelected ? "currentColor" : PRIORITY_COLORS[t.priority] }}
-              />
-            ))}
-            {dayTasks.length > 3 && <span className="text-[8px]">+{dayTasks.length - 3}</span>}
-          </span>
-        )}
-      </button>
+        dateKey={dateKey}
+        day={d}
+        isToday={dateKey === todayKey}
+        isSelected={dateKey === selectedDate}
+        isWeekend={dow === 0 || dow === 6}
+        holiday={THAI_HOLIDAYS[dateKey]}
+        dayTasks={tasksByDate.get(dateKey) || []}
+        onSelect={setSelectedDate}
+      />
     );
   }
 
-  function goPrev() {
-    if (calMonth === 0) {
-      setCalMonth(11);
-      setCalYear((y) => y - 1);
-    } else {
-      setCalMonth((m) => m - 1);
-    }
-  }
-  function goNext() {
-    if (calMonth === 11) {
-      setCalMonth(0);
-      setCalYear((y) => y + 1);
-    } else {
-      setCalMonth((m) => m + 1);
-    }
+  function shiftMonth(delta) {
+    const next = new Date(calYear, calMonth + delta, 1);
+    setCalYear(next.getFullYear());
+    setCalMonth(next.getMonth());
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
-      <div>
-        <div className="flex items-center justify-between border-b border-hairline pb-3">
-          <button type="button" onClick={goPrev} aria-label="เดือนก่อน" className="text-ink-muted hover:text-ink">
+    <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[3fr_2fr]">
+      <div className="border border-hairline bg-paper p-5">
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => shiftMonth(-1)}
+            aria-label="เดือนก่อน"
+            className="p-1 text-ink-faint hover:text-accent"
+          >
             <ChevronLeft size={18} aria-hidden />
           </button>
           <div className="text-center">
-            <span className="font-grotesk text-lg font-semibold text-ink">{THAI_MONTHS[calMonth]}</span>{" "}
-            <span className="text-ink-muted">{thaiYear}</span>
+            <span className="font-grotesk text-base font-semibold text-ink">{THAI_MONTHS[calMonth]}</span>{" "}
+            <span className="text-sm text-ink-faint">{calYear + 543}</span>
           </div>
-          <button type="button" onClick={goNext} aria-label="เดือนถัดไป" className="text-ink-muted hover:text-ink">
+          <button
+            type="button"
+            onClick={() => shiftMonth(1)}
+            aria-label="เดือนถัดไป"
+            className="p-1 text-ink-faint hover:text-accent"
+          >
             <ChevronRight size={18} aria-hidden />
           </button>
         </div>
-        <div className="mt-3 grid grid-cols-7 gap-1 text-center text-xs text-ink-faint">
+
+        <div className="mt-4 grid grid-cols-7 text-center text-[11px] text-ink-faint">
           {THAI_DOW.map((d, i) => (
-            <span key={i} className={i === 0 || i === 6 ? "text-ink-faint" : ""}>
-              {d}
-            </span>
+            <span key={i}>{d}</span>
           ))}
         </div>
-        <div className="mt-1 grid grid-cols-7 gap-1">{cells}</div>
-        <div className="mt-4 flex flex-wrap gap-4 text-xs text-ink-faint">
-          <span className="flex items-center gap-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" /> วันหยุดราชการ/พุทธ/ราชพิธี
+        {/* No cell borders — the gap does the separating. */}
+        <div className="mt-1 grid grid-cols-7">{cells}</div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-hairline pt-3 text-[11px] text-ink-faint">
+          <span className="flex items-center gap-1.5">
+            <span className="h-4 w-4 rounded-full border border-accent" aria-hidden /> วันนี้
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-4 w-4 rounded-full bg-accent" aria-hidden /> วันที่เลือก
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="text-accent">12</span> วันหยุด
           </span>
         </div>
       </div>
-      <aside className="border border-hairline bg-paper p-4">
+
+      <aside className="border border-hairline bg-paper p-5 lg:min-h-[420px]">
         {selectedDate ? (
-          <CalendarDayPanel dateKey={selectedDate} tasks={tasksByDate.get(selectedDate) || []} />
+          <AgendaPanel dateKey={selectedDate} tasks={tasksByDate.get(selectedDate) || []} />
         ) : (
           <div className="flex flex-col items-center justify-center gap-2 py-10 text-center text-ink-faint">
             <CalendarDays size={28} className="opacity-30" aria-hidden />
