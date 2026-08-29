@@ -15,6 +15,12 @@ preview_urls = true
 pattern = "johny.siwat.me"
 custom_domain = true
 
+# Workers Builds ships with no build command configured, so the deploy step used
+# to run against a web_dist/ that was never produced. Declaring the build here
+# keeps that in the repo instead of in dashboard settings nothing can see.
+[build]
+command = "npm run build"
+
 # Lives at the repo root, not under server/: Cloudflare Workers Builds only
 # looks for the config here. Moving it into server/ broke CI silently for two
 # weeks - every push failed in 0s because the config could not be found.

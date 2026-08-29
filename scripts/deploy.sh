@@ -7,10 +7,8 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-echo "==> Building ..."
-npm run build
-
-echo "==> Deploying to Cloudflare Workers ..."
+echo "==> Building and deploying to Cloudflare Workers ..."
+# wrangler runs `npm run build` itself via [build] in wrangler.toml
 npx wrangler deploy
 
 echo "✅ Done: https://johnyos.sj-siwat.workers.dev"
