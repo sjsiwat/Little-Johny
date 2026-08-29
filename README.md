@@ -119,7 +119,7 @@ little-johny/
 │   └── .env.example         # Worker secrets + optional client build vars
 ├── supabase/migrations/     # 001_v2 … 004_task_progress
 ├── scripts/deploy.sh        # build → headers → wrangler deploy
-├── docs/                    # DESIGN.md, PRODUCT.md (local-only), mascot.md
+├── docs/                    # DESIGN.md, PRODUCT.md — both local-only (gitignored)
 └── web_dist/                # Build output — gitignored, rebuilt every deploy
 ```
 
