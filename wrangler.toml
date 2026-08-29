@@ -1,5 +1,5 @@
 name = "johnyos"
-main = "worker.js"
+main = "server/worker.js"
 compatibility_date = "2024-01-01"
 
 # Both default to false once any config is applied via wrangler, which silently
@@ -15,9 +15,11 @@ preview_urls = true
 pattern = "johny.siwat.me"
 custom_domain = true
 
-# Paths are relative to this file (server/), hence the ../ on the asset dir.
+# Lives at the repo root, not under server/: Cloudflare Workers Builds only
+# looks for the config here. Moving it into server/ broke CI silently for two
+# weeks - every push failed in 0s because the config could not be found.
 [assets]
-directory = "../web_dist"
+directory = "web_dist"
 binding = "ASSETS"
 # Single-page app: deep links like /tasks must fall through to index.html so
 # React Router can handle them.

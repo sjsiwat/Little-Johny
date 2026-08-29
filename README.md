@@ -114,11 +114,12 @@ little-johny/
 ├── public/                  # icons, mascot (animated webp + still), manifest, sw.js
 ├── server/
 │   ├── worker.js            # Cloudflare Worker: LINE callback + static assets
-│   ├── wrangler.toml        # Worker config (name: johnyos)
 │   ├── headers              # Security headers → copied to web_dist/_headers
 │   └── .env.example         # Worker secrets + optional client build vars
+├── wrangler.toml            # Worker config (johnyos) — must stay at the root
+│                            #   so Cloudflare Workers Builds can find it
 ├── supabase/migrations/     # 001_v2 … 004_task_progress
-├── scripts/deploy.sh        # build → headers → wrangler deploy
+├── scripts/deploy.sh        # manual deploy; pushing to main deploys too
 ├── docs/                    # DESIGN.md, PRODUCT.md — both local-only (gitignored)
 └── web_dist/                # Build output — gitignored, rebuilt every deploy
 ```
@@ -140,7 +141,7 @@ project, put `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` /
 `VITE_LINE_CHANNEL_ID` in a root `.env.local` — see `server/.env.example`.
 
 The Worker's own secrets (`LINE_CHANNEL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`)
-are set with `npx wrangler secret put <NAME> -c server/wrangler.toml`.
+are set with `npx wrangler secret put <NAME>`.
 
 ---
 
